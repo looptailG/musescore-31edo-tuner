@@ -1,2 +1,2 @@
 # 31EDO Tuner
-A  Musescore plugin for running scores to 31EDO.
+A  Musescore plugin for tuning scores to 31EDO.

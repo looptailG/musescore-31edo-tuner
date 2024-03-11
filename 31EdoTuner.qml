@@ -18,8 +18,8 @@ MuseScore
 	}
 
 	// Size in cents of an EDO step.
-	property var stepSize: 38.709677419355;
-	property var fifthDeviation: 700 - 696.774193548387;
+	property var stepSize: 1200.0 / 31;
+	property var fifthDeviation: 700 - 18 * stepSize;
 	property variant centOffsets:
 	{
 		"C":

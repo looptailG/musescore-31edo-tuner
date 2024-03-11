@@ -15,6 +15,14 @@ These notation systems are not mutually exclusive, the plugin can correctly tune
 
 
 ## Usage
+- If the score contains transposing instruments, ensure that the score is being displayd in concert pitch.  If it's not, the notes of transposing instruments will not be tuned correctly.
+- Launch the plugin:
+  - Musescore3: Plugins -> Tuner -> 31Edo
+  - Musescore4: Plugins -> Playback -> 31EDO Tuner
+
+At this point your score will be tuned according to 31EDO.
+
+If the score contains transposing instruments, you can safely turn off concert pitch after running the plugin, as the tuning of the notes will not be affected.
 
 
 ## Installing

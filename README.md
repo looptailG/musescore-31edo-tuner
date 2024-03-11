@@ -26,3 +26,12 @@ If the score contains transposing instruments, you can safely turn off concert p
 
 
 ## Installing
+### Musescore3
+- Download the file <code>31_edo_tuner_x.y.z.zip</code>, where <code>x.y.z</code> is the version of the plugin.
+- Extract the folder <code>31_edo_tuner</code>, navigate inside it and copy the file <code>31EdoTuner.qml</code> in Musescore3 plugin folder.
+- Follow the steps listed [here](https://musescore.org/en/handbook/3/plugins) to enable the plugin.
+
+### Musescore4
+- Download the file <code>31_edo_tuner_x.y.z.zip</code>, where <code>x.y.z</code> is the version of the plugin.
+- Extract the folder <code>31_edo_tuner</code> and copy it in Musescore4 plugin folder.
+- Follow the steps listed [here](https://musescore.org/en/handbook/4/plugins) to enable the plugin.

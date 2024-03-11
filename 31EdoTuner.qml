@@ -6,7 +6,7 @@ MuseScore
 {
 	menuPath: "Plugins.Tuner.31Edo"
 	description: "Retune the whole score to 31EDO.  Supports circle of fifths notation, using both double sharps / flats, or half sharps / flats"
-	version: "1.0.1"
+	version: "1.0.2"
 	
 	Component.onCompleted:
 	{

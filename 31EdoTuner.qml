@@ -83,6 +83,7 @@ MuseScore
 	}
 	
 	property var showLog: false;
+	property var maxLines: 50;
 	MessageDialog
 	{
 		id: debugLogger;
@@ -90,23 +91,29 @@ MuseScore
 		text: "";
 		function log(message)
 		{
-			if (showLog)
+			if (showLog || message.includes("ERROR"))
 			{
-				text += Qt.formatDateTime(new Date(), "yyyy-MM-dd HH:mm:ss") + " | " + message + "\n";
+				text += message + "\n";
 			}
 		}
+		
 		function showLogMessages()
 		{
-			if (showLog)
+			if (text != "")
 			{
+				// Truncate the message to a maximum number of lines, to prevent
+				// issues with the message box being too large.
+				var messageLines = text.split("\n").slice(0, maxLines);
+				text = messageLines.join("\n") + "\n" + "...";
 				debugLogger.open();
-				console.log("\n" + text);
 			}
 		}
 	}
 
 	onRun:
 	{
+		logMessage("-- 31EDO Tuner --");
+	
 		curScore.startCmd();
 		var cursor = curScore.newCursor();
 
@@ -117,7 +124,7 @@ MuseScore
 				cursor.voice = voice;
 				cursor.staffIdx = staff;
 				cursor.rewind(0);
-				debugLogger.log("-- Tuning Staff: " + staff + " -- Voice: " + voice + " --");
+				logMessage("-- Tuning Staff: " + staff + " -- Voice: " + voice + " --");
 
 				// Loop elements of a voice.
 				while (cursor.segment)
@@ -170,7 +177,7 @@ MuseScore
 	 */
 	function calculateTuningOffset(note)
 	{
-		debugLogger.log("Tuning note: " + calculatenoteName(note));
+		logMessage("Tuning note: " + calculatenoteName(note));
 
 		var tuningOffset = 0;
 		// Get the tuning offset for the input note with respect to 12EDO.
@@ -316,31 +323,40 @@ MuseScore
 				tuningOffset += centOffsets["B"]["x"];
 				break;
 		}
-		debugLogger.log("Base tuning offset: " + tuningOffset);
+		logMessage("Base tuning offset: " + tuningOffset);
 
-		// Microtonal accidentals are not conveyed by the tpc property, they have to be accounted for individually.
+		// Microtonal accidentals are not conveyed by the tpc property, they
+		// have to be accounted for individually.
 		var alteration = getAlteration(note);
 		if ((alteration == -3) || (alteration == -1) || (alteration == 1) || (alteration == 3))
 		{
 			tuningOffset += calculateMicrotonalOffset(alteration, stepSize);
+			logMessage("Tuning offset after accounting for microtonal alteration: " + tuningOffset);
 		}
-		debugLogger.log("Final tuning offset: " + tuningOffset);
+		else if (alteration == "?")
+		{
+			logMessage("ERROR: Unsupported accidental: " + note.accidentalType + "; this note will not be tuned.");
+			return 0;
+		}
 
 		return tuningOffset;
 	}
 
-
 	/**
-	 * Return the amount of cents necessary to tune the input note to 31EDO due to microtonal accidentals.
+	 * Return the amount of cents necessary to tune the input note to 31EDO due
+	 * to microtonal accidentals.
 	 */
 	function calculateMicrotonalOffset(nSteps, stepSize)
 	{
-		debugLogger.log("Applying " + nSteps + " steps offset.");
+		logMessage("Applying " + nSteps + " steps offset.");
 		var tuningOffset = nSteps * stepSize;
 
 		if (mscoreMajorVersion >= 4)
 		{
-			// Undo the automatic cent offset that Musescore 4 apply to microtonal accidentals.
+			// Undo the automatic cent offset that Musescore 4 apply to
+			// microtonal accidentals.
+			var additionalOffset = -nSteps * 50;
+			logMessage("Applying an additional offset: " + additionalOffset);
 			tuningOffset -= nSteps * 50;
 		}
 
@@ -348,46 +364,24 @@ MuseScore
 	}
 	
 	/**
-	 * Return the english note name for the input note, written with ASCII characters only.
+	 * Return the english note name for the input note, written with ASCII
+	 * characters only.  Uses the following characters for the alterations:
+	 *
+	 * - Double flat  -> bb
+	 * - Sesqui flat  -> db
+	 * - Flat         -> b
+	 * - Half flat    -> d
+	 * - Half sharp   -> t
+	 * - sharp        -> #
+	 * - Sesqui sharp -> t#
+	 * - Double sharp -> x
+	 *
+	 * The alteration is ? if it's an alteration that's not supported by the
+	 * plugin.
 	 */
 	function calculatenoteName(note)
 	{
-		var noteName = "";
-		
-		switch (positiveModulo(note.tpc, 7))
-		{
-			case 0:
-				noteName += "C";
-				break;
-			
-			case 1:
-				noteName += "G";
-				break;
-			
-			case 2:
-				noteName += "D";
-				break;
-			
-			case 3:
-				noteName += "A";
-				break;
-			
-			case 4:
-				noteName += "E";
-				break;
-			
-			case 5:
-				noteName += "B";
-				break;
-			
-			case 6:
-				noteName += "F";
-				break;
-			
-			default:
-				noteName += "?";
-				break;
-		}
+		var noteName = getNoteLetter(note);
 		
 		switch (getAlteration(note))
 		{
@@ -435,106 +429,103 @@ MuseScore
 	}
 	
 	/**
-	 * Return the number of 31EDO steps this note is altered by.
+	 * Return the english note name for the input note.
+	 */
+	function getNoteLetter(note)
+	{
+		switch (positiveModulo(note.tpc, 7))
+		{
+			case 0:
+				return "C";
+			
+			case 1:
+				return "G";
+			
+			case 2:
+				return "D";
+			
+			case 3:
+				return "A";
+			
+			case 4:
+				return "E";
+			
+			case 5:
+				return "B";
+			
+			case 6:
+				return "F";
+			
+			default:
+				logMessage("ERROR: could not resolve the tpc: " + note.tpc);
+				return "?";
+		}
+	}
+	
+	/**
+	 * Return the number of 31EDO steps this note is altered by.  Returns ? if
+	 * the accidental is not supported.
 	 */
 	function getAlteration(note)
 	{
-		if (mscoreMajorVersion >= 4)
+		if (note.accidentalType == 5)  // Double flat.
 		{
-			if (note.accidentalType == 5)
-			{
-				// Double flat.
-				return -4;
-			}
-			else if (note.accidentalType == 24)
-			{
-				// Three quarter tone flat.
-				return -3;
-			}
-			else if (note.accidentalType == 1)
-			{
-				// Flat.
-				return -2;
-			}
-			else if (note.accidentalType == 23)
-			{
-				// Half flat.
-				return -1;
-			}
-			else if ((note.accidentalType == 0) || (note.accidentalType == 2))
-			{
-				// Natural.
-				return 0;
-			}
-			else if (note.accidentalType == 25)
-			{
-				// Half sharp.
-				return 1;
-			}
-			else if (note.accidentalType == 3)
-			{
-				// Sharp.
-				return 2;
-			}
-			else if (note.accidentalType == 26)
-			{
-				// Three quarter tone sharp.
-				return 3;
-			}
-			else if (note.accidentalType == 4)
-			{
-				// Double sharp.
-				return 4;
-			}
-			else
-			{
-				return "?";
-			}
+			return -4;
+		}
+		else if (note.accidentalType == 24)  // Sesqui flat.
+		{
+			return -3;
+		}
+		else if (note.accidentalType == 1)  // Flat.
+		{
+			return -2;
+		}
+		else if (note.accidentalType == 23)  // Half flat.
+		{
+			return -1;
+		}
+		else if (
+			(note.accidentalType == 0)  // No accidentals.
+			|| (note.accidentalType == 2)  // Natural.
+		) {
+			return 0;
+		}
+		else if (note.accidentalType == 25)  // Half sharp.
+		{
+			return 1;
+		}
+		else if (note.accidentalType == 3)  // Sharp.
+		{
+			return 2;
+		}
+		else if (note.accidentalType == 26)  // Sesqui sharp.
+		{
+			return 3;
+		}
+		else if (note.accidentalType == 4)  // Double sharp.
+		{
+			return 4;
 		}
 		else
 		{
-			switch (note.accidentalType.toString())
-			{
-				// Double flat.
-				case "FLAT2":
-					return -4;
-				
-				// Three quarter tone flat.
-				case "MIRRORED_FLAT2":
-					return -3;
-				
-				// Flat.
-				case "FLAT":
-					return -2;
-				
-				// Half flat.
-				case "MIRRORED_FLAT":
-					return -1;
-				
-				// Natural.
-				case "NONE":
-				case "NATURAL":
-					return 0;
-				
-				// Half sharp.
-				case "SHARP_SLASH":
-					return 1;
-				
-				// Sharp.
-				case "SHARP":
-					return 2;
-				
-				// Thre quarter tone sharp.
-				case "SHARP_SLASH4":
-					return 3;
-				
-				// Double sharp.
-				case "SHARP2":
-					return 4;
-				
-				default:
-					return "?";
-			}
+			return "?";
+		}
+	}
+	
+	/**
+	 * Log the input message, prefixed by the timestamp.  Automatically redirect
+	 * the output message depending on the MuseScore version.
+	 */
+	function logMessage(message)
+	{
+		var formattedMessage = Qt.formatDateTime(new Date(), "yyyy-MM-dd HH:mm:ss") + " | " + message;
+		if (mscoreMajorVersion >= 4)
+		{
+			debugLogger.log(formattedMessage);
+		}
+		else
+		{
+			console.log(formattedMessage);	
 		}
 	}
 	

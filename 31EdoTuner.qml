@@ -5,7 +5,7 @@ import MuseScore 3.0
 MuseScore
 {
 	menuPath: "Plugins.Tuner.31Edo"
-	description: "Retune the whole score to 31EDO.  Supports circle of fifths notation, using both double sharps / flats, or half sharps / flats"
+	description: "Retune the whole score to 31EDO."
 	version: "1.0.2"
 	
 	Component.onCompleted:
@@ -17,7 +17,7 @@ MuseScore
 		}
 	}
 
-	// Cents deviations from 12EDO.
+	// Size in cents of an EDO step.
 	property var stepSize: 38.709677419355;
 	property var fifthDeviation: 700 - 696.774193548387;
 	property variant centOffsets:

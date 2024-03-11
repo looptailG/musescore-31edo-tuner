@@ -7,7 +7,7 @@ This plugin tunes the whole score to 31EDO.
 
 It's compatible with the following notation systems:
 
-- [Circle of fifths notation](https://en.xen.wiki/w/Circle-of-fifths_notation), using double sharps and flats.  In this system, a sharp or a flat indicates an alteration of 2 EDO steps, and a double sharp or flat an alteration of 4 EDO steps.  For example, a chromatic scale between <code>C</code> and <code>D</code> would be written as: <cod>C</code> <code>Dbb</code> <code>C#</code> <code>Db</code> <code>Cx</code> <code>D</code>.
+- [Circle of fifths notation](https://en.xen.wiki/w/Circle-of-fifths_notation), using double sharps and flats.  In this system, a sharp or a flat indicates an alteration of 2 EDO steps, and a double sharp or flat an alteration of 4 EDO steps.  For example, a chromatic scale between <code>C</code> and <code>D</code> would be written as: <code>C</code> <code>Dbb</code> <code>C#</code> <code>Db</code> <code>Cx</code> <code>D</code>.
 
 - [Neutral circle of fifths notation](https://en.xen.wiki/w/Neutral_circle-of-fifths_notation), using half and sesqui sharps and flats.  In this system, a  half sharp or flat indicates an alteration of 1 EDO step, and a sesqui sharp or flat an alteration of 3 EDO steps.  For example, a chromatic scale between <code>C</code> and <code>D</code> would be written as: <code>C</code> <code>Ct</code> <code>C#</code> <code>Db</code> <code>Dd</code> <code>D</code>.
 

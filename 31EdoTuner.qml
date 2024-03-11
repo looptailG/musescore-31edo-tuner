@@ -21,6 +21,7 @@ MuseScore
 	property var stepSize: 1200.0 / 31;
 	// Difference in cents between a 12EDO and a 31EDO fifths.
 	property var fifthDeviation: 700 - 18 * stepSize;
+	// Offsets in cents between the notes in 31EDO and their 12EDO counterparts.
 	property variant centOffsets:
 	{
 		"C":
@@ -165,13 +166,14 @@ MuseScore
 	}
 
 	/**
-	 * Calculate the tuning offset for the input note.
+	 * Returns the amount of cents necessary to tune the input note to 31EDO.
 	 */
 	function calculateTuningOffset(note)
 	{
 		debugLogger.log("Tuning note: " + calculatenoteName(note));
-		var tuningOffset = 0;
 
+		var tuningOffset = 0;
+		// Get the tuning offset for the input note with respect to 12EDO.
 		switch (note.tpc)
 		{
 			case -1:
@@ -316,7 +318,7 @@ MuseScore
 		}
 		debugLogger.log("Base tuning offset: " + tuningOffset);
 
-		// Apply microtonal accidentals.
+		// Microtonal accidentals are not conveyed by the tpc property, they have to be accounted for individually.
 		var alteration = getAlteration(note);
 		if ((alteration == -3) || (alteration == -1) || (alteration == 1) || (alteration == 3))
 		{
@@ -329,7 +331,7 @@ MuseScore
 
 
 	/**
-	 * Calculate the tuning offset due to microtonal accidentals.
+	 * Return the amount of cents necessary to tune the input note to 31EDO due to microtonal accidentals.
 	 */
 	function calculateMicrotonalOffset(nSteps, stepSize)
 	{
@@ -346,7 +348,7 @@ MuseScore
 	}
 	
 	/**
-	 * Calculate the note name for the input note.
+	 * Return the english note name for the input note, written with ASCII characters only.
 	 */
 	function calculatenoteName(note)
 	{

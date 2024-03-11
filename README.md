@@ -1,5 +1,5 @@
 # 31EDO Tuner
-A  Musescore plugin for tuning scores to 31EDO.
+A  Musescore plugin for tuning scores to [31EDO](https://en.xen.wiki/w/31edo).
 
 
 ## Features

@@ -353,7 +353,7 @@ MuseScore
 
 		if (mscoreMajorVersion >= 4)
 		{
-			// Undo the automatic cent offset that Musescore 4 apply to
+			// Undo the automatic cent offset that Musescore 4 applies to
 			// microtonal accidentals.
 			var additionalOffset = -nSteps * 50;
 			logMessage("Applying an additional offset: " + additionalOffset);

@@ -4,7 +4,7 @@ import MuseScore 3.0
 
 MuseScore
 {
-	menuPath: "Plugins.Tuner.31Edo"
+	menuPath: "Plugins.Tuner.31EDO"
 	description: "Retune the whole score to 31EDO."
 	version: "1.1.0"
 	

@@ -6,7 +6,7 @@ MuseScore
 {
 	menuPath: "Plugins.Tuner.31Edo"
 	description: "Retune the whole score to 31EDO."
-	version: "1.0.2"
+	version: "1.1.0"
 	
 	Component.onCompleted:
 	{

@@ -15,7 +15,7 @@ These notation systems are not mutually exclusive, the plugin can correctly tune
 
 
 ## Usage
-- If the score contains transposing instruments, ensure that the score is being displayed in concert pitch.  If it's not, the notes of transposing instruments will not be tuned correctly.
+- If the score contains transposing instruments, ensure that the score is being displayed at concert pitch.  If it's not, the notes of transposing instruments will not be tuned correctly.
 - Launch the plugin:
   - Musescore3: Plugins -> Tuner -> 31Edo
   - Musescore4: Plugins -> Playback -> 31EDO Tuner

@@ -410,7 +410,7 @@ MuseScore
 	
 	/**
 	 * Return the english note name for the input note, written with ASCII
-	 * characters only.  Uses the following characters for the alterations:
+	 * characters only.  Uses the following characters for the accidentals:
 	 *
 	 * - Double flat  -> bb
 	 * - Sesqui flat  -> db

@@ -1,3 +1,21 @@
+/*
+	31EDO Tuner plugin for Musescore
+	Copyright (C) 2024 Alessandro Culatti
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 import QtQuick 2.2
 import QtQuick.Dialogs 1.1
 import MuseScore 3.0
@@ -6,7 +24,7 @@ MuseScore
 {
 	menuPath: "Plugins.Tuner.31EDO"
 	description: "Retune the whole score to 31EDO."
-	version: "1.1.0"
+	version: "1.0.3"
 	
 	Component.onCompleted:
 	{
@@ -80,6 +98,22 @@ MuseScore
 			"#": -3 * fifthDeviation - 7 * fifthDeviation,
 			"x": -3 * fifthDeviation - 14 * fifthDeviation
 		},
+	}
+	
+	// Map containing every supported accidental, having as value the number of
+	// EDO steps they modify a note by.
+	property variant accidentalsEdoSteps:
+	{
+		"0":   0,  // No accidental
+		"1":  -2,  // Flat
+		"2":   0,  // Natural
+		"3":   2,  // Sharp
+		"4":   4,  // Double sharp
+		"5":  -4,  // Double flat
+		"23": -1,  // Half flat
+		"24": -3,  // Sesqui flat
+		"25":  1,  // Half sharp
+		"26":  3,  // Sesqui sharp
 	}
 	
 	property var showLog: false;
@@ -468,46 +502,14 @@ MuseScore
 	 */
 	function getAlteration(note)
 	{
-		if (note.accidentalType == 5)  // Double flat.
+		var alteration = accidentalsEdoSteps["" + note.accidentalType];
+		if (alteration !== undefined)
 		{
-			return -4;
-		}
-		else if (note.accidentalType == 24)  // Sesqui flat.
-		{
-			return -3;
-		}
-		else if (note.accidentalType == 1)  // Flat.
-		{
-			return -2;
-		}
-		else if (note.accidentalType == 23)  // Half flat.
-		{
-			return -1;
-		}
-		else if (
-			(note.accidentalType == 0)  // No accidentals.
-			|| (note.accidentalType == 2)  // Natural.
-		) {
-			return 0;
-		}
-		else if (note.accidentalType == 25)  // Half sharp.
-		{
-			return 1;
-		}
-		else if (note.accidentalType == 3)  // Sharp.
-		{
-			return 2;
-		}
-		else if (note.accidentalType == 26)  // Sesqui sharp.
-		{
-			return 3;
-		}
-		else if (note.accidentalType == 4)  // Double sharp.
-		{
-			return 4;
+			return alteration;
 		}
 		else
 		{
+			logMessage("ERROR: Could not find the following accidental in the accidentals mapping: " + note.accidentalType);
 			return "?";
 		}
 	}

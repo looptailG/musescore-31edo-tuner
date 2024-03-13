@@ -24,13 +24,14 @@ MuseScore
 {
 	menuPath: "Plugins.Tuner.31EDO"
 	description: "Retune the whole score to 31EDO."
-	version: "1.0.3"
+	version: "1.1.0"
 	
 	Component.onCompleted:
 	{
 		if (mscoreMajorVersion >= 4)
 		{
 			title = qsTr("31EDO Tuner");
+			thumbnailName = "31EdoThumbnail.png";
 			categoryCode = "playback";
 		}
 	}

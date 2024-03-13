@@ -124,6 +124,7 @@ MuseScore
 		id: debugLogger;
 		title: "31EDO Tuner - Debug";
 		text: "";
+
 		function log(message, isErrorMessage)
 		{
 			if (showLog || isErrorMessage)

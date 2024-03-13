@@ -13,6 +13,8 @@ It's compatible with the following notation systems:
 
 These notation systems are not mutually exclusive, the plugin can correctly tune a file which uses a mixture of them.
 
+See [here](https://github.com/looptailG/musescore-31edo-tuner/wiki/Supported-Accidentals) for a list of every supported accidental.
+
 
 ## Usage
 - If the score contains transposing instruments, ensure that the score is being displayed at concert pitch.  If it's not, the notes of transposing instruments will not be tuned correctly.

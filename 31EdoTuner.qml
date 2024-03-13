@@ -162,7 +162,7 @@ MuseScore
 				cursor.rewind(0);
 				logMessage("-- Tuning Staff: " + staff + " -- Voice: " + voice + " --");
 
-				// Loop elements of a voice.
+				// Loop on elements of a voice.
 				while (cursor.segment)
 				{
 					if (cursor.element)

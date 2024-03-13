@@ -123,9 +123,9 @@ MuseScore
 		id: debugLogger;
 		title: "31EDO Tuner - Debug";
 		text: "";
-		function log(message)
+		function log(message, isErrorMessage)
 		{
-			if (showLog || message.includes("ERROR"))
+			if (showLog || isErrorMessage)
 			{
 				text += message + "\n";
 			}
@@ -146,7 +146,7 @@ MuseScore
 
 	onRun:
 	{
-		logMessage("-- 31EDO Tuner --");
+		logMessage("-- 31EDO Tuner -- Version " + version +  " --");
 	
 		curScore.startCmd();
 		var cursor = curScore.newCursor();
@@ -174,7 +174,14 @@ MuseScore
 								var notes = graceChords[i].notes;
 								for (var j = 0; j < notes.length; j++)
 								{
-									notes[j].tuning = calculateTuningOffset(notes[j]);
+									try
+									{
+										notes[j].tuning = calculateTuningOffset(notes[j]);
+									}
+									catch(error)
+									{
+										logMessage(error, true);
+									}
 								}
 							}
 
@@ -182,7 +189,14 @@ MuseScore
 							var notes = cursor.element.notes;
 							for (var i = 0; i < notes.length; i++)
 							{
-								notes[i].tuning = calculateTuningOffset(notes[i]);
+								try
+								{
+									notes[i].tuning = calculateTuningOffset(notes[i]);
+								}
+								catch(error)
+								{
+									logMessage(error, true);
+								}
 							}
 						}
 					}
@@ -361,16 +375,11 @@ MuseScore
 
 		// Microtonal accidentals are not conveyed by the tpc property, they
 		// have to be accounted for individually.
-		var alteration = getAlteration(note);
-		if ((alteration == -3) || (alteration == -1) || (alteration == 1) || (alteration == 3))
+		var accidental = getAccidental(note);
+		if ((accidental == -3) || (accidental == -1) || (accidental == 1) || (accidental == 3))
 		{
-			tuningOffset += calculateMicrotonalOffset(alteration, stepSize);
-			logMessage("Tuning offset after accounting for microtonal alteration: " + tuningOffset);
-		}
-		else if (alteration == "?")
-		{
-			logMessage("ERROR: Unsupported accidental: " + note.accidentalType + "; this note will not be tuned.");
-			return 0;
+			tuningOffset += calculateMicrotonalOffset(accidental, stepSize);
+			logMessage("Tuning offset after accounting for microtonal accidental: " + tuningOffset);
 		}
 
 		return tuningOffset;
@@ -409,15 +418,13 @@ MuseScore
 	 * - sharp        -> #
 	 * - Sesqui sharp -> t#
 	 * - Double sharp -> x
-	 *
-	 * The alteration is ? if it's an alteration that's not supported by the
-	 * plugin.
 	 */
 	function calculatenoteName(note)
 	{
 		var noteName = getNoteLetter(note);
 		
-		switch (getAlteration(note))
+		var accidental = getAccidental(note);
+		switch (accidental)
 		{
 			case -4:
 				noteName += "bb";
@@ -455,8 +462,7 @@ MuseScore
 				break;
 			
 			default:
-				noteName += "?";
-				break;
+				throw "Unsupported accidental: " + accidental;
 		}
 		
 		return noteName;
@@ -491,16 +497,14 @@ MuseScore
 				return "F";
 			
 			default:
-				logMessage("ERROR: could not resolve the tpc: " + note.tpc);
-				return "?";
+				throw "Could not resolve the tpc: " + note.tpc;
 		}
 	}
 	
 	/**
-	 * Return the number of 31EDO steps this note is altered by.  Returns ? if
-	 * the accidental is not supported.
+	 * Return the number of 31EDO steps this note is altered by.
 	 */
-	function getAlteration(note)
+	function getAccidental(note)
 	{
 		var alteration = accidentalsEdoSteps["" + note.accidentalType];
 		if (alteration !== undefined)
@@ -509,8 +513,7 @@ MuseScore
 		}
 		else
 		{
-			logMessage("ERROR: Could not find the following accidental in the accidentals mapping: " + note.accidentalType);
-			return "?";
+			throw "Could not find the following accidental in the accidentals mapping: " + note.accidentalType;
 		}
 	}
 	
@@ -518,12 +521,17 @@ MuseScore
 	 * Log the input message, prefixed by the timestamp.  Automatically redirect
 	 * the output message depending on the MuseScore version.
 	 */
-	function logMessage(message)
+	function logMessage(message, isErrorMessage)
 	{
+		if (isErrorMessage === undefined)
+		{
+			isErrorMessage = false;
+		}
+	
 		var formattedMessage = Qt.formatDateTime(new Date(), "yyyy-MM-dd HH:mm:ss") + " | " + message;
 		if (mscoreMajorVersion >= 4)
 		{
-			debugLogger.log(formattedMessage);
+			debugLogger.log(formattedMessage, isErrorMessage);
 		}
 		else
 		{

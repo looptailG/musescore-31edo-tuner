@@ -26,6 +26,8 @@ At this point your score will be tuned according to 31EDO.
 
 If the score contains transposing instruments, you can safely turn off concert pitch after running the plugin, as the tuning of the notes will not be affected.
 
+See [here](https://github.com/looptailG/musescore-31edo-tuner/wiki/Known-Issues#incorrect-handling-of-microtonal-accidental-for-transposing-instruments) for a known issue regarding transposing instruments.
+
 
 ## Installing
 ### Musescore3

@@ -105,16 +105,22 @@ MuseScore
 	// EDO steps they modify a note by.
 	property variant supportedAccidentals:
 	{
-		"0":   0,  // No accidental
-		"1":  -2,  // Flat
-		"2":   0,  // Natural
-		"3":   2,  // Sharp
-		"4":   4,  // Double sharp
-		"5":  -4,  // Double flat
-		"23": -1,  // Half flat
-		"24": -3,  // Sesqui flat
-		"25":  1,  // Half sharp
-		"26":  3,  // Sesqui sharp
+		"0":    0,  // No accidental
+		"1":   -2,  // Flat
+		"2":    0,  // Natural
+		"3":    2,  // Sharp
+		"4":    4,  // Double sharp
+		"5":   -4,  // Double flat
+		"8":   -2,  // Natural flat
+		"9":    2,  // Natural sharp
+		"23":  -1,  // Half flat
+		"24":  -3,  // Sesqui flat
+		"25":   1,  // Half sharp
+		"26":   3,  // Sesqui sharp
+		"120": -1,  // Sagittal quarter tone down
+		"121":  1,  // Sagittal quarter tone up
+		"134": -2,  // Sagittal half tone down
+		"135":  2,  // Sagittal half tone up
 	}
 	
 	// Map containing every supported accidental which is not reflected by the
@@ -122,20 +128,28 @@ MuseScore
 	// specific number of EOD steps.
 	property variant accidentalsEdoSteps:
 	{
-		"23": -1,  // Half flat
-		"24": -3,  // Sesqui flat
-		"25":  1,  // Half sharp
-		"26":  3,  // Sesqui sharp
+		"23":  -1,  // Half flat
+		"24":  -3,  // Sesqui flat
+		"25":   1,  // Half sharp
+		"26":   3,  // Sesqui sharp
+		"120": -1,  // Sagittal quarter tone down
+		"121":  1,  // Sagittal quarter tone up
+		"134": -2,  // Sagittal half tone down
+		"135":  2,  // Sagittal half tone up
 	}
 	
 	// Map containing every supported accidental which has a default tuning
 	// offset in Musescore.
 	property variant accidentalsDefaultOffset:
 	{
-		"23":  -50,  // Half flat
-		"24": -150,  // Sesqui flat
-		"25":   50,  // Half sharp
-		"26":  150,  // Sesqui sharp
+		"23":   -50,  // Half flat
+		"24":  -150,  // Sesqui flat
+		"25":    50,  // Half sharp
+		"26":   150,  // Sesqui sharp
+		"120":  -50,  // Sagittal quarter tone down
+		"121":   50,  // Sagittal quarter tone up
+		"134": -100,  // Sagittal half tone down
+		"135":  100,  // Sagittal half tone up
 	}
 	
 	property var showLog: false;
@@ -404,7 +418,7 @@ MuseScore
 		// Certain accidentals, like the microtonal accidentals, are not
 		// conveyed by the tpc property, but are instead handled directly via a
 		// tuning offset.
-		var accidentalTuningSteps = accidentalsEdoSteps["" + note.accidentalType];
+		var accidentalTuningSteps = accidentalsEdoSteps[getPositiveAccidentalType(note)];
 		if (accidentalTuningSteps !== undefined)
 		{
 			var accidentalTuningOffset = accidentalTuningSteps * stepSize;
@@ -416,7 +430,7 @@ MuseScore
 		// accidentals.
 		if (mscoreMajorVersion >= 4)
 		{
-			var defaultAccidentalOffset = accidentalsDefaultOffset["" + note.accidentalType];
+			var defaultAccidentalOffset = accidentalsDefaultOffset[getPositiveAccidentalType(note)];
 			if (defaultAccidentalOffset !== undefined)
 			{
 				logMessage("Undoing the default microtonal tuning offset by adding an addition offset: " + (-defaultAccidentalOffset));
@@ -527,15 +541,7 @@ MuseScore
 	 */
 	function getAccidental(note)
 	{
-		var accidentalType = note.accidentalType;
-		// In Musescore3 the accidentalType property is as signed integer, while
-		// in Musescore4 it's unsigned.  If it's negative, convert it to an
-		// unsigned 8 bit integer by shifting it by 256.
-		if (accidentalType < 0)
-		{
-			accidentalType += 256;
-		}
-		var accidental = supportedAccidentals["" + accidentalType];
+		var accidental = supportedAccidentals[getPositiveAccidentalType(note)];
 		if (accidental !== undefined)
 		{
 			return accidental;
@@ -544,6 +550,22 @@ MuseScore
 		{
 			throw "Could not find the following accidental in the accidentals mapping: " + note.accidentalType;
 		}
+	}
+	
+	/**
+	 * Return the accidentalType property as a positive number.
+	 */
+	function getPositiveAccidentalType(note)
+	{
+		var accidentalType = note.accidentalType;
+		// In Musescore3 the accidentalType property is as signed integer, while
+		// in Musescore4 it's unsigned.  If it's negative, convert it to an
+		// unsigned 8 bit integer by shifting it by 256.
+		if (accidentalType < 0)
+		{
+			accidentalType += 256;
+		}
+		return ("" + accidentalType);
 	}
 	
 	/**

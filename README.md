@@ -7,11 +7,17 @@ This plugin tunes the whole score to 31EDO.
 
 It's compatible with the following notation systems:
 
-- [Circle of fifths notation](https://en.xen.wiki/w/31edo#Notations), using double sharps and flats.  In this system, a sharp <code>#</code> or a flat <code>b</code> indicates an alteration of 2 EDO steps, and a double sharp <code>x</code> or a double flat <code>bb</code> an alteration of 4 EDO steps.  For example, a chromatic scale between <code>C</code> and <code>D</code> would be written as: <code>C</code> <code>Dbb</code> <code>C#</code> <code>Db</code> <code>Cx</code> <code>D</code>.
+- [Circle of fifths notation](https://en.xen.wiki/w/31edo#Notations), using double sharps and flats.  In this system, a sharp or a flat indicates an alteration of 2 EDO steps, and a double sharp or a double flat an alteration of 4 EDO steps.  For example, a chromatic scale between <code>C</code> and <code>D</code> would be written as:
 
-- [Neutral circle of fifths notation](https://en.xen.wiki/w/31edo#Notations), using half and sesqui sharps and flats.  In this system, a  half sharp <code>t</code> or half flat <code>d</code> indicates an alteration of 1 EDO step, and a sesqui sharp <code>t#</code> or a sesqui flat <code>db</code> an alteration of 3 EDO steps.  For example, a chromatic scale between <code>C</code> and <code>D</code> would be written as: <code>C</code> <code>Ct</code> <code>C#</code> <code>Db</code> <code>Dd</code> <code>D</code>.
+![image](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/dacd45b3-dc7e-4f1e-8ed3-5fea6f26330c)
 
-- [Sagittal notation](https://en.xen.wiki/w/Sagittal_notation), using quarter tone and half tone arrows.  In this system, a quarter tone arrow indicates an alteration of 1 EDO step, and a half tone arrow indicates an alteration of 2 EDO steps.
+- [Neutral circle of fifths notation](https://en.xen.wiki/w/31edo#Notations), using half and sesqui sharps and flats.  In this system, a half sharp or half flat indicates an alteration of 1 EDO step, and a sesqui sharp or a sesqui flat an alteration of 3 EDO steps.  For example, a chromatic scale between <code>C</code> and <code>D</code> would be written as:
+
+![image](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/cec09ecc-632b-48a1-a5a0-d30f4a2d88c4)
+
+- [Sagittal notation](https://en.xen.wiki/w/Sagittal_notation), using quarter tone and half tone arrows.  In this system, a quarter tone arrow indicates an alteration of 1 EDO step, and a half tone arrow indicates an alteration of 2 EDO steps.  For example, a chromatic scale between <code>C</code> and <code>D</code> would be written as:
+
+![image](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/b6343855-5eb4-4666-a231-aefb26eb4dbe)
 
 These notation systems are not mutually exclusive, the plugin can correctly tune a file which uses a mixture of them.
 

@@ -101,55 +101,97 @@ MuseScore
 		},
 	}
 	
-	// Map containing every supported accidental, having as value the number of
-	// EDO steps they modify a note by.
+	// Map containing the properties of every supported accidental.
 	property variant supportedAccidentals:
 	{
-		"0":    0,  // No accidental
-		"1":   -2,  // Flat
-		"2":    0,  // Natural
-		"3":    2,  // Sharp
-		"4":    4,  // Double sharp
-		"5":   -4,  // Double flat
-		"8":   -2,  // Natural flat
-		"9":    2,  // Natural sharp
-		"23":  -1,  // Half flat
-		"24":  -3,  // Sesqui flat
-		"25":   1,  // Half sharp
-		"26":   3,  // Sesqui sharp
-		"120": -1,  // Sagittal quarter tone down
-		"121":  1,  // Sagittal quarter tone up
-		"134": -2,  // Sagittal half tone down
-		"135":  2,  // Sagittal half tone up
-	}
-	
-	// Map containing every supported accidental which is not reflected by the
-	// tpc property, and that has to be accounted for via a tuning offset of a
-	// specific number of EOD steps.
-	property variant accidentalsEdoSteps:
-	{
-		"23":  -1,  // Half flat
-		"24":  -3,  // Sesqui flat
-		"25":   1,  // Half sharp
-		"26":   3,  // Sesqui sharp
-		"120": -1,  // Sagittal quarter tone down
-		"121":  1,  // Sagittal quarter tone up
-		"134": -2,  // Sagittal half tone down
-		"135":  2,  // Sagittal half tone up
-	}
-	
-	// Map containing every supported accidental which has a default tuning
-	// offset in Musescore.
-	property variant accidentalsDefaultOffset:
-	{
-		"23":   -50,  // Half flat
-		"24":  -150,  // Sesqui flat
-		"25":    50,  // Half sharp
-		"26":   150,  // Sesqui sharp
-		"120":  -50,  // Sagittal quarter tone down
-		"121":   50,  // Sagittal quarter tone up
-		"134": -100,  // Sagittal half tone down
-		"135":  100,  // Sagittal half tone up
+		"0":  // No accidental
+		{
+			"EDO_STEPS": 0,
+			"TPC": true,
+		},
+		"1":  // Flat
+		{
+			"EDO_STEPS": -2,
+			"TPC": true,
+		},
+		"2":  // Natural
+		{
+			"EDO_STEPS": 0,
+			"TPC": true,
+		},
+		"3":  // Sharp
+		{
+			"EDO_STEPS": 2,
+			"TPC": true,
+		},
+		"4":  // Double sharp
+		{
+			"EDO_STEPS": 4,
+			"TPC": true,
+		},
+		"5":  // Double flat
+		{
+			"EDO_STEPS": -4,
+			"TPC": true,
+		},
+		"8":  // Naatural flat
+		{
+			"EDO_STEPS": -2,
+			"TPC": true,
+		},
+		"9":  // Natural sharp
+		{
+			"EDO_STEPS": 2,
+			"TPC": true,
+		},
+		"23":  // Half flat
+		{
+			"EDO_STEPS": -1,
+			"TPC": false,
+			"DEFAULT_OFFSET": -50,
+		},
+		"24":  // Sesqui flat
+		{
+			"EDO_STEPS": -3,
+			"TPC": false,
+			"DEFAULT_OFFSET": -150,
+		},
+		"25":  // Half sharp
+		{
+			"EDO_STEPS": 1,
+			"TPC": false,
+			"DEFAULT_OFFSET": 50,
+		},
+		"26":  // Sesqui sharp
+		{
+			"EDO_STEPS": 3,
+			"TPC": false,
+			"DEFAULT_OFFSET": 150,
+		},
+		"120":  // Sagittal quarter tone down
+		{
+			"EDO_STEPS": -1,
+			"TPC": false,
+			"DEFAULT_OFFSET": -50,
+		},
+		"121":  // Sagittal quarter tone up
+		{
+			"EDO_STEPS": 1,
+			"TPC": false,
+			"DEFAULT_OFFSET": 50,
+		},
+		"134":  // Sagittal half tone down
+		{
+			"EDO_STEPS": -2,
+			"TPC": false,
+			"DEFAULT_OFFSET": -100,
+		},
+		"135":  // Sagittal half tone up
+		{
+			"EDO_STEPS": 2,
+			"TPC": false,
+			"DEFAULT_OFFSET": 100,
+		},
 	}
 	
 	property var showLog: false;
@@ -418,10 +460,9 @@ MuseScore
 		// Certain accidentals, like the microtonal accidentals, are not
 		// conveyed by the tpc property, but are instead handled directly via a
 		// tuning offset.
-		var accidentalTuningSteps = accidentalsEdoSteps[getPositiveAccidentalType(note)];
-		if (accidentalTuningSteps !== undefined)
+		if (!supportedAccidentals[getPositiveAccidentalType(note)]["TPC"])
 		{
-			var accidentalTuningOffset = accidentalTuningSteps * stepSize;
+			var accidentalTuningOffset = supportedAccidentals[getPositiveAccidentalType(note)]["EDO_STEPS"] * stepSize;
 			logMessage("Applying an additional tuning offset: " + accidentalTuningOffset);
 			tuningOffset += accidentalTuningOffset;
 		}
@@ -430,7 +471,7 @@ MuseScore
 		// accidentals.
 		if (mscoreMajorVersion >= 4)
 		{
-			var defaultAccidentalOffset = accidentalsDefaultOffset[getPositiveAccidentalType(note)];
+			var defaultAccidentalOffset = supportedAccidentals[getPositiveAccidentalType(note)]["DEFAULT_OFFSET"];
 			if (defaultAccidentalOffset !== undefined)
 			{
 				logMessage("Undoing the default microtonal tuning offset by adding an addition offset: " + (-defaultAccidentalOffset));
@@ -541,7 +582,7 @@ MuseScore
 	 */
 	function getAccidental(note)
 	{
-		var accidental = supportedAccidentals[getPositiveAccidentalType(note)];
+		var accidental = supportedAccidentals[getPositiveAccidentalType(note)]["EDO_STEPS"];
 		if (accidental !== undefined)
 		{
 			return accidental;

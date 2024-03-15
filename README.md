@@ -13,7 +13,7 @@ It's compatible with the following notation systems:
 
 - [Neutral circle of fifths notation](https://en.xen.wiki/w/31edo#Notations), using half and sesqui sharps and flats.  In this system, a half sharp or half flat indicates an alteration of 1 EDO step, and a sesqui sharp or a sesqui flat an alteration of 3 EDO steps.  For example, a chromatic scale between <code>C</code> and <code>D</code> would be written as:
 
-![image](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/cec09ecc-632b-48a1-a5a0-d30f4a2d88c4)
+![image](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/fcb25851-e60a-4892-b757-a9a29b4030b0)
 
 - [Sagittal notation](https://en.xen.wiki/w/Sagittal_notation), using quarter tone and half tone arrows.  In this system, a quarter tone arrow indicates an alteration of 1 EDO step, and a half tone arrow indicates an alteration of 2 EDO steps.  For example, a chromatic scale between <code>C</code> and <code>D</code> would be written as:
 

@@ -1,7 +1,6 @@
 # 31EDO Tuner
 A  Musescore plugin for tuning scores to [31EDO](https://en.xen.wiki/w/31edo).
 
-
 ## Features
 This plugin tunes the whole score to 31EDO.
 
@@ -11,7 +10,7 @@ It's compatible with the following notation systems:
 
 ![image](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/dacd45b3-dc7e-4f1e-8ed3-5fea6f26330c)
 
-- [Neutral circle of fifths notation](https://en.xen.wiki/w/31edo#Notations), using half and sesqui sharps and flats.  In this system, a half sharp or half flat indicates an alteration of 1 EDO step, and a sesqui sharp or a sesqui flat an alteration of 3 EDO steps.  For example, a chromatic scale between <code>C</code> and <code>D</code> would be written as:
+- [Neutral circle of fifths notation](https://en.xen.wiki/w/31edo#Notations), using half and sesqui sharps and flats.  In this system, a half sharp or a half flat indicates an alteration of 1 EDO step, and a sesqui sharp or a sesqui flat an alteration of 3 EDO steps.  For example, a chromatic scale between <code>C</code> and <code>D</code> would be written as:
 
 ![image](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/fcb25851-e60a-4892-b757-a9a29b4030b0)
 
@@ -19,7 +18,7 @@ It's compatible with the following notation systems:
 
 ![image](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/b6343855-5eb4-4666-a231-aefb26eb4dbe)
 
-These notation systems are not mutually exclusive, the plugin can correctly tune a file which uses a mixture of them.
+These notation systems are not mutually exclusive, the plugin can correctly tune a score which uses a mixture of them.
 
 See [here](https://github.com/looptailG/musescore-31edo-tuner/wiki/Supported-Accidentals) for a list of every supported accidental.
 

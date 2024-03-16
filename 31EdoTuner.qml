@@ -102,6 +102,7 @@ MuseScore
 	}
 	
 	// Map containing the properties of every supported accidental.
+	// Values taken from: Musescore/src/engraving/dom/accidental.cpp
 	property variant supportedAccidentals:
 	{
 		"0":  // No accidental
@@ -172,25 +173,25 @@ MuseScore
 		{
 			"EDO_STEPS": -1,
 			"TPC": false,
-			"DEFAULT_OFFSET": -50,
+			"DEFAULT_OFFSET": -53.3,
 		},
 		"121":  // Sagittal quarter tone up
 		{
 			"EDO_STEPS": 1,
 			"TPC": false,
-			"DEFAULT_OFFSET": 50,
+			"DEFAULT_OFFSET": 53.3,
 		},
 		"134":  // Sagittal half tone down
 		{
 			"EDO_STEPS": -2,
 			"TPC": false,
-			"DEFAULT_OFFSET": -100,
+			"DEFAULT_OFFSET": -113.7,
 		},
 		"135":  // Sagittal half tone up
 		{
 			"EDO_STEPS": 2,
 			"TPC": false,
-			"DEFAULT_OFFSET": 100,
+			"DEFAULT_OFFSET": 113.7,
 		},
 	}
 	

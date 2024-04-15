@@ -24,7 +24,7 @@ MuseScore
 {
 	menuPath: "Plugins.Tuner.31EDO"
 	description: "Retune the whole score to 31EDO."
-	version: "1.2.0"
+	version: "1.2.1 - alpha"
 	
 	Component.onCompleted:
 	{
@@ -108,89 +108,73 @@ MuseScore
 		"0":  // No accidental
 		{
 			"EDO_STEPS": 0,
-			"TPC": true,
 		},
 		"1":  // Flat
 		{
 			"EDO_STEPS": -2,
-			"TPC": true,
 		},
 		"2":  // Natural
 		{
 			"EDO_STEPS": 0,
-			"TPC": true,
 		},
 		"3":  // Sharp
 		{
 			"EDO_STEPS": 2,
-			"TPC": true,
 		},
 		"4":  // Double sharp
 		{
 			"EDO_STEPS": 4,
-			"TPC": true,
 		},
 		"5":  // Double flat
 		{
 			"EDO_STEPS": -4,
-			"TPC": true,
 		},
 		"8":  // Naatural flat
 		{
 			"EDO_STEPS": -2,
-			"TPC": true,
 		},
 		"9":  // Natural sharp
 		{
 			"EDO_STEPS": 2,
-			"TPC": true,
 		},
 		"23":  // Half flat
 		{
 			"EDO_STEPS": -1,
-			"TPC": false,
 			"DEFAULT_OFFSET": -50,
 		},
 		"24":  // Sesqui flat
 		{
 			"EDO_STEPS": -3,
-			"TPC": false,
 			"DEFAULT_OFFSET": -150,
 		},
 		"25":  // Half sharp
 		{
 			"EDO_STEPS": 1,
-			"TPC": false,
 			"DEFAULT_OFFSET": 50,
 		},
 		"26":  // Sesqui sharp
 		{
 			"EDO_STEPS": 3,
-			"TPC": false,
 			"DEFAULT_OFFSET": 150,
 		},
 		"120":  // Sagittal quarter tone down
 		{
 			"EDO_STEPS": -1,
-			"TPC": false,
 			"DEFAULT_OFFSET": -53.3,
 		},
 		"121":  // Sagittal quarter tone up
 		{
 			"EDO_STEPS": 1,
-			"TPC": false,
 			"DEFAULT_OFFSET": 53.3,
 		},
 		"134":  // Sagittal half tone down
 		{
 			"EDO_STEPS": -2,
-			"TPC": false,
 			"DEFAULT_OFFSET": -113.7,
 		},
 		"135":  // Sagittal half tone up
 		{
 			"EDO_STEPS": 2,
-			"TPC": false,
 			"DEFAULT_OFFSET": 113.7,
 		},
 	}
@@ -461,23 +445,21 @@ MuseScore
 		// Certain accidentals, like the microtonal accidentals, are not
 		// conveyed by the tpc property, but are instead handled directly via a
 		// tuning offset.
-		if (!supportedAccidentals[getPositiveAccidentalType(note)]["TPC"])
+		var defaultAccidentalOffset = supportedAccidentals[getPositiveAccidentalType(note)]["DEFAULT_OFFSET"];
+		if (defaultAccidentalOffset !== undefined)
 		{
-			var accidentalTuningOffset = supportedAccidentals[getPositiveAccidentalType(note)]["EDO_STEPS"] * stepSize;
-			logMessage("Applying an additional tuning offset: " + accidentalTuningOffset);
-			tuningOffset += accidentalTuningOffset;
-		}
-		
-		// Undo the default tuning offset which is applied to certain
-		// accidentals.
-		if (mscoreMajorVersion >= 4)
-		{
-			var defaultAccidentalOffset = supportedAccidentals[getPositiveAccidentalType(note)]["DEFAULT_OFFSET"];
-			if (defaultAccidentalOffset !== undefined)
+			// Undo the default tuning offset which is applied to certain
+			// accidentals.
+			if (mscoreMajorVersion >= 4)
 			{
-				logMessage("Undoing the default microtonal tuning offset by adding an addition offset: " + (-defaultAccidentalOffset));
+				logMessage("Undoing the default tuning offset of: " + defaultAccidentalOffset);
 				tuningOffset -= defaultAccidentalOffset;
 			}
+			
+			// Apply the tuning offset for this specific accidental.
+			var edoSteps = supportedAccidentals[getPositiveAccidentalType(note)]["EDO_STEPS"];
+			logMessage("Offsetting the tuning by the following amount of EDO steps: " + edoSteps);
+			tuningOffset += edoSteps * stepSize;
 		}
 
 		return tuningOffset;

@@ -532,7 +532,7 @@ MuseScore
 	 */
 	function getNoteLetter(note)
 	{
-		switch (positiveModulo(note.tpc, 7))
+		switch (note.tpc % 7)
 		{
 			case 0:
 				return "C";
@@ -552,6 +552,7 @@ MuseScore
 			case 5:
 				return "B";
 			
+			case -1:
 			case 6:
 				return "F";
 			
@@ -612,13 +613,5 @@ MuseScore
 		{
 			console.log(formattedMessage);	
 		}
-	}
-	
-	/**
-	 * Return the modulo as a positive number.
-	 */
-	function positiveModulo(a, b)
-	{
-		return (((a % b) + b) % b);
 	}
 }

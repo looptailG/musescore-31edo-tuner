@@ -293,6 +293,7 @@ MuseScore
 		logMessage("Tuning note: " + calculateNoteName(note));
 		
 		var tuningOffset = 0;
+
 		// Get the tuning offset for the input note with respect to 12EDO, based
 		// on its tonal pitch class.
 		switch (note.tpc)

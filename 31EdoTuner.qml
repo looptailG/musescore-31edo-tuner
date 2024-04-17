@@ -24,7 +24,7 @@ MuseScore
 {
 	menuPath: "Plugins.Tuner.31EDO"
 	description: "Retune the whole score to 31EDO."
-	version: "1.2.1 - alpha"
+	version: "1.2.1-alpha"
 	
 	Component.onCompleted:
 	{
@@ -38,7 +38,7 @@ MuseScore
 
 	// Size in cents of an EDO step.
 	property var stepSize: 1200.0 / 31;
-	// Difference in cents between a 12EDO and a 31EDO fifths.
+	// Difference in cents between a 12EDO and a 31EDO fifth.
 	property var fifthDeviation: 700 - 18 * stepSize;
 	// Offsets in cents between the notes in 31EDO and their 12EDO counterparts.
 	property variant centOffsets:

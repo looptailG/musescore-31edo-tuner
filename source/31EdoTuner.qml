@@ -494,7 +494,7 @@ MuseScore
 			}
 			
 			// Apply the tuning offset for this specific accidental.
-			var edoSteps = supportedAccidentals[getPositiveAccidentalType(note)]["EDO_STEPS"];
+			var edoSteps = getAccidentalEdoSteps(note);
 			logMessage("Offsetting the tuning by the following amount of EDO steps: " + edoSteps);
 			tuningOffset += edoSteps * stepSize;
 		}
@@ -601,7 +601,7 @@ MuseScore
 	/**
 	 * Return the number of 31EDO steps this note is altered by.
 	 */
-	function getAccidental(note)
+	function getAccidentalEdoSteps(note)
 	{
 		var accidental = supportedAccidentals[getPositiveAccidentalType(note)]["EDO_STEPS"];
 		if (accidental !== undefined)

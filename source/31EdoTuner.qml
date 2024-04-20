@@ -105,74 +105,74 @@ MuseScore
 	// Values taken from: Musescore/src/engraving/dom/accidental.cpp
 	property variant supportedAccidentals:
 	{
-		"0":  // No accidental
+		"NONE":
 		{
 			"EDO_STEPS": 0,
 		},
-		"1":  // Flat
+		"FLAT":
 		{
 			"EDO_STEPS": -2,
 		},
-		"2":  // Natural
+		"NATURAL":
 		{
 			"EDO_STEPS": 0,
 		},
-		"3":  // Sharp
+		"SHARP":
 		{
 			"EDO_STEPS": 2,
 		},
-		"4":  // Double sharp
+		"SHARP2":  // Double sharp
 		{
 			"EDO_STEPS": 4,
 		},
-		"5":  // Double flat
+		"FLAT2":  // Double flat
 		{
 			"EDO_STEPS": -4,
 		},
-		"8":  // Naatural flat
+		"NATURAL_FLAT":
 		{
 			"EDO_STEPS": -2,
 		},
-		"9":  // Natural sharp
+		"NATURAL_SHARP":
 		{
 			"EDO_STEPS": 2,
 		},
-		"23":  // Half flat
+		"MIRRORED_FLAT":  // Half flat
 		{
 			"EDO_STEPS": -1,
 			"DEFAULT_OFFSET": -50,
 		},
-		"24":  // Sesqui flat
+		"MIRRORED_FLAT2":  // Sesqui flat
 		{
 			"EDO_STEPS": -3,
 			"DEFAULT_OFFSET": -150,
 		},
-		"25":  // Half sharp
+		"SHARP_SLASH":  // Half sharp
 		{
 			"EDO_STEPS": 1,
 			"DEFAULT_OFFSET": 50,
 		},
-		"26":  // Sesqui sharp
+		"SHARP_SLASH4":  // Sesqui sharp
 		{
 			"EDO_STEPS": 3,
 			"DEFAULT_OFFSET": 150,
 		},
-		"120":  // Sagittal quarter tone down
+		"SAGITTAL_11MDD":  // Sagittal quarter tone down
 		{
 			"EDO_STEPS": -1,
 			"DEFAULT_OFFSET": -53.3,
 		},
-		"121":  // Sagittal quarter tone up
+		"SAGITTAL_11MDU":  // Sagittal quarter tone up
 		{
 			"EDO_STEPS": 1,
 			"DEFAULT_OFFSET": 53.3,
 		},
-		"134":  // Sagittal half tone down
+		"SAGITTAL_FLAT":  // Sagittal half tone down
 		{
 			"EDO_STEPS": -2,
 			"DEFAULT_OFFSET": -113.7,
 		},
-		"135":  // Sagittal half tone up
+		"SAGITTAL_SHARP":  // Sagittal half tone up
 		{
 			"EDO_STEPS": 2,
 			"DEFAULT_OFFSET": 113.7,
@@ -482,7 +482,7 @@ MuseScore
 		// Certain accidentals, like the microtonal accidentals, are not
 		// conveyed by the tpc property, but are instead handled directly via a
 		// tuning offset.
-		var defaultAccidentalOffset = supportedAccidentals[getPositiveAccidentalType(note)]["DEFAULT_OFFSET"];
+		var defaultAccidentalOffset = supportedAccidentals[getAccidentalName(note)]["DEFAULT_OFFSET"];
 		if (defaultAccidentalOffset !== undefined)
 		{
 			// Undo the default tuning offset which is applied to certain
@@ -519,7 +519,7 @@ MuseScore
 	{
 		var noteName = getNoteLetter(note);
 		
-		var accidental = getAccidental(note);
+		var accidental = getAccidentalEdoSteps(note);
 		switch (accidental)
 		{
 			case -4:
@@ -603,7 +603,7 @@ MuseScore
 	 */
 	function getAccidentalEdoSteps(note)
 	{
-		var accidental = supportedAccidentals[getPositiveAccidentalType(note)]["EDO_STEPS"];
+		var accidental = supportedAccidentals[getAccidentalName(note)]["EDO_STEPS"];
 		if (accidental !== undefined)
 		{
 			return accidental;
@@ -615,19 +615,76 @@ MuseScore
 	}
 	
 	/**
-	 * Return the accidentalType property as a positive number.
+	 * Return the name of the input note's accidental for the supported
+	 * accidentals.
 	 */
-	function getPositiveAccidentalType(note)
+	function getAccidentalName(note)
 	{
-		var accidentalType = note.accidentalType;
-		// In Musescore3 the accidentalType property is as signed integer, while
-		// in Musescore4 it's unsigned.  If it's negative, convert it to an
-		// unsigned 8 bit integer by shifting it by 256.
+		// Casting the accidentalType as a string is necessary to obtain the
+		// number corresponding to the enum value.  Parsing it as an int is
+		// needed to properly compare it with the enum values in a switch
+		// statement.
+		var accidentalType = parseInt("" + note.accidentalType);
+		// In Musescore3 the accidentalType property is a signed integer, while
+		// the Accidentals enum values are always positive.  If it's negative,
+		// convert it to an unsigned 8 bit integer by shifting it by 256.
 		if (accidentalType < 0)
 		{
 			accidentalType += 256;
 		}
-		return ("" + accidentalType);
+		switch (accidentalType)
+		{
+			case Accidental.NONE:
+				return "NONE";
+			
+			case Accidental.FLAT:
+				return "FLAT";
+			
+			case Accidental.NATURAL:
+				return "NATURAL";
+			
+			case Accidental.SHARP:
+				return "SHARP";
+			
+			case Accidental.SHARP2:
+				return "SHARP2";
+			
+			case Accidental.FLAT2:
+				return "FLAT2";
+			
+			case Accidental.NATURAL_FLAT:
+				return "NATURAL_FLAT";
+			
+			case Accidental.NATURAL_SHARP:
+				return "NATURAL_SHARP";
+			
+			case Accidental.MIRRORED_FLAT:
+				return "MIRRORED_FLAT";
+			
+			case Accidental.MIRRORED_FLAT2:
+				return "MIRRORED_FLAT2";
+			
+			case Accidental.SHARP_SLASH:
+				return "SHARP_SLASH";
+			
+			case Accidental.SHARP_SLASH4:
+				return "SHARP_SLASH4";
+			
+			case Accidental.SAGITTAL_11MDD:
+				return "SAGITTAL_11MDD";
+			
+			case Accidental.SAGITTAL_11MDU:
+				return "SAGITTAL_11MDU";
+			
+			case Accidental.SAGITTAL_FLAT:
+				return "SAGITTAL_FLAT";
+			
+			case Accidental.SAGITTAL_SHARP:
+				return "SAGITTAL_SHARP";
+			
+			default:
+				throw "Unsupported accidental: " + note.accidentalType;
+		}
 	}
 	
 	/**

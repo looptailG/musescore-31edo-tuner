@@ -632,6 +632,10 @@ MuseScore
 		{
 			accidentalType += 256;
 		}
+		if ((accidentalType < 0) || (accidentalType >= 256)
+		{
+			throw "Out of bound accidental type: " + accidentalType;
+		}
 		switch (accidentalType)
 		{
 			case Accidental.NONE:

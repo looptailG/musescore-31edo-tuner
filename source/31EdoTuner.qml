@@ -35,10 +35,6 @@ MuseScore
 			categoryCode = "playback";
 		}
 	}
-	
-	// These constants should be replaced with the corresponding enums.
-	property var rewindMode_SELECTION_START: 1;
-	property var rewindMode_SELECTION_END: 2;
 
 	// Size in cents of an EDO step.
 	property var stepSize: 1200.0 / 31;
@@ -224,9 +220,10 @@ MuseScore
 		var endStaff;
 		var startTick;
 		var endTick;
-		cursor.rewind(rewindMode_SELECTION_START);
+		cursor.rewind(Cursor.SELECTION_START);
 		if (!cursor.segment)
 		{
+			// Tuning the entire score.
 			startStaff = 0;
 			endStaff = curScore.nstaves - 1;
 			startTick = 0;
@@ -235,9 +232,10 @@ MuseScore
 		}
 		else
 		{
+			// Tuning only the selection.
 			startStaff = cursor.staffIdx;
 			startTick = cursor.tick;
-			cursor.rewind(rewindMode_SELECTION_END);
+			cursor.rewind(Cursor.SELECTION_END);
 			endStaff = cursor.staffIdx;
 			if (cursor.tick == 0)
 			{

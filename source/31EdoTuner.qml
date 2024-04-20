@@ -23,7 +23,7 @@ import MuseScore 3.0
 MuseScore
 {
 	menuPath: "Plugins.Tuner.31EDO"
-	description: "Retune the whole score to 31EDO."
+	description: "Retune the selection, or the whole score if nothing is selected, to 31EDO."
 	version: "1.3.0-alpha"
 	
 	Component.onCompleted:

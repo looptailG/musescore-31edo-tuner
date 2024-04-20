@@ -213,20 +213,54 @@ MuseScore
 		logMessage("-- 31EDO Tuner -- Version " + version +  " --");
 	
 		curScore.startCmd();
+		
+		// Calculate the portion of the score to tune.
 		var cursor = curScore.newCursor();
+		var startStaff;
+		var endStaff;
+		var startTick;
+		var endTick;
+		cursor.rewind(1);
+		if (!cursor.segment)
+		{
+			startStaff = 0;
+			endStaff = curScore.nstaves - 1;
+			startTick = 0;
+			endTick = endTick = curScore.lastSegment.tick + 1;
+			logMessage("Tuning the entire score.");
+		}
+		else
+		{
+			startStaff = cursor.staffIdx;
+			startTick = cursor.tick;
+			cursor.rewind(2);
+			endStaff = cursor.staffIdx;
+			if (cursor.tick == 0)
+			{
+				// If the selection includes the last measure of the score,
+				// .rewind() overflows and goes back to tick 0.
+				endTick = curScore.lastSegment.tick + 1;
+			}
+			else
+			{
+				endTick = cursor.tick;
+			}
+			logMessage("Tuning only the portion of the score between staffs " + startStaff + " - " + endStaff + ", and between ticks " + startTick + " - " + endTick + ".");
+		}
 
-		// Main loop on the notes.
-		for (var staff = 0; staff < curScore.nstaves; staff++)
+		// Loop on the portion of the score to tune.
+		for (var staff = startStaff; staff <= endStaff; staff++)
 		{
 			for (var voice = 0; voice < 4; voice++)
 			{
+				logMessage("-- Tuning Staff: " + staff + " -- Voice: " + voice + " --");
+				
 				cursor.voice = voice;
 				cursor.staffIdx = staff;
-				cursor.rewind(0);
-				logMessage("-- Tuning Staff: " + staff + " -- Voice: " + voice + " --");
+				cursor.rewindToTick(startTick);
 
 				// Loop on elements of a voice.
-				while (cursor.segment)
+				while (cursor.segment && (cursor.tick < endTick))
 				{
 					if (cursor.element)
 					{

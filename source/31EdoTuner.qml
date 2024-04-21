@@ -227,7 +227,7 @@ MuseScore
 			startStaff = 0;
 			endStaff = curScore.nstaves - 1;
 			startTick = 0;
-			endTick = endTick = curScore.lastSegment.tick + 1;
+			endTick = curScore.lastSegment.tick + 1;
 			logMessage("Tuning the entire score.");
 		}
 		else
@@ -279,7 +279,7 @@ MuseScore
 									{
 										notes[j].tuning = calculateTuningOffset(notes[j]);
 									}
-									catch(error)
+									catch (error)
 									{
 										logMessage(error, true);
 									}
@@ -294,7 +294,7 @@ MuseScore
 								{
 									notes[i].tuning = calculateTuningOffset(notes[i]);
 								}
-								catch(error)
+								catch (error)
 								{
 									logMessage(error, true);
 								}

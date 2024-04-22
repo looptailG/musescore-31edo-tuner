@@ -2,7 +2,7 @@
 A  Musescore plugin for tuning scores to [31EDO](https://en.xen.wiki/w/31edo).
 
 ## Features
-This plugin tunes the whole score to 31EDO.
+This plugin can be used to tune the whole score, or only a portion of it, to 31EDO.
 
 It's compatible with the following notation systems:
 

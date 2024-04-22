@@ -511,7 +511,7 @@ MuseScore
 	 * - Flat         -> b
 	 * - Half flat    -> d
 	 * - Half sharp   -> t
-	 * - sharp        -> #
+	 * - Sharp        -> #
 	 * - Sesqui sharp -> t#
 	 * - Double sharp -> x
 	 */

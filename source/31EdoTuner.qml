@@ -223,7 +223,7 @@ MuseScore
 		cursor.rewind(Cursor.SELECTION_START);
 		if (!cursor.segment)
 		{
-			// Tuning the entire score.
+			// Tune the entire score.
 			startStaff = 0;
 			endStaff = curScore.nstaves - 1;
 			startTick = 0;
@@ -232,7 +232,7 @@ MuseScore
 		}
 		else
 		{
-			// Tuning only the selection.
+			// Tune only the selection.
 			startStaff = cursor.staffIdx;
 			startTick = cursor.tick;
 			cursor.rewind(Cursor.SELECTION_END);

@@ -25,6 +25,7 @@ See [here](https://github.com/looptailG/musescore-31edo-tuner/wiki/Supported-Acc
 
 ## Usage
 - If the score contains transposing instruments, ensure that the score is being displayed at concert pitch.  If it's not, the notes of transposing instruments will not be tuned correctly.
+- If you want to tune only a portion of the score, select it before running the plugin.  If nothing is selected, the entire score will be tuned.
 - Launch the plugin:
   - Musescore3: <code>Plugins</code> → <code>Tuner</code> → <code>31EDO</code>
   - Musescore4: <code>Plugins</code> → <code>Playback</code> → <code>31EDO Tuner</code>

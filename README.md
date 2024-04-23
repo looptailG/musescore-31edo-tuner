@@ -39,9 +39,9 @@ See [here](https://github.com/looptailG/musescore-31edo-tuner/wiki/Known-Issues#
 ### Musescore3
 - Download the file <code>31edo_tuner_x.y.z.zip</code>, where <code>x.y.z</code> is the version of the plugin.  You can find the latest version [here](https://github.com/looptailG/musescore-31edo-tuner/releases/latest).
 - Extract the file `31EdoTuner.qml`, and move it to Musescore's plugin folder.
-- Follow the steps listed [here](https://musescore.org/en/handbook/3/plugins) to enable the plugin.
+- Follow the steps listed [here](https://musescore.org/en/handbook/3/plugins#enable-disable) to enable the plugin.
 
 ### Musescore4
 - Download the file <code>31edo_tuner_x.y.z.zip</code>, where <code>x.y.z</code> is the version of the plugin.  You can find the latest version [here](https://github.com/looptailG/musescore-31edo-tuner/releases/latest).
 - Extract the folder `31edo_tuner` and move it to Musescore's plugin folder.
-- Follow the steps listed [here](https://musescore.org/en/handbook/4/plugins) to enable the plugin.
+- Follow the steps listed [here]([https://musescore.org/en/handbook/4/plugins#enable-disable) to enable the plugin.

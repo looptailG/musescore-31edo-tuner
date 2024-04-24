@@ -101,7 +101,9 @@ MuseScore
 		},
 	}
 	
-	// Map containing the properties of every supported accidental.
+	// Map containing the properties of every supported accidental.  The
+	// accidentals with a "DEFAULT_OFFSET" property are those not handled by the
+	// tpc property, but instead by a tuning offset.
 	// Values taken from: Musescore/src/engraving/dom/accidental.cpp
 	property variant supportedAccidentals:
 	{

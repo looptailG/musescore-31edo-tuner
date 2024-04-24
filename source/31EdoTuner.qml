@@ -1,5 +1,5 @@
 /*
-	31EDO Tuner plugin for Musescore
+	31EDO Tuner plugin for Musescore.
 	Copyright (C) 2024 Alessandro Culatti
 
 	This program is free software: you can redistribute it and/or modify

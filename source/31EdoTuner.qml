@@ -24,7 +24,7 @@ MuseScore
 {
 	menuPath: "Plugins.Tuner.31EDO"
 	description: "Retune the selection, or the whole score if nothing is selected, to 31EDO."
-	version: "1.3.0"
+	version: "1.4.0-alpha"
 	
 	Component.onCompleted:
 	{
@@ -139,6 +139,11 @@ MuseScore
 		{
 			"EDO_STEPS": 2,
 		},
+		"ARROW_DOWN":
+		{
+			"EDO_STEPS": -1,
+			"DEFAULT_OFFSET": -50,
+		},
 		"MIRRORED_FLAT":  // Half flat
 		{
 			"EDO_STEPS": -1,
@@ -153,6 +158,11 @@ MuseScore
 		{
 			"EDO_STEPS": 1,
 			"DEFAULT_OFFSET": 50,
+		},
+		"LOWER_ONE_SEPTIMAL_COMMA":
+		{
+			"EDO_STEPS": -1,
+			"DEFAULT_OFFSET": 0,
 		},
 		"SHARP_SLASH4":  // Sesqui sharp
 		{
@@ -664,6 +674,9 @@ MuseScore
 			case Accidental.NATURAL_SHARP:
 				return "NATURAL_SHARP";
 			
+			case Accidental.ARROW_DOWN:
+				return "ARROW_DOWN";
+			
 			case Accidental.MIRRORED_FLAT:
 				return "MIRRORED_FLAT";
 			
@@ -675,6 +688,9 @@ MuseScore
 			
 			case Accidental.SHARP_SLASH4:
 				return "SHARP_SLASH4";
+			
+			case Accidental.LOWER_ONE_SEPTIMAL_COMMA:
+				return "LOWER_ONE_SEPTIMAL_COMMA";
 			
 			case Accidental.SAGITTAL_11MDD:
 				return "SAGITTAL_11MDD";

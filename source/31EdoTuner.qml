@@ -191,6 +191,13 @@ MuseScore
 		},
 	}
 	
+	// Map containing the previous microtonal accidentals in the current
+	// measure.  The keys are formatted as note letter concatenated with the
+	// note octave, for example C4.  The value is the last microtonal accidental
+	// that was applied to that note.
+	property variant previousAccidentals:
+	{}
+	
 	property var showLog: false;
 	property var maxLines: 50;
 	MessageDialog
@@ -276,6 +283,12 @@ MuseScore
 				// Loop on elements of a voice.
 				while (cursor.segment && (cursor.tick < endTick))
 				{
+					if (cursor.segment.tick == cursor.measure.firstSegment.tick)
+					{
+						// New measure, empty the previous accidentals map.
+						previousAccidentals = {};
+					}
+				
 					if (cursor.element)
 					{
 						if (cursor.element.type == Element.CHORD)
@@ -341,6 +354,8 @@ MuseScore
 		logMessage("Tuning note: " + calculateNoteName(note));
 		
 		var tuningOffset = 0;
+		var noteNameOctave = getNoteLetter(note) + getOctave(note);
+		var accidentalName = getAccidentalName(note);
 
 		// Get the tuning offset for the input note with respect to 12EDO, based
 		// on its tonal pitch class.
@@ -491,10 +506,30 @@ MuseScore
 		}
 		logMessage("Base tuning offset: " + tuningOffset);
 		
+		// If the note does not have any accidental applied to it, check if the
+		// same note previously in the measure was modified by a microtonal
+		// accidental.
+		if (accidentalName == "NONE")
+		{
+			if (previousAccidentals.hasOwnProperty(noteNameOctave))
+			{
+				accidentalName = previousAccidentals[noteNameOctave];
+				logMessage("Applying to the following accidental to the current note from a previous note within the measure: " + accidentalName);
+			}
+		}
+		else
+		{
+			// Save the accidental in the previous accidentals map for this
+			// note.
+			previousAccidentals[noteNameOctave] = accidentalName;
+		}
+		
+		// TODO: Non funziona per MS4, perché il tuning offset è basato sull'alterazione che è effettivamente applicata alla nota corrente, non a quelle precedenti nella battuta.
+		
 		// Certain accidentals, like the microtonal accidentals, are not
 		// conveyed by the tpc property, but are instead handled directly via a
 		// tuning offset.
-		var defaultAccidentalOffset = supportedAccidentals[getAccidentalName(note)]["DEFAULT_OFFSET"];
+		var defaultAccidentalOffset = supportedAccidentals[accidentalName]["DEFAULT_OFFSET"];
 		if (defaultAccidentalOffset !== undefined)
 		{
 			// Undo the default tuning offset which is applied to certain
@@ -506,7 +541,7 @@ MuseScore
 			}
 			
 			// Apply the tuning offset for this specific accidental.
-			var edoSteps = getAccidentalEdoSteps(note);
+			var edoSteps = getAccidentalEdoSteps(accidentalName);
 			logMessage("Offsetting the tuning by the following amount of EDO steps: " + edoSteps);
 			tuningOffset += edoSteps * stepSize;
 		}
@@ -531,7 +566,7 @@ MuseScore
 	{
 		var noteName = getNoteLetter(note);
 		
-		var accidental = getAccidentalEdoSteps(note);
+		var accidental = getAccidentalEdoSteps(getAccidentalName(note));
 		switch (accidental)
 		{
 			case -4:
@@ -613,9 +648,9 @@ MuseScore
 	/**
 	 * Return the number of 31EDO steps this note is altered by.
 	 */
-	function getAccidentalEdoSteps(note)
+	function getAccidentalEdoSteps(accidentalName)
 	{
-		var accidental = supportedAccidentals[getAccidentalName(note)]["EDO_STEPS"];
+		var accidental = supportedAccidentals[accidentalName]["EDO_STEPS"];
 		if (accidental !== undefined)
 		{
 			return accidental;
@@ -707,6 +742,14 @@ MuseScore
 			default:
 				throw "Unsupported accidental: " + note.accidentalType;
 		}
+	}
+	
+	/**
+	 * Return the octave of the input note.
+	 */
+	function getOctave(note)
+	{
+		return Math.floor(note.pitch / 12) - 1;
 	}
 	
 	/**

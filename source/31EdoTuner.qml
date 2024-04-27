@@ -24,7 +24,7 @@ MuseScore
 {
 	menuPath: "Plugins.Tuner.31EDO"
 	description: "Retune the selection, or the whole score if nothing is selected, to 31EDO."
-	version: "1.4.0-alpha"
+	version: "1.4.0"
 	
 	Component.onCompleted:
 	{
@@ -532,8 +532,8 @@ MuseScore
 		{
 			// Undo the default tuning offset which is applied to certain
 			// accidentals.
-			// The tuning offset is applied only if an actual microtonal
-			// accidental is applied to the current note.  For this reason we
+			// The default tuning offset is applied only if an actual microtonal
+			// accidental is applied to the current note.  For this reason, we
 			// must check getAccidentalName() on the current note, it is not
 			// sufficient to check the value saved in accidentalName.
 			if (mscoreMajorVersion >= 4)

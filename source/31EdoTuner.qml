@@ -524,8 +524,6 @@ MuseScore
 			previousAccidentals[noteNameOctave] = accidentalName;
 		}
 		
-		// TODO: Non funziona per MS4, perché il tuning offset è basato sull'alterazione che è effettivamente applicata alla nota corrente, non a quelle precedenti nella battuta.
-		
 		// Certain accidentals, like the microtonal accidentals, are not
 		// conveyed by the tpc property, but are instead handled directly via a
 		// tuning offset.
@@ -534,10 +532,19 @@ MuseScore
 		{
 			// Undo the default tuning offset which is applied to certain
 			// accidentals.
+			// The tuning offset is applied only if an actual microtonal
+			// accidental is applied to the current note.  For this reason we
+			// must check getAccidentalName() on the current note, it is not
+			// sufficient to check the value saved in accidentalName.
 			if (mscoreMajorVersion >= 4)
 			{
-				logMessage("Undoing the default tuning offset of: " + defaultAccidentalOffset);
-				tuningOffset -= defaultAccidentalOffset;
+				var actualAccidentalName = getAccidentalName(note);
+				var actualAccidentalOffset = supportedAccidentals[actualAccidentalName]["DEFAULT_OFFSET"];
+				if (actualAccidentalOffset !== undefined)
+				{
+					logMessage("Undoing the default tuning offset of: " + defaultAccidentalOffset);
+					tuningOffset -= defaultAccidentalOffset;
+				}
 			}
 			
 			// Apply the tuning offset for this specific accidental.

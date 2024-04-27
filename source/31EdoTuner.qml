@@ -506,11 +506,11 @@ MuseScore
 		}
 		logMessage("Base tuning offset: " + tuningOffset);
 		
-		// If the note does not have any accidental applied to it, check if the
-		// same note previously in the measure was modified by a microtonal
-		// accidental.
 		if (accidentalName == "NONE")
 		{
+			// If the note does not have any accidental applied to it, check if
+			// the same note previously in the measure was modified by a
+			// microtonal accidental.
 			if (previousAccidentals.hasOwnProperty(noteNameOctave))
 			{
 				accidentalName = previousAccidentals[noteNameOctave];

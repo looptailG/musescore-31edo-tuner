@@ -867,8 +867,8 @@ MuseScore
 	}
 	
 	/**
-	 * Log the input message, prefixed by the timestamp.  Automatically redirect
-	 * the output message depending on the MuseScore version.
+	 * Log the input message, and automatically redirect the output message
+	 * depending on the MuseScore version.
 	 */
 	function logMessage(message, isErrorMessage)
 	{
@@ -883,10 +883,14 @@ MuseScore
 		}
 		else
 		{
-			console.log(message);
 			if (isErrorMessage)
 			{
-				debugLogger.log(message, true);
+				console.error(message);
+				debugLogger.log(message, isErrorMessage);
+			}
+			else
+			{
+				console.log(message);
 			}
 		}
 	}

@@ -43,7 +43,7 @@ If the key signature contains microtonal accidentals, then it is necessary to al
 | ![halfSharp](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/e903afe2-8625-442d-b8ab-5914eac0ecba) | `t` |
 | ![sharp](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/8d63ed6d-6495-4f73-a4f5-2c2dde707008) | `#` |
 | ![sesquiSharp](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/b167b72d-6b81-46b5-8dd7-e85dbf40ac6c) | `t#` |
-| ![naturalSharp](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/35321944-a830-40e2-9dc0-57757ad66f0f) | `x` |
+| ![doubleSharp](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/83bbb0e3-00e3-4ed6-b57d-ac679d757401) | `x` |
 
 If a note does not have an accidental in the custom key signature, you can leave the text for that note empty.
 

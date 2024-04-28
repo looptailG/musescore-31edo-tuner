@@ -24,10 +24,32 @@ These notation systems are not mutually exclusive, the plugin can correctly tune
 
 See [here](https://github.com/looptailG/musescore-31edo-tuner/wiki/Supported-Accidentals) for a list of every supported accidental.
 
-This plugin remembers which accidental is applied to any given note, and will automatically apply the same accidental to the following notes within the same measure.  This is also true for microtonal accidentals, for which this is usually not automatically done in Musescore.  A limitation of this is that the plugin only checks for accidentals for each voice individually, so if there are multiple voices with microtonal accidentals, it might be necessary to add an extra accidental for the first modified note in each voice.  This extra accidental can be safely made invisible, as this won't affect the plugin, as in the following example:
+This plugin remembers which accidental is applied to any given note, and will automatically apply the same accidental to the following notes within the same measure.  This is also true for microtonal accidentals, for which this is usually not automatically done in Musescore.  A limitation of this is that the plugin only checks for accidentals for each voice individually, so if there are multiple voices with microtonal accidentals, it might be necessary to add an extra accidental for the first modified note in each voice.  This extra accidental can be safely made invisible, as that won't affect the plugin, as in the following example:
 
 ![image](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/ae091a16-ded2-43df-aa22-28144d39982c)
 
+### Key Signatures
+
+This plugin supports custom key signatures.  If the custom key signatures only contain standard accidentals, no extra action is required other than inserting the custom key signaturs into the score.
+
+If the key signature contains microtonal accidentals, then it is necessary to also add a text (`System Text` for a regular key signature, or `Staff Text` for a local key signature) to inform the plugin about the accidentals present in the key signature.  This text has to be formatted as `X.X.X.X.X.X.X`, where `X` are the accidental applied to each note, arranged according to the circle of fifths: `F.C.G.D.A.E.B`.  These accidentals are written using ASCII characters only in the following way:
+
+| Accidental | Text |
+| :--------: | :--: |
+| ![doubleFlat](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/aed40ea1-31b3-4ce8-97a3-c737ec7dc51c) | `bb` |
+| ![sesquiFlat](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/562b6267-9f08-417e-a8e5-5960f48c105b) | `db` |
+| ![flat](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/5fe008de-b58c-4ad4-bec7-51449c2050f4) | `b` |
+| ![halfFlat](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/2324736a-ccb3-4ebe-b8e2-4480019a3a93) | `d` |
+| ![halfSharp](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/e903afe2-8625-442d-b8ab-5914eac0ecba) | `t` |
+| ![sharp](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/8d63ed6d-6495-4f73-a4f5-2c2dde707008) | `#` |
+| ![sesquiSharp](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/b167b72d-6b81-46b5-8dd7-e85dbf40ac6c) | `t#` |
+| ![naturalSharp](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/35321944-a830-40e2-9dc0-57757ad66f0f) | `x` |
+
+If a note does not have an accidental in the custom key signature, you can leave the text for that note empty.
+
+The text describing the custom key signature can be safely made invisible, as that won't affect the plugin, as in the following example:
+
+![image](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/3e063adf-32bf-426a-995d-09453e26b113)
 
 
 ## Usage

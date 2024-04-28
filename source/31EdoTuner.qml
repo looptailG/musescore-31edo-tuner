@@ -309,7 +309,12 @@ MuseScore
 					{
 						// The key signature has changed, empty the custom key
 						// signature map.
-						currentCustomKeySignature = {};
+						// TODO: This if is necessary only because the previous if is not true only when there is an actual key signature change.  This way we check if the mapping was not empty earlier, and thus actually needs to be emptied now.
+						if (Object.keys(currentCustomKeySignature).length != 0)
+						{
+							logMessage("Key signature change, emptying the custom key signature map.");
+							currentCustomKeySignature = {};
+						}
 					}
 					// Check if there is a text indicating a custom key
 					// signature change.

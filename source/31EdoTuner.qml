@@ -22,9 +22,9 @@ import MuseScore 3.0
 
 MuseScore
 {
-	menuPath: "Plugins.Tuner.31EDO"
-	description: "Retune the selection, or the whole score if nothing is selected, to 31EDO."
-	version: "1.5.0-alpha"
+	menuPath: "Plugins.Tuner.31EDO";
+	description: "Retune the selection, or the whole score if nothing is selected, to 31EDO.";
+	version: "1.5.0";
 	
 	Component.onCompleted:
 	{
@@ -194,7 +194,7 @@ MuseScore
 	// Map containing the previous microtonal accidentals in the current
 	// measure.  The keys are formatted as note letter concatenated with the
 	// note octave, for example C4.  The value is the last microtonal accidental
-	// that was applied to that note.
+	// that was applied to that note within the current measure.
 	property variant previousAccidentals:
 	{}
 	

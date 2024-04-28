@@ -309,7 +309,7 @@ MuseScore
 					{
 						// The key signature has changed, empty the custom key
 						// signature map.
-						// TODO: This if is necessary only because the previous if is not true only when there is an actual key signature change.  This way we check if the mapping was not empty earlier, and thus actually needs to be emptied now.
+						// TODO: This if is necessary only because the previous if is not true only when there is an actual key signature change.  This way we check if the mapping was not empty before, and thus actually needs to be emptied now.
 						if (Object.keys(currentCustomKeySignature).length != 0)
 						{
 							logMessage("Key signature change, emptying the custom key signature map.");
@@ -873,14 +873,13 @@ MuseScore
 			isErrorMessage = false;
 		}
 	
-		var formattedMessage = Qt.formatDateTime(new Date(), "yyyy-MM-dd HH:mm:ss") + " | " + message;
 		if (mscoreMajorVersion >= 4)
 		{
-			debugLogger.log(formattedMessage, isErrorMessage);
+			debugLogger.log(message, isErrorMessage);
 		}
 		else
 		{
-			console.log(formattedMessage);	
+			console.log(message);	
 		}
 	}
 }

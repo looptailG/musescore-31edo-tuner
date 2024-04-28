@@ -4,7 +4,9 @@ A  Musescore plugin for tuning scores to [31EDO](https://en.xen.wiki/w/31edo).
 ## Features
 This plugin can be used to tune the whole score, or only a portion of it, to 31EDO.
 
-It's compatible with the following notation systems:
+### Accidentals
+
+This plugin is compatible with the following notation systems:
 
 - [Circle of fifths notation](https://en.xen.wiki/w/31edo#Notations), using double sharps and flats.  In this system, a sharp or a flat indicates an alteration of 2 EDO steps, and a double sharp or a double flat an alteration of 4 EDO steps.  For example, a chromatic scale between <code>C</code> and <code>D</code> would be written as:
 
@@ -21,6 +23,11 @@ It's compatible with the following notation systems:
 These notation systems are not mutually exclusive, the plugin can correctly tune a score which uses a mixture of them.
 
 See [here](https://github.com/looptailG/musescore-31edo-tuner/wiki/Supported-Accidentals) for a list of every supported accidental.
+
+This plugin remembers which accidental is applied to any given note, and will automatically apply the same accidental to the following notes within the same measure.  This is also true for microtonal accidentals, for which this is usually not automatically done in Musescore.  A limitation of this is that the plugin only checks for accidentals for each voice individually, so if there are multiple voices with microtonal accidentals, it might be necessary to add an extra accidental for the first modified note in each voice.  This extra accidental can be safely made invisible, as this won't affect the plugin, as in the following example:
+
+![image](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/ae091a16-ded2-43df-aa22-28144d39982c)
+
 
 
 ## Usage

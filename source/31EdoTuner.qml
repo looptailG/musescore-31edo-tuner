@@ -24,7 +24,7 @@ MuseScore
 {
 	menuPath: "Plugins.Tuner.31EDO"
 	description: "Retune the selection, or the whole score if nothing is selected, to 31EDO."
-	version: "1.4.0"
+	version: "1.5.0-alpha"
 	
 	Component.onCompleted:
 	{
@@ -198,6 +198,18 @@ MuseScore
 	property variant previousAccidentals:
 	{}
 	
+	// Map containing the alteration presents in the current custom key
+	// signature, if any.  The keys are the names of the notes, and the values
+	// are the accidentals applied to them.  It supports only octave-repeating
+	// key signatures.
+	property variant currentCustomKeySignature:
+	{}
+	// Regex used for checking if a string is valid as a custom key signature.
+	property var customKeySignatureRegex: /^(x|t#|#|t|h|d|b|db|bb|)(?:\.(?:x|t#|#|t|h|d|b|db|bb|)){6}$/;
+	// Array containing the notes in the order they appear in the custom key
+	// signature string.
+	property var customKeySignatureNoteOrder: ["F", "C", "G", "D", "A", "E", "B"];
+	
 	property var showLog: false;
 	property var maxLines: 50;
 	MessageDialog
@@ -279,6 +291,8 @@ MuseScore
 				cursor.voice = voice;
 				cursor.staffIdx = staff;
 				cursor.rewindToTick(startTick);
+				
+				currentCustomKeySignature = {};
 
 				// Loop on elements of a voice.
 				while (cursor.segment && (cursor.tick < endTick))
@@ -287,6 +301,86 @@ MuseScore
 					{
 						// New measure, empty the previous accidentals map.
 						previousAccidentals = {};
+					}
+					
+					// Check for key signature change.
+					// TODO: This implementation is very ineffcient, as this piece of code is called on every element when the key signature is not empty.  Find a way to call this only when the key signature actually change.
+					if (cursor.keySignature)
+					{
+						// The key signature has changed, empty the custom key
+						// signature map.
+						currentCustomKeySignature = {};
+					}
+					// Check if there is a text indicating a custom key
+					// signature change.
+					for (var i = 0; i < cursor.segment.annotations.length; i++)
+					{
+						var annotationText = cursor.segment.annotations[i].text;
+						if (customKeySignatureRegex.test(annotationText))
+						{
+							logMessage("Applying the current custom key signature: " + annotationText);
+							currentCustomKeySignature = {};
+							try
+							{
+								var annotationTextSplitted = annotationText.split(".");
+								for (var j = 0; j < annotationTextSplitted.length; j++)
+								{
+									var currentNote = customKeySignatureNoteOrder[j];
+									var currentAccidental = annotationTextSplitted[j];
+									var accidentalName = "";
+									switch (currentAccidental)
+									{
+										case "bb":
+											accidentalName = "FLAT2";
+											break;
+										
+										case "db":
+											accidentalName = "MIRRORED_FLAT2";
+											break;
+										
+										case "b":
+											accidentalName = "FLAT";
+											break;
+										
+										case "d":
+											accidentalName = "MIRRORED_FLAT";
+											break;
+										
+										case "":
+										case "h":
+											break;
+										
+										case "t":
+											accidentalName = "SHARP_SLASH";
+											break;
+										
+										case "#":
+											accidentalName = "SHARP";
+											break;
+										
+										case "t#":
+											accidentalName = "SHARP_SLASH4";
+											break;
+										
+										case "x":
+											accidentalName = "SHARP2";
+											break;
+										
+										default:
+											throw "Unsupported accidental in the custom key signature: " + currentAccidental;
+									}
+									if (accidentalName != "")
+									{
+										currentCustomKeySignature[currentNote] = accidentalName;
+									}
+								}
+							}
+							catch (error)
+							{
+								logMessage(error, true);
+								currentCustomKeySignature = {};
+							}
+						}
 					}
 				
 					if (cursor.element)

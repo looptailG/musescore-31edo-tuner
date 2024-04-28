@@ -232,8 +232,12 @@ MuseScore
 			{
 				// Truncate the message to a maximum number of lines, to prevent
 				// issues with the message box being too large.
-				var messageLines = text.split("\n").slice(0, maxLines);
-				text = messageLines.join("\n") + "\n" + "...";
+				var messageLines = text.split("\n");
+				if (messageLines.length > maxLines)
+				{
+					var messageLines = messageLines.slice(0, maxLines);
+					text = messageLines.join("\n") + "\n" + "...";
+				}
 				debugLogger.open();
 			}
 		}
@@ -879,7 +883,11 @@ MuseScore
 		}
 		else
 		{
-			console.log(message);	
+			console.log(message);
+			if (isErrorMessage)
+			{
+				debugLogger.log(message, true);
+			}
 		}
 	}
 }

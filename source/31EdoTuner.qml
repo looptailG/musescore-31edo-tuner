@@ -331,39 +331,32 @@ MuseScore
 									switch (currentAccidental)
 									{
 										case "bb":
-											accidentalName = "FLAT2";
+										case "b":
+										case "":
+										case "h":
+										case "#":
+										case "x":
+											// Non-microtonal accidentals are
+											// automatically handled by
+											// Musescore even in custom key
+											// signatures, so we only have to
+											// check for microtonal accidentals.
 											break;
 										
 										case "db":
 											accidentalName = "MIRRORED_FLAT2";
 											break;
 										
-										case "b":
-											accidentalName = "FLAT";
-											break;
-										
 										case "d":
 											accidentalName = "MIRRORED_FLAT";
-											break;
-										
-										case "":
-										case "h":
 											break;
 										
 										case "t":
 											accidentalName = "SHARP_SLASH";
 											break;
 										
-										case "#":
-											accidentalName = "SHARP";
-											break;
-										
 										case "t#":
 											accidentalName = "SHARP_SLASH4";
-											break;
-										
-										case "x":
-											accidentalName = "SHARP2";
 											break;
 										
 										default:
@@ -448,7 +441,8 @@ MuseScore
 		logMessage("Tuning note: " + calculateNoteName(note));
 		
 		var tuningOffset = 0;
-		var noteNameOctave = getNoteLetter(note) + getOctave(note);
+		var noteLetter = getNoteLetter(note);
+		var noteNameOctave = noteLetter + getOctave(note);
 		var accidentalName = getAccidentalName(note);
 
 		// Get the tuning offset for the input note with respect to 12EDO, based
@@ -609,6 +603,16 @@ MuseScore
 			{
 				accidentalName = previousAccidentals[noteNameOctave];
 				logMessage("Applying to the following accidental to the current note from a previous note within the measure: " + accidentalName);
+			}
+			// If the note still does not have an accidental applied to it,
+			// check if it's modified by a custom key signature.
+			if (accidentalName == "NONE")
+			{
+				if (currentCustomKeySignature.hasOwnProperty(noteLetter))
+				{
+					accidentalName = currentCustomKeySignature[noteLetter];
+					logMessage("Applying the following accidental from a custom key signature: " + accidentalName);
+				}
 			}
 		}
 		else

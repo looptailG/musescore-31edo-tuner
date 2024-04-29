@@ -24,7 +24,7 @@ These notation systems are not mutually exclusive, the plugin can correctly tune
 
 See [here](https://github.com/looptailG/musescore-31edo-tuner/wiki/Supported-Accidentals) for a list of every supported accidental.
 
-This plugin remembers which accidental is applied to any given note, and will automatically apply the same accidental to the following notes within the same measure.  This is also true for microtonal accidentals, for which this is usually not automatically done in Musescore.  A limitation of this is that the plugin only checks for accidentals for each voice individually, so if there are multiple voices with microtonal accidentals, it might be necessary to add an extra accidental for the first modified note in each voice.  This extra accidental can be safely made invisible, as that won't affect the plugin, as in the following example:
+This plugin remembers which accidental is applied to any given note, and will automatically apply the correct tuning offset to the following notes within the same measure.  This is also true for microtonal accidentals, for which this is usually not automatically done in Musescore.  A limitation of this is that the plugin only checks for accidentals for each voice individually, so if there are multiple voices with microtonal accidentals, it might be necessary to add an extra accidental for the first modified note in each voice.  This extra accidental can be safely made invisible, as that won't affect the plugin, as in the following example:
 
 ![image](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/ae091a16-ded2-43df-aa22-28144d39982c)
 

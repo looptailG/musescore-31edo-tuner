@@ -272,7 +272,8 @@ MuseScore
 					{
 						if (currentSegment.segmentType == Segment.KeySig)
 						{
-							console.log("key sig");
+							logMessage("Key signature change, emptying the custom key signature map.");
+							currentCustomKeySignature = {};
 						}
 						currentSegment = currentSegment.nextInMeasure;
 					}
@@ -281,22 +282,11 @@ MuseScore
 					{
 						if (currentSegment.segmentType == Segment.KeySig)
 						{
-							console.log("key sig");
-						}
-						currentSegment = currentSegment.prevInMeasure;
-					}
-					// TODO: This implementation is very ineffcient, as this piece of code is called on every element when the key signature is not empty.  Find a way to call this only when the key signature actually change.
-					/*if (cursor.keySignature)
-					{
-						// The key signature has changed, empty the custom key
-						// signature map.
-						// TODO: This if is necessary only because the previous if is not true only when there is an actual key signature change.  This way we check if the mapping was not empty before, and thus actually needs to be emptied now.
-						if (Object.keys(currentCustomKeySignature).length != 0)
-						{
 							logMessage("Key signature change, emptying the custom key signature map.");
 							currentCustomKeySignature = {};
 						}
-					}*/
+						currentSegment = currentSegment.prevInMeasure;
+					}
 					// Check if there is a text indicating a custom key
 					// signature change.
 					for (var i = 0; i < cursor.segment.annotations.length; i++)

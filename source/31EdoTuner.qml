@@ -24,7 +24,7 @@ MuseScore
 {
 	menuPath: "Plugins.Tuner.31EDO";
 	description: "Retune the selection, or the whole score if nothing is selected, to 31EDO.";
-	version: "1.5.1-alpha.5";
+	version: "1.5.1-alpha.6";
 	
 	Component.onCompleted:
 	{
@@ -429,26 +429,32 @@ MuseScore
 				break;
 			
 			case 2:
+			case -5:
 				tpcNoteName = "D";
 				break;
 			
 			case 4:
+			case -3:
 				tpcNoteName = "E";
 				break;
 			
 			case 6:
+			case -1:
 				tpcNoteName = "F";
 				break;
 			
 			case 1:
+			case -6:
 				tpcNoteName = "G";
 				break;
 			
 			case 3:
+			case -4:
 				tpcNoteName = "A";
 				break;
 			
 			case 5:
+			case -2:
 				tpcNoteName = "B";
 				break;
 		}
@@ -607,27 +613,29 @@ MuseScore
 			case 0:
 				return "C";
 			
-			case 1:
-				return "G";
-			
 			case 2:
+			case -5:
 				return "D";
 			
-			case 3:
-				return "A";
-			
 			case 4:
+			case -3:
 				return "E";
 			
-			case 5:
-				return "B";
-			
-			case -1:
 			case 6:
+			case -1:
 				return "F";
 			
-			default:
-				throw "Could not resolve the tpc: " + note.tpc;
+			case 1:
+			case -6:
+				return "G";
+			
+			case 3:
+			case -4:
+				return "A";
+			
+			case 5:
+			case -2:
+				return "B";
 		}
 	}
 	

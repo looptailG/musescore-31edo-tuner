@@ -24,7 +24,7 @@ MuseScore
 {
 	menuPath: "Plugins.Tuner.31EDO";
 	description: "Retune the selection, or the whole score if nothing is selected, to 31EDO.";
-	version: "1.5.1-alpha.6";
+	version: "1.5.1";
 	
 	Component.onCompleted:
 	{
@@ -426,8 +426,8 @@ MuseScore
 		// on its tonal pitch class.
 		tuningOffset = baseNotesOffset[noteLetter];
 		// Add the tuning offset due to the accidental.  Each semitone adds 7
-		// fifth deviations to the note tuning, because we have to move 7 steps
-		// in the circle of fifths to get to the altered note.
+		// fifth deviations to the note's tuning, because we have to move 7
+		// steps in the circle of fifths to get to the altered note.
 		var tpcAccidental = Math.floor((note.tpc + 1) / 7) - 2;
 		tuningOffset -= tpcAccidental * 7 * fifthDeviation;
 		logMessage("Base tuning offset: " + tuningOffset);

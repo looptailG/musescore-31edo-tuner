@@ -18,7 +18,7 @@ This plugin is compatible with the following notation systems:
 
 - [Sagittal notation](https://en.xen.wiki/w/Sagittal_notation), using quarter tone and half tone arrows.  In this system, a quarter tone arrow indicates an alteration of 1 EDO step, and a half tone arrow indicates an alteration of 2 EDO steps.  For example, a chromatic scale between <code>C</code> and <code>D</code> would be written as:
 
-![image](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/b6343855-5eb4-4666-a231-aefb26eb4dbe)
+![image](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/eea3a806-9c91-436c-8e0b-3cfefbeb46f3)
 
 These notation systems are not mutually exclusive, the plugin can correctly tune a score which uses a mixture of them.
 
@@ -49,7 +49,7 @@ If a note does not have an accidental in the custom key signature, you can leave
 
 The text describing the custom key signature can be safely made invisible, as that won't affect the plugin, as in the following example:
 
-![image](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/3e063adf-32bf-426a-995d-09453e26b113)
+![image](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/e005d94a-6d25-4149-896b-997a8bafc316)
 
 
 ## Usage

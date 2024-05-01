@@ -24,7 +24,7 @@ MuseScore
 {
 	menuPath: "Plugins.Tuner.31EDO";
 	description: "Retune the selection, or the whole score if nothing is selected, to 31EDO.";
-	version: "1.5.1-alpha.1";
+	version: "1.5.1-alpha.2";
 	
 	Component.onCompleted:
 	{
@@ -45,59 +45,73 @@ MuseScore
 	{
 		"C":
 		{
+			"bbb": 2 * fifthDeviation + 21 * fifthDeviation,
 			"bb": 2 * fifthDeviation + 14 * fifthDeviation,
 			"b": 2 * fifthDeviation + 7 * fifthDeviation,
 			"h": 2 * fifthDeviation,
 			"#": 2 * fifthDeviation - 7 * fifthDeviation,
-			"x": 2 * fifthDeviation - 14 * fifthDeviation
+			"x": 2 * fifthDeviation - 14 * fifthDeviation,
+			"#x": 2 * fifthDeviation - 21 * fifthDeviation,
 		},
 		"D":
 		{
+			"bbb": 21 * fifthDeviation,
 			"bb": 14 * fifthDeviation,
 			"b": 7 * fifthDeviation,
 			"h": 0,
 			"#": -7 * fifthDeviation,
-			"x": -14 * fifthDeviation
+			"x": -14 * fifthDeviation,
+			"#x": -21 * fifthDeviation,
 		},
 		"E":
 		{
+			"bbb": -2 * fifthDeviation + 21 * fifthDeviation,
 			"bb": -2 * fifthDeviation + 14 * fifthDeviation,
 			"b": -2 * fifthDeviation + 7 * fifthDeviation,
 			"h": -2 * fifthDeviation,
 			"#": -2 * fifthDeviation - 7 * fifthDeviation,
-			"x": -2 * fifthDeviation - 14 * fifthDeviation
+			"x": -2 * fifthDeviation - 14 * fifthDeviation,
+			"#x": -2 * fifthDeviation - 21 * fifthDeviation,
 		},
 		"F":
 		{
+			"bbb": 3 * fifthDeviation + 21 * fifthDeviation,
 			"bb": 3 * fifthDeviation + 14 * fifthDeviation,
 			"b": 3 * fifthDeviation + 7 * fifthDeviation,
 			"h": 3 * fifthDeviation,
 			"#": 3 * fifthDeviation - 7 * fifthDeviation,
-			"x": 3 * fifthDeviation - 14 * fifthDeviation
+			"x": 3 * fifthDeviation - 14 * fifthDeviation,
+			"#x": 3 * fifthDeviation - 21 * fifthDeviation,
 		},
 		"G":
 		{
+			"bbb": 1 * fifthDeviation + 21 * fifthDeviation,
 			"bb": 1 * fifthDeviation + 14 * fifthDeviation,
 			"b": 1 * fifthDeviation + 7 * fifthDeviation,
 			"h": 1 * fifthDeviation,
 			"#": 1 * fifthDeviation - 7 * fifthDeviation,
-			"x": 1 * fifthDeviation - 14 * fifthDeviation
+			"x": 1 * fifthDeviation - 14 * fifthDeviation,
+			"#x": 1 * fifthDeviation - 21 * fifthDeviation,
 		},
 		"A":
 		{
+			"bbb": -1 * fifthDeviation + 21 * fifthDeviation,
 			"bb": -1 * fifthDeviation + 14 * fifthDeviation,
 			"b": -1 * fifthDeviation + 7 * fifthDeviation,
 			"h": -1 * fifthDeviation,
 			"#": -1 * fifthDeviation - 7 * fifthDeviation,
-			"x": -1 * fifthDeviation - 14 * fifthDeviation
+			"x": -1 * fifthDeviation - 14 * fifthDeviation,
+			"#x": -1 * fifthDeviation - 21 * fifthDeviation,
 		},
 		"B":
 		{
+			"bbb": -3 * fifthDeviation + 21 * fifthDeviation,
 			"bb": -3 * fifthDeviation + 14 * fifthDeviation,
 			"b": -3 * fifthDeviation + 7 * fifthDeviation,
 			"h": -3 * fifthDeviation,
 			"#": -3 * fifthDeviation - 7 * fifthDeviation,
-			"x": -3 * fifthDeviation - 14 * fifthDeviation
+			"x": -3 * fifthDeviation - 14 * fifthDeviation,
+			"#x": -3 * fifthDeviation - 21 * fifthDeviation,
 		},
 	}
 	
@@ -123,13 +137,21 @@ MuseScore
 		{
 			"EDO_STEPS": 2,
 		},
-		"SHARP2":  // Double sharp
+		"SHARP2":
 		{
 			"EDO_STEPS": 4,
 		},
-		"FLAT2":  // Double flat
+		"FLAT2":
 		{
 			"EDO_STEPS": -4,
+		},
+		"SHARP3":
+		{
+			"EDO_STEPS": 6,
+		},
+		"FLAT3":
+		{
+			"EDO_STEPS": -6,
 		},
 		"NATURAL_FLAT":
 		{
@@ -458,6 +480,34 @@ MuseScore
 		// on its tonal pitch class.
 		switch (note.tpc)
 		{
+			case -8:
+				tuningOffset += centOffsets["F"]["bbb"];
+				break;
+
+			case -7:
+				tuningOffset += centOffsets["C"]["bbb"];
+				break;
+
+			case -6:
+				tuningOffset += centOffsets["G"]["bbb"];
+				break;
+
+			case -5:
+				tuningOffset += centOffsets["D"]["bbb"];
+				break;
+
+			case -4:
+				tuningOffset += centOffsets["A"]["bbb"];
+				break;
+
+			case -3:
+				tuningOffset += centOffsets["E"]["bbb"];
+				break;
+
+			case -2:
+				tuningOffset += centOffsets["B"]["bbb"];
+				break;
+			
 			case -1:
 				tuningOffset += centOffsets["F"]["bb"];
 				break;
@@ -591,11 +641,39 @@ MuseScore
 				break;
 
 			case 32:
-				tuningOffset += centOffsets["E"]["x"];
+				tuningOffset += centOffsets["E"]["#x"];
 				break;
 
 			case 33:
-				tuningOffset += centOffsets["B"]["x"];
+				tuningOffset += centOffsets["B"]["#x"];
+				break;
+
+			case 34:
+				tuningOffset += centOffsets["F"]["#x"];
+				break;
+
+			case 35:
+				tuningOffset += centOffsets["C"]["#x"];
+				break;
+
+			case 36:
+				tuningOffset += centOffsets["G"]["#x"];
+				break;
+
+			case 37:
+				tuningOffset += centOffsets["D"]["#x"];
+				break;
+
+			case 38:
+				tuningOffset += centOffsets["A"]["#x"];
+				break;
+
+			case 39:
+				tuningOffset += centOffsets["E"]["#x"];
+				break;
+
+			case 40:
+				tuningOffset += centOffsets["B"]["#x"];
 				break;
 			
 			default:
@@ -683,6 +761,10 @@ MuseScore
 		var accidental = getAccidentalEdoSteps(getAccidentalName(note));
 		switch (accidental)
 		{
+			case -6:
+				noteName += "bbb";
+				break;
+		
 			case -4:
 				noteName += "bb";
 				break;
@@ -716,6 +798,10 @@ MuseScore
 			
 			case 4:
 				noteName += "x";
+				break;
+			
+			case 6:
+				noteName += "#x";
 				break;
 			
 			default:
@@ -816,6 +902,12 @@ MuseScore
 			
 			case Accidental.FLAT2:
 				return "FLAT2";
+			
+			case Accidental.SHARP3:
+				return "SHARP3";
+			
+			case Accidental.FLAT3:
+				return "FLAT3";
 			
 			case Accidental.NATURAL_FLAT:
 				return "NATURAL_FLAT";

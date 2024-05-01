@@ -418,47 +418,13 @@ MuseScore
 		logMessage("Tuning note: " + calculateNoteName(note));
 		
 		var tuningOffset = 0;
+		var noteLetter = getNoteLetter(note);
+		var noteNameOctave = noteLetter + getOctave(note);
+		var accidentalName = getAccidentalName(note);
 
 		// Get the tuning offset for the input note with respect to 12EDO, based
 		// on its tonal pitch class.
-		var tpcNoteName = "";
-		switch (note.tpc % 7)
-		{
-			case 0:
-				tpcNoteName = "C";
-				break;
-			
-			case 2:
-			case -5:
-				tpcNoteName = "D";
-				break;
-			
-			case 4:
-			case -3:
-				tpcNoteName = "E";
-				break;
-			
-			case 6:
-			case -1:
-				tpcNoteName = "F";
-				break;
-			
-			case 1:
-			case -6:
-				tpcNoteName = "G";
-				break;
-			
-			case 3:
-			case -4:
-				tpcNoteName = "A";
-				break;
-			
-			case 5:
-			case -2:
-				tpcNoteName = "B";
-				break;
-		}
-		tuningOffset = baseNotesOffset[tpcNoteName];
+		tuningOffset = baseNotesOffset[noteLetter];
 		// Add the tuning offset due to the accidental.  Each semitone adds 7
 		// fifth deviations to the note tuning, because we have to move 7 steps
 		// in the circle of fifths to get to the altered note.
@@ -470,9 +436,6 @@ MuseScore
 		// conveyed by the tpc property, but are instead handled directly via a
 		// tuning offset.
 		// Check which accidental is applied to the note.
-		var noteLetter = getNoteLetter(note);
-		var noteNameOctave = noteLetter + getOctave(note);
-		var accidentalName = getAccidentalName(note);
 		if (accidentalName == "NONE")
 		{
 			// If the note does not have any accidental applied to it, check if

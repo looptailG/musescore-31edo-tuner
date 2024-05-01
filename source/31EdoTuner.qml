@@ -598,8 +598,6 @@ MuseScore
 				throw "Unsupported accidental: " + accidental;
 		}
 		
-		noteName += getOctave(note);
-		
 		return noteName;
 	}
 	

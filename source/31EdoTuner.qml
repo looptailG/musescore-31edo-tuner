@@ -24,7 +24,7 @@ MuseScore
 {
 	menuPath: "Plugins.Tuner.31EDO";
 	description: "Retune the selection, or the whole score if nothing is selected, to 31EDO.";
-	version: "1.5.1-alpha.4";
+	version: "1.5.1-alpha.5";
 	
 	Component.onCompleted:
 	{
@@ -267,8 +267,26 @@ MuseScore
 					}
 					
 					// Check for key signature change.
+					var currentSegment = cursor.segment;
+					while ((currentSegment != null) && (currentSegment.tick == cursor.segment.tick))
+					{
+						if (currentSegment.segmentType == Segment.KeySig)
+						{
+							console.log("key sig");
+						}
+						currentSegment = currentSegment.nextInMeasure;
+					}
+					currentSegment = cursor.segment.prevInMeasure;
+					while ((currentSegment != null) && (currentSegment.tick == cursor.segment.tick))
+					{
+						if (currentSegment.segmentType == Segment.KeySig)
+						{
+							console.log("key sig");
+						}
+						currentSegment = currentSegment.prevInMeasure;
+					}
 					// TODO: This implementation is very ineffcient, as this piece of code is called on every element when the key signature is not empty.  Find a way to call this only when the key signature actually change.
-					if (cursor.keySignature)
+					/*if (cursor.keySignature)
 					{
 						// The key signature has changed, empty the custom key
 						// signature map.
@@ -278,7 +296,7 @@ MuseScore
 							logMessage("Key signature change, emptying the custom key signature map.");
 							currentCustomKeySignature = {};
 						}
-					}
+					}*/
 					// Check if there is a text indicating a custom key
 					// signature change.
 					for (var i = 0; i < cursor.segment.annotations.length; i++)
@@ -343,7 +361,8 @@ MuseScore
 							}
 						}
 					}
-				
+					
+					// Tune notes.
 					if (cursor.element)
 					{
 						if (cursor.element.type == Element.CHORD)

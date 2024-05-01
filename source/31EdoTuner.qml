@@ -24,7 +24,7 @@ MuseScore
 {
 	menuPath: "Plugins.Tuner.31EDO";
 	description: "Retune the selection, or the whole score if nothing is selected, to 31EDO.";
-	version: "1.5.0";
+	version: "1.5.1-alpha.1";
 	
 	Component.onCompleted:
 	{
@@ -324,7 +324,7 @@ MuseScore
 					// signature change.
 					for (var i = 0; i < cursor.segment.annotations.length; i++)
 					{
-						var annotationText = cursor.segment.annotations[i].text;
+						var annotationText = cursor.segment.annotations[i].text.replace(/\s*/g, "");
 						if (customKeySignatureRegex.test(annotationText))
 						{
 							logMessage("Applying the current custom key signature: " + annotationText);
@@ -335,7 +335,7 @@ MuseScore
 								for (var j = 0; j < annotationTextSplitted.length; j++)
 								{
 									var currentNote = customKeySignatureNoteOrder[j];
-									var currentAccidental = annotationTextSplitted[j];
+									var currentAccidental = annotationTextSplitted[j].trim();
 									var accidentalName = "";
 									switch (currentAccidental)
 									{

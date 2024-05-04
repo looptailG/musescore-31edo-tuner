@@ -264,6 +264,7 @@ MuseScore
 					{
 						// New measure, empty the previous accidentals map.
 						previousAccidentals = {};
+						logMessage("----");
 					}
 					
 					// Check for key signature change.

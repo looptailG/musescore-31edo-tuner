@@ -24,7 +24,7 @@ MuseScore
 {
 	menuPath: "Plugins.Tuner.31EDO";
 	description: "Retune the selection, or the whole score if nothing is selected, to 31EDO.";
-	version: "1.5.1";
+	version: "1.5.2-alpha";
 	
 	Component.onCompleted:
 	{
@@ -268,25 +268,17 @@ MuseScore
 					}
 					
 					// Check for key signature change.
-					var currentSegment = cursor.segment;
-					while ((currentSegment != null) && (currentSegment.tick == cursor.segment.tick))
+					// TODO: This implementation is very ineffcient, as this piece of code is called on every element when the key signature is not empty.  Find a way to call this only when the key signature actually change.
+					if (cursor.keySignature)
 					{
-						if (currentSegment.segmentType == Segment.KeySig)
+						// The key signature has changed, empty the custom key
+						// signature map.
+						// TODO: This if is necessary only because the previous if is not true only when there is an actual key signature change.  This way we check if the mapping was not empty before, and thus actually needs to be emptied now.
+						if (Object.keys(currentCustomKeySignature).length != 0)
 						{
 							logMessage("Key signature change, emptying the custom key signature map.");
 							currentCustomKeySignature = {};
 						}
-						currentSegment = currentSegment.nextInMeasure;
-					}
-					currentSegment = cursor.segment.prevInMeasure;
-					while ((currentSegment != null) && (currentSegment.tick == cursor.segment.tick))
-					{
-						if (currentSegment.segmentType == Segment.KeySig)
-						{
-							logMessage("Key signature change, emptying the custom key signature map.");
-							currentCustomKeySignature = {};
-						}
-						currentSegment = currentSegment.prevInMeasure;
 					}
 					// Check if there is a text indicating a custom key
 					// signature change.

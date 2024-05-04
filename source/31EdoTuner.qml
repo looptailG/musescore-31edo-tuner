@@ -284,63 +284,67 @@ MuseScore
 					// signature change.
 					for (var i = 0; i < cursor.segment.annotations.length; i++)
 					{
-						var annotationText = cursor.segment.annotations[i].text.replace(/\s*/g, "");
-						if (customKeySignatureRegex.test(annotationText))
+						var annotationText = cursor.segment.annotations[i].text;
+						if (annotationText)
 						{
-							logMessage("Applying the current custom key signature: " + annotationText);
-							currentCustomKeySignature = {};
-							try
+							annotationText = annotationText.replace(/\s*/g, "");
+							if (customKeySignatureRegex.test(annotationText))
 							{
-								var annotationTextSplitted = annotationText.split(".");
-								for (var j = 0; j < annotationTextSplitted.length; j++)
+								logMessage("Applying the current custom key signature: " + annotationText);
+								currentCustomKeySignature = {};
+								try
 								{
-									var currentNote = customKeySignatureNoteOrder[j];
-									var currentAccidental = annotationTextSplitted[j].trim();
-									var accidentalName = "";
-									switch (currentAccidental)
+									var annotationTextSplitted = annotationText.split(".");
+									for (var j = 0; j < annotationTextSplitted.length; j++)
 									{
-										case "bb":
-										case "b":
-										case "":
-										case "h":
-										case "#":
-										case "x":
-											// Non-microtonal accidentals are
-											// automatically handled by
-											// Musescore even in custom key
-											// signatures, so we only have to
-											// check for microtonal accidentals.
-											break;
-										
-										case "db":
-											accidentalName = "MIRRORED_FLAT2";
-											break;
-										
-										case "d":
-											accidentalName = "MIRRORED_FLAT";
-											break;
-										
-										case "t":
-											accidentalName = "SHARP_SLASH";
-											break;
-										
-										case "t#":
-											accidentalName = "SHARP_SLASH4";
-											break;
-										
-										default:
-											throw "Unsupported accidental in the custom key signature: " + currentAccidental;
-									}
-									if (accidentalName != "")
-									{
-										currentCustomKeySignature[currentNote] = accidentalName;
+										var currentNote = customKeySignatureNoteOrder[j];
+										var currentAccidental = annotationTextSplitted[j].trim();
+										var accidentalName = "";
+										switch (currentAccidental)
+										{
+											case "bb":
+											case "b":
+											case "":
+											case "h":
+											case "#":
+											case "x":
+												// Non-microtonal accidentals are
+												// automatically handled by
+												// Musescore even in custom key
+												// signatures, so we only have to
+												// check for microtonal accidentals.
+												break;
+											
+											case "db":
+												accidentalName = "MIRRORED_FLAT2";
+												break;
+											
+											case "d":
+												accidentalName = "MIRRORED_FLAT";
+												break;
+											
+											case "t":
+												accidentalName = "SHARP_SLASH";
+												break;
+											
+											case "t#":
+												accidentalName = "SHARP_SLASH4";
+												break;
+											
+											default:
+												throw "Unsupported accidental in the custom key signature: " + currentAccidental;
+										}
+										if (accidentalName != "")
+										{
+											currentCustomKeySignature[currentNote] = accidentalName;
+										}
 									}
 								}
-							}
-							catch (error)
-							{
-								logMessage(error, true);
-								currentCustomKeySignature = {};
+								catch (error)
+								{
+									logMessage(error, true);
+									currentCustomKeySignature = {};
+								}
 							}
 						}
 					}

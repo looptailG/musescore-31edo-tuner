@@ -32,7 +32,7 @@ This plugin remembers which accidental is applied to any given note, and will au
 
 This plugin supports custom key signatures.  If the custom key signatures only contain standard accidentals, no extra action is required other than inserting the custom key signaturs into the score.
 
-If the key signature contains microtonal accidentals, then it is necessary to also add a text (`System Text` for a regular key signature, or `Staff Text` for a local key signature) to inform the plugin about the accidentals present in the key signature.  This text has to be formatted as `X.X.X.X.X.X.X`, where `X` are the accidental applied to each note, arranged according to the circle of fifths: `F.C.G.D.A.E.B`.  These accidentals are written using ASCII characters only in the following way:
+If the key signature contains microtonal accidentals, then it is necessary to also add a text (`System Text`  or `Staff Text`) to inform the plugin about the accidentals present in the key signature.  This text has to be formatted as `X.X.X.X.X.X.X`, where `X` are the accidental applied to each note, arranged according to the circle of fifths: `F.C.G.D.A.E.B`.  These accidentals are written using ASCII characters only in the following way:
 
 | Accidental | Text |
 | :--------: | :--: |

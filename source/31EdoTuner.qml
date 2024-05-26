@@ -24,7 +24,7 @@ MuseScore
 {
 	menuPath: "Plugins.Tuner.31EDO";
 	description: "Retune the selection, or the whole score if nothing is selected, to 31EDO.";
-	version: "1.5.2";
+	version: "1.5.3";
 	
 	Component.onCompleted:
 	{
@@ -602,14 +602,14 @@ MuseScore
 	 */
 	function getAccidentalEdoSteps(accidentalName)
 	{
-		var accidental = supportedAccidentals[accidentalName]["EDO_STEPS"];
-		if (accidental !== undefined)
+		var edoSteps = supportedAccidentals[accidentalName]["EDO_STEPS"];
+		if (edoSteps !== undefined)
 		{
-			return accidental;
+			return edoSteps;
 		}
 		else
 		{
-			throw "Could not find the following accidental in the accidentals mapping: " + note.accidentalType;
+			throw "Could not find the following accidental in the accidentals mapping: " + accidentalName;
 		}
 	}
 	

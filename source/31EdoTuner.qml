@@ -22,19 +22,11 @@ import MuseScore 3.0
 
 MuseScore
 {
-	menuPath: "Plugins.Tuner.31EDO";
+	title: "31EDO Tuner";
 	description: "Retune the selection, or the whole score if nothing is selected, to 31EDO.";
+	categoryCode: "playback";
+	thumbnailName: "31EdoThumbnail.png";
 	version: "2.0.0-alpha";
-	
-	Component.onCompleted:
-	{
-		if (mscoreMajorVersion >= 4)
-		{
-			title = qsTr("31EDO Tuner");
-			thumbnailName = "31EdoThumbnail.png";
-			categoryCode = "playback";
-		}
-	}
 
 	// Size in cents of an EDO step.
 	property var stepSize: 1200.0 / 31;
@@ -308,11 +300,12 @@ MuseScore
 											case "h":
 											case "#":
 											case "x":
-												// Non-microtonal accidentals are
-												// automatically handled by
+												// Non-microtonal accidentals
+												// are automatically handled by
 												// Musescore even in custom key
-												// signatures, so we only have to
-												// check for microtonal accidentals.
+												// signatures, so we only have
+												// to check for microtonal
+												// accidentals.
 												break;
 											
 											case "db":
@@ -397,14 +390,7 @@ MuseScore
 		
 		debugLogger.showLogMessages();
 
-		if (mscoreMajorVersion >= 4)
-		{
-			quit();
-		}
-		else
-		{
-			Qt.quit();
-		}
+		quit();
 	}
 
 	/**
@@ -470,15 +456,12 @@ MuseScore
 			// accidental is applied to the current note.  For this reason, we
 			// must check getAccidentalName() on the current note, it is not
 			// sufficient to check the value saved in accidentalName.
-			if (mscoreMajorVersion >= 4)
+			var actualAccidentalName = getAccidentalName(note);
+			var actualAccidentalOffset = supportedAccidentals[actualAccidentalName]["DEFAULT_OFFSET"];
+			if (actualAccidentalOffset !== undefined)
 			{
-				var actualAccidentalName = getAccidentalName(note);
-				var actualAccidentalOffset = supportedAccidentals[actualAccidentalName]["DEFAULT_OFFSET"];
-				if (actualAccidentalOffset !== undefined)
-				{
-					logMessage("Undoing the default tuning offset of: " + defaultAccidentalOffset);
-					tuningOffset -= defaultAccidentalOffset;
-				}
+				logMessage("Undoing the default tuning offset of: " + defaultAccidentalOffset);
+				tuningOffset -= defaultAccidentalOffset;
 			}
 			
 			// Apply the tuning offset for this specific accidental.
@@ -495,6 +478,7 @@ MuseScore
 	 * Return the english note name for the input note, written with ASCII
 	 * characters only.  Uses the following characters for the accidentals:
 	 *
+	 * - Triple flat  -> bbb
 	 * - Double flat  -> bb
 	 * - Sesqui flat  -> db
 	 * - Flat         -> b
@@ -503,6 +487,7 @@ MuseScore
 	 * - Sharp        -> #
 	 * - Sesqui sharp -> t#
 	 * - Double sharp -> x
+	 * - Triple sharp -> #x
 	 */
 	function calculateNoteName(note)
 	{
@@ -624,6 +609,7 @@ MuseScore
 		// needed to properly compare it with the enum values in a switch
 		// statement.
 		var accidentalType = parseInt("" + note.accidentalType);
+		// TODO: Check if it's still necessary in Musescore 4.4 and later.
 		// In Musescore3 the accidentalType property is a signed integer, while
 		// the Accidentals enum values are always positive.  If it's negative,
 		// convert it to an unsigned 8 bit integer by shifting it by 256.
@@ -720,22 +706,6 @@ MuseScore
 		{
 			isErrorMessage = false;
 		}
-	
-		if (mscoreMajorVersion >= 4)
-		{
-			debugLogger.log(message, isErrorMessage);
-		}
-		else
-		{
-			if (isErrorMessage)
-			{
-				console.error(message);
-				debugLogger.log(message, isErrorMessage);
-			}
-			else
-			{
-				console.log(message);
-			}
-		}
+		debugLogger.log(message, isErrorMessage);
 	}
 }

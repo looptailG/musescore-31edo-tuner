@@ -19,6 +19,9 @@
 import QtQuick 2.2
 import QtQuick.Dialogs 1.1
 import MuseScore 3.0
+import "libs/AccidentalUtils.js" as AccidentalUtils
+import "libs/NoteUtils.js" as NoteUtils
+import "libs/TuningUtils.js" as TuningUtils
 
 MuseScore
 {

@@ -18,6 +18,7 @@
 
 const VERSION = "1.0.0";
 
+// TODO: Check which accidentals are actually handled by the tpc property.
 const ACCIDENTAL_DATA = {
 	"NONE":
 	{

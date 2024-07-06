@@ -200,6 +200,196 @@ MuseScore
 		try
 		{
 			logger.log("-- 31EDO Tuner -- Version " + version + " --");
+			
+			curScore.startCmd();
+			
+			// Calculate the portion of the score to tune.
+			var cursor = curScore.newCursor();
+			var startStaff;
+			var endStaff;
+			var startTick;
+			var endTick;
+			cursor.rewind(Cursor.SELECTION_START);
+			if (!cursor.segment)
+			{
+				logger.log("Tuning the entire score.");
+				startStaff = 0;
+				endStaff = curScore.nstaves - 1;
+				startTick = 0;
+				endTick = curScore.lastSegment.tick + 1;
+			}
+			else
+			{
+				logger.log("Tuning only the current selection.");
+				startStaff = cursor.staffIdx;
+				startTick = cursor.tick;
+				cursor.rewind(Cursor.SELECTION_END);
+				endStaff = cursor.staffIdx;
+				if (cursor.tick == 0)
+				{
+					// If the selection includes the last measure of the score,
+					// .rewind() overflows and goes back to tick 0.
+					endTick = curScore.lastSegment.tick + 1;
+				}
+				else
+				{
+					endTick = cursor.tick;
+				}
+				logger.trace("Tuning only ticks: " + startTick + " - " + endTick);
+				logger.trace("Tuning only staffs: " + startStaff + " - " + endStaff);
+			}
+			
+			// Loop on the portion of the score to tune.
+			for (var staff = startStaff; staff <= endStaff; staff++)
+			{
+				for (var voice = 0; voice < 4; voice++)
+				{
+					logger.log("Tuning Staff: " + staff + "; Voice: " + voice);
+					
+					cursor.voice = voice;
+					cursor.staffIdx = staff;
+					cursor.rewindToTick(startTick);
+					
+					currentCustomKeySignature = {};
+
+					// Loop on elements of a voice.
+					while (cursor.segment && (cursor.tick < endTick))
+					{
+						if (cursor.segment.tick == cursor.measure.firstSegment.tick)
+						{
+							// New measure, empty the previous accidentals map.
+							previousAccidentals = {};
+							logger.trace("----");
+						}
+						
+						// Check for key signature change.
+						// TODO: This implementation is very ineffcient, as this piece of code is called on every element when the key signature is not empty.  Find a way to call this only when the key signature actually change.
+						if (cursor.keySignature)
+						{
+							// The key signature has changed, empty the custom
+							// key signature map.
+							// TODO: This if is necessary only because the previous if is not true only when there is an actual key signature change.  This way we check if the mapping was not empty before, and thus actually needs to be emptied now.
+							if (Object.keys(currentCustomKeySignature).length != 0)
+							{
+								logger.log("Key signature change, emptying the custom key signature map.");
+								currentCustomKeySignature = {};
+							}
+						}
+						// Check if there is a text indicating a custom key
+						// signature change.
+						for (var i = 0; i < cursor.segment.annotations.length; i++)
+						{
+							var annotationText = cursor.segment.annotations[i].text;
+							if (annotationText)
+							{
+								annotationText = annotationText.replace(/\s*/g, "");
+								if (customKeySignatureRegex.test(annotationText))
+								{
+									logger.log("Applying the current custom key signature: " + annotationText);
+									currentCustomKeySignature = {};
+									try
+									{
+										var annotationTextSplitted = annotationText.split(".");
+										for (var j = 0; j < annotationTextSplitted.length; j++)
+										{
+											var currentNote = customKeySignatureNoteOrder[j];
+											var currentAccidental = annotationTextSplitted[j].trim();
+											var accidentalName = "";
+											switch (currentAccidental)
+											{
+												// Non-microtonal accidentals
+												// are automatically handled by
+												// Musescore even in custom key
+												// signatures, so we only have
+												// to check for microtonal
+												// accidentals.
+												case "bb":
+												case "b":
+												case "":
+												case "h":
+												case "#":
+												case "x":
+													break;
+												
+												case "db":
+													accidentalName = "MIRRORED_FLAT2";
+													break;
+												
+												case "d":
+													accidentalName = "MIRRORED_FLAT";
+													break;
+												
+												case "t":
+													accidentalName = "SHARP_SLASH";
+													break;
+												
+												case "t#":
+													accidentalName = "SHARP_SLASH4";
+													break;
+												
+												default:
+													throw "Unsupported accidental in the custom key signature: " + currentAccidental;
+											}
+											if (accidentalName != "")
+											{
+												currentCustomKeySignature[currentNote] = accidentalName;
+											}
+										}
+									}
+									catch (error)
+									{
+										logger.error(error);
+										currentCustomKeySignature = {};
+									}
+								}
+							}
+						}
+						
+						// Tune notes.
+						if (cursor.element)
+						{
+							if (cursor.element.type == Element.CHORD)
+							{
+								// Iterate through every grace chord.
+								var graceChords = cursor.element.graceNotes;
+								for (var i = 0; i < graceChords.length; i++)
+								{
+									var notes = graceChords[i].notes;
+									for (var j = 0; j < notes.length; j++)
+									{
+										try
+										{
+											notes[j].tuning = calculateTuningOffset(notes[j]);
+										}
+										catch (error)
+										{
+											logger.error(error);
+										}
+									}
+								}
+
+								// Iterate through every chord note.
+								var notes = cursor.element.notes;
+								for (var i = 0; i < notes.length; i++)
+								{
+									try
+									{
+										notes[i].tuning = calculateTuningOffset(notes[i]);
+									}
+									catch (error)
+									{
+										logger.errror(error);
+									}
+								}
+							}
+						}
+
+						cursor.next();
+					}
+				}
+			}
+			
+			curScore.endCmd();
 		}
 		catch (error)
 		{
@@ -211,5 +401,13 @@ MuseScore
 			
 			quit();
 		}
+	}
+
+	/**
+	 * Returns the amount of cents necessary to tune the input note to 31EDO.
+	 */
+	function calculateTuningOffset(note)
+	{
+		return 0;
 	}
 }

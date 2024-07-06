@@ -164,12 +164,79 @@ MuseScore
 	// Array containing the notes in the order they appear in the custom key
 	// signature string.
 	property var customKeySignatureNoteOrder: ["F", "C", "G", "D", "A", "E", "B"];
+	
+	FileIO
+	{
+		id: logger;
+		source: Qt.resolvedUrl(".").toString().substring(8) + "logs/" + DateUtils.getFileDateTime() + "_log.txt";
+		property var logMessages: "";
+		property var currentLogLevel: 0;
+		property variant logLevels:
+		{
+			0: " | TRACE   | ",
+			1: " | INFO    | ",
+			2: " | WARNING | ",
+			3: " | ERROR   | ",
+			4: " | FATAL   | "
+		}
+		
+		function log(message, logLevel)
+		{
+			if (logLevel === undefined)
+			{
+				logLevel = 1;
+			}
+			
+			if (logLevel >= currentLogLevel)
+			{
+				logMessages += DateUtils.getRFC3339DateTime() + logLevels[logLevel] + message + "\n";
+			}
+		}
+		
+		function trace(message)
+		{
+			log(message, 0);
+		}
+		
+		function warning(message)
+		{
+			log(message, 2);
+		}
+		
+		function error(message)
+		{
+			log(measure, 3);
+		}
+		
+		function fatal(message)
+		{
+			log(message, 4);
+		}
+		
+		function writeLogMessages()
+		{
+			write(logMessages);
+		}
+	}
 
 	onRun:
 	{
+		try
+		{
+			logger.log("test")
+		}
+		catch (error)
+		{
+			logger.source = "C:/MSPlugins/log.txt";
+			logger.error(error);
+		}
+		finally
+		{
+			logger.writeLogMessages();
+		}
 		//logMessage("-- 31EDO Tuner -- Version " + version +  " --");
 	
-		curScore.startCmd();
+/*		curScore.startCmd();
 		
 		// Calculate the portion of the score to tune.
 		var cursor = curScore.newCursor();
@@ -249,9 +316,9 @@ MuseScore
 					{
 						var annotationText = cursor.segment.annotations[i].text;
 						if (annotationText)
-						{
-							annotationText = annotationText.replace(/\s*/g, "");
-							if (customKeySignatureRegex.test(annotationText))
+						{*/
+//							annotationText = annotationText.replace(/\s*/g, "");
+/*							if (customKeySignatureRegex.test(annotationText))
 							{
 								//logMessage("Applying the current custom key signature: " + annotationText);
 								currentCustomKeySignature = {};
@@ -357,7 +424,7 @@ MuseScore
 			}
 		}
 		
-		curScore.endCmd();
+		curScore.endCmd();*/
 		
 		//debugLogger.showLogMessages();
 
@@ -367,7 +434,7 @@ MuseScore
 	/**
 	 * Returns the amount of cents necessary to tune the input note to 31EDO.
 	 */
-	function calculateTuningOffset(note)
+/*	function calculateTuningOffset(note)
 	{
 		//logMessage("Tuning note: " + calculateNoteName(note));
 		
@@ -443,7 +510,7 @@ MuseScore
 		//logMessage("Final tuning offset: " + tuningOffset);
 
 		return tuningOffset;
-	}
+	}*/
 	
 	/**
 	 * Return the english note name for the input note, written with ASCII
@@ -460,7 +527,7 @@ MuseScore
 	 * - Double sharp -> x
 	 * - Triple sharp -> #x
 	 */
-	function calculateNoteName(note)
+/*	function calculateNoteName(note)
 	{
 		var noteName = getNoteLetter(note);
 		
@@ -515,12 +582,12 @@ MuseScore
 		}
 		
 		return noteName;
-	}
+	}*/
 	
 	/**
 	 * Return the english note name for the input note.
 	 */
-	function getNoteLetter(note)
+/*	function getNoteLetter(note)
 	{
 		switch (note.tpc % 7)
 		{
@@ -551,12 +618,12 @@ MuseScore
 			case -2:
 				return "B";
 		}
-	}
+	}*/
 	
 	/**
 	 * Return the number of 31EDO steps this note is altered by.
 	 */
-	function getAccidentalEdoSteps(accidentalName)
+/*	function getAccidentalEdoSteps(accidentalName)
 	{
 		var edoSteps = supportedAccidentals[accidentalName]["EDO_STEPS"];
 		if (edoSteps !== undefined)
@@ -567,13 +634,13 @@ MuseScore
 		{
 			throw "Could not find the following accidental in the accidentals mapping: " + accidentalName;
 		}
-	}
+	}*/
 	
 	/**
 	 * Return the name of the input note's accidental for the supported
 	 * accidentals.
 	 */
-	function getAccidentalName(note)
+/*	function getAccidentalName(note)
 	{
 		// Casting the accidentalType as a string is necessary to obtain the
 		// number corresponding to the enum value.  Parsing it as an int is
@@ -657,15 +724,15 @@ MuseScore
 			default:
 				throw "Unsupported accidental: " + note.accidentalType;
 		}
-	}
+	}*/
 	
 	/**
 	 * Return the octave of the input note.
 	 */
-	function getOctave(note)
+/*	function getOctave(note)
 	{
 		return Math.floor(note.pitch / 12) - 1;
-	}
+	}*/
 	
 	/**
 	 * Log the input message, and automatically redirect the output message

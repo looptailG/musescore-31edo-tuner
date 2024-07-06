@@ -398,7 +398,7 @@ MuseScore
 			// accidental is applied to the current note.  For this reason, we
 			// must check getAccidentalName() on the current note, it is not
 			// sufficient to check the value saved in accidentalName.
-			var actualAccidentalName = getAccidentalName(note);
+			var actualAccidentalName = AccidentalUtils.getAccidentalName(note);
 			var actualAccidentalOffset = AccidentalUtils.ACCIDENTAL_DATA[actualAccidentalName]["DEFAULT_OFFSET"];
 			tuningOffset -= actualAccidentalOffset;
 			logger.trace("Undoing the default tuning offset of: " + actualAccidentalOffset);

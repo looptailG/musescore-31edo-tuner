@@ -181,6 +181,8 @@ MuseScore
 				logger.trace("Tuning only staffs: " + startStaff + " - " + endStaff);
 			}
 			
+			var tunedNotes = 0;
+			var totalNotes = 0;
 			// Loop on the portion of the score to tune.
 			for (var staff = startStaff; staff <= endStaff; staff++)
 			{
@@ -298,9 +300,11 @@ MuseScore
 									var notes = graceChords[i].notes;
 									for (var j = 0; j < notes.length; j++)
 									{
+										totalNotes += 1;
 										try
 										{
 											notes[j].tuning = calculateTuningOffset(notes[j]);
+											tunedNotes += 1;
 										}
 										catch (error)
 										{
@@ -313,9 +317,11 @@ MuseScore
 								var notes = cursor.element.notes;
 								for (var i = 0; i < notes.length; i++)
 								{
+									totalNotes += 1;
 									try
 									{
 										notes[i].tuning = calculateTuningOffset(notes[i]);
+										tunedNotes += 1;
 									}
 									catch (error)
 									{
@@ -329,6 +335,8 @@ MuseScore
 					}
 				}
 			}
+			
+			logger.log("Notes tuned: " + tunedNotes + " / " + totalNotes);
 			
 			curScore.endCmd();
 		}
@@ -405,6 +413,10 @@ MuseScore
 			
 			// Apply the tuning offset for this specific accidental.
 			var edoSteps = supportedAccidentals[accidentalName];
+			if (edoSteps === undefined)
+			{
+				throw "Unsupported accidental: " + accidentalName;
+			}
 			tuningOffset += edoSteps * stepSize;
 			logger.trace("Offsetting the tuning by " + edoSteps + " EDO steps.");
 		}

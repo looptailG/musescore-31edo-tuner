@@ -24,7 +24,7 @@ MuseScore
 {
 	menuPath: "Plugins.Tuner.31EDO";
 	description: "Retune the selection, or the whole score if nothing is selected, to 31EDO.";
-	version: "1.5.3";
+	version: "1.5.4-alpha";
 	
 	Component.onCompleted:
 	{
@@ -476,8 +476,8 @@ MuseScore
 				var actualAccidentalOffset = supportedAccidentals[actualAccidentalName]["DEFAULT_OFFSET"];
 				if (actualAccidentalOffset !== undefined)
 				{
-					logMessage("Undoing the default tuning offset of: " + defaultAccidentalOffset);
-					tuningOffset -= defaultAccidentalOffset;
+					logMessage("Undoing the default tuning offset of: " + actualAccidentalOffset);
+					tuningOffset -= actualAccidentalOffset;
 				}
 			}
 			

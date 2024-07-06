@@ -42,86 +42,26 @@ MuseScore
 	// Map containing the amount of EDO steps of every supported accidental.
 	property variant supportedAccidentals:
 	{
-		"NONE":
-		{
-			"EDO_STEPS": 0,
-		},
-		"FLAT":
-		{
-			"EDO_STEPS": -2,
-		},
-		"NATURAL":
-		{
-			"EDO_STEPS": 0,
-		},
-		"SHARP":
-		{
-			"EDO_STEPS": 2,
-		},
-		"SHARP2":
-		{
-			"EDO_STEPS": 4,
-		},
-		"FLAT2":
-		{
-			"EDO_STEPS": -4,
-		},
-		"SHARP3":
-		{
-			"EDO_STEPS": 6,
-		},
-		"FLAT3":
-		{
-			"EDO_STEPS": -6,
-		},
-		"NATURAL_FLAT":
-		{
-			"EDO_STEPS": -2,
-		},
-		"NATURAL_SHARP":
-		{
-			"EDO_STEPS": 2,
-		},
-		"ARROW_DOWN":
-		{
-			"EDO_STEPS": -1,
-		},
-		"MIRRORED_FLAT":  // Half flat
-		{
-			"EDO_STEPS": -1,
-		},
-		"MIRRORED_FLAT2":  // Sesqui flat
-		{
-			"EDO_STEPS": -3,
-		},
-		"SHARP_SLASH":  // Half sharp
-		{
-			"EDO_STEPS": 1,
-		},
-		"LOWER_ONE_SEPTIMAL_COMMA":
-		{
-			"EDO_STEPS": -1,
-		},
-		"SHARP_SLASH4":  // Sesqui sharp
-		{
-			"EDO_STEPS": 3,
-		},
-		"SAGITTAL_11MDD":  // Sagittal quarter tone down
-		{
-			"EDO_STEPS": -1,
-		},
-		"SAGITTAL_11MDU":  // Sagittal quarter tone up
-		{
-			"EDO_STEPS": 1,
-		},
-		"SAGITTAL_FLAT":  // Sagittal half tone down
-		{
-			"EDO_STEPS": -2,
-		},
-		"SAGITTAL_SHARP":  // Sagittal half tone up
-		{
-			"EDO_STEPS": 2,
-		},
+		"NONE": 0,
+		"FLAT": -2,
+		"NATURAL": 0,
+		"SHARP": 2,
+		"SHARP2": 4,
+		"FLAT2": -4,
+		"SHARP3": 6,
+		"FLAT3": -6,
+		"NATURAL_FLAT": -2,
+		"NATURAL_SHARP": 2,
+		"ARROW_DOWN": -1,
+		"MIRRORED_FLAT": -1,
+		"MIRRORED_FLAT2": -3,
+		"SHARP_SLASH": 1,
+		"LOWER_ONE_SEPTIMAL_COMMA": -1,
+		"SHARP_SLASH4": 3,
+		"SAGITTAL_11MDD": -1,
+		"SAGITTAL_11MDU": 1,
+		"SAGITTAL_FLAT": -2,
+		"SAGITTAL_SHARP": 2,
 	}
 	
 	// Map containing the previous microtonal accidentals in the current
@@ -427,12 +367,49 @@ MuseScore
 			// If the note does not have any accidental applied to it, check if
 			// the same note previously in the measure was modified by a
 			// microtonal accidental.
-			if (previousAccidentals.hasOwrProperty(noteNameOctave))
+			if (previousAccidentals.hasOwnProperty(noteNameOctave))
 			{
-				
+				accidentalName = previousAccidentals[noteNameOctave];
+				logger.trace("Applying to the following accidental to the current note from a previous note within the measure: " + accidentalName);
+			}
+			// If the note still does not have an accidental applied to it,
+			// check if it's modified by a custom key signature.
+			if (accidentalName == "NONE")
+			{
+				if (currentCustomKeySignature.hasOwnProperty(noteLetter))
+				{
+					accidentalName = currentCustomKeySignature[noteLetter];
+					logger.trace("Applying the following accidental from a custom key signature: " + accidentalName);
+				}
 			}
 		}
+		else
+		{
+			// Save the accidental in the previous accidentals map for this
+			// note.
+			previousAccidentals[noteNameOctave] = accidentalName;
+		}
+		// Check if the accidental is handled by a tuning offset.
+		if (!AccidentalUtils.ACCIDENTAL_DATA[accidentalName]["TPC"])
+		{
+			// Undo the default tuning offset which is applied to certain
+			// accidentals.
+			// The default tuning offset is applied only if an actual microtonal
+			// accidental is applied to the current note.  For this reason, we
+			// must check getAccidentalName() on the current note, it is not
+			// sufficient to check the value saved in accidentalName.
+			var actualAccidentalName = getAccidentalName(note);
+			var actualAccidentalOffset = AccidentalUtils.ACCIDENTAL_DATA[actualAccidentalName]["DEFAULT_OFFSET"];
+			tuningOffset -= actualAccidentalOffset;
+			logger.trace("Undoing the default tuning offset of: " + actualAccidentalOffset);
+			
+			// Apply the tuning offset for this specific accidental.
+			var edoSteps = supportedAccidentals[accidentalName];
+			tuningOffset += edoSteps * stepSize;
+			logger.trace("Offsetting the tuning by " + edoSteps + " EDO steps.");
+		}
 		
+		logger.trace("Final tuning offset: " + tuningOffset);
 		return tuningOffset;
 	}
 }

@@ -17,9 +17,10 @@
 */
 
 import QtQuick 2.2
-import QtQuick.Dialogs 1.1
+import FileIO 3.0
 import MuseScore 3.0
 import "libs/AccidentalUtils.js" as AccidentalUtils
+import "libs/DateUtils.js" as DateUtils
 import "libs/NoteUtils.js" as NoteUtils
 import "libs/TuningUtils.js" as TuningUtils
 
@@ -163,43 +164,10 @@ MuseScore
 	// Array containing the notes in the order they appear in the custom key
 	// signature string.
 	property var customKeySignatureNoteOrder: ["F", "C", "G", "D", "A", "E", "B"];
-	
-	property var showLog: false;
-	property var maxLines: 50;
-	MessageDialog
-	{
-		id: debugLogger;
-		title: "31EDO Tuner - Debug";
-		text: "";
-
-		function log(message, isErrorMessage)
-		{
-			if (showLog || isErrorMessage)
-			{
-				text += message + "\n";
-			}
-		}
-		
-		function showLogMessages()
-		{
-			if (text != "")
-			{
-				// Truncate the message to a maximum number of lines, to prevent
-				// issues with the message box being too large.
-				var messageLines = text.split("\n");
-				if (messageLines.length > maxLines)
-				{
-					var messageLines = messageLines.slice(0, maxLines);
-					text = messageLines.join("\n") + "\n" + "...";
-				}
-				debugLogger.open();
-			}
-		}
-	}
 
 	onRun:
 	{
-		logMessage("-- 31EDO Tuner -- Version " + version +  " --");
+		//logMessage("-- 31EDO Tuner -- Version " + version +  " --");
 	
 		curScore.startCmd();
 		
@@ -217,7 +185,7 @@ MuseScore
 			endStaff = curScore.nstaves - 1;
 			startTick = 0;
 			endTick = curScore.lastSegment.tick + 1;
-			logMessage("Tuning the entire score.");
+			//logMessage("Tuning the entire score.");
 		}
 		else
 		{
@@ -236,7 +204,7 @@ MuseScore
 			{
 				endTick = cursor.tick;
 			}
-			logMessage("Tuning only the portion of the score between staffs " + startStaff + " - " + endStaff + ", and between ticks " + startTick + " - " + endTick + ".");
+			//logMessage("Tuning only the portion of the score between staffs " + startStaff + " - " + endStaff + ", and between ticks " + startTick + " - " + endTick + ".");
 		}
 
 		// Loop on the portion of the score to tune.
@@ -244,7 +212,7 @@ MuseScore
 		{
 			for (var voice = 0; voice < 4; voice++)
 			{
-				logMessage("-- Tuning Staff: " + staff + " -- Voice: " + voice + " --");
+				//logMessage("-- Tuning Staff: " + staff + " -- Voice: " + voice + " --");
 				
 				cursor.voice = voice;
 				cursor.staffIdx = staff;
@@ -259,7 +227,7 @@ MuseScore
 					{
 						// New measure, empty the previous accidentals map.
 						previousAccidentals = {};
-						logMessage("----");
+						//logMessage("----");
 					}
 					
 					// Check for key signature change.
@@ -271,7 +239,7 @@ MuseScore
 						// TODO: This if is necessary only because the previous if is not true only when there is an actual key signature change.  This way we check if the mapping was not empty before, and thus actually needs to be emptied now.
 						if (Object.keys(currentCustomKeySignature).length != 0)
 						{
-							logMessage("Key signature change, emptying the custom key signature map.");
+							//logMessage("Key signature change, emptying the custom key signature map.");
 							currentCustomKeySignature = {};
 						}
 					}
@@ -285,7 +253,7 @@ MuseScore
 							annotationText = annotationText.replace(/\s*/g, "");
 							if (customKeySignatureRegex.test(annotationText))
 							{
-								logMessage("Applying the current custom key signature: " + annotationText);
+								//logMessage("Applying the current custom key signature: " + annotationText);
 								currentCustomKeySignature = {};
 								try
 								{
@@ -338,7 +306,7 @@ MuseScore
 								}
 								catch (error)
 								{
-									logMessage(error, true);
+									//logMessage(error, true);
 									currentCustomKeySignature = {};
 								}
 							}
@@ -363,7 +331,7 @@ MuseScore
 									}
 									catch (error)
 									{
-										logMessage(error, true);
+										//logMessage(error, true);
 									}
 								}
 							}
@@ -378,7 +346,7 @@ MuseScore
 								}
 								catch (error)
 								{
-									logMessage(error, true);
+									//logMessage(error, true);
 								}
 							}
 						}
@@ -391,7 +359,7 @@ MuseScore
 		
 		curScore.endCmd();
 		
-		debugLogger.showLogMessages();
+		//debugLogger.showLogMessages();
 
 		quit();
 	}
@@ -401,7 +369,7 @@ MuseScore
 	 */
 	function calculateTuningOffset(note)
 	{
-		logMessage("Tuning note: " + calculateNoteName(note));
+		//logMessage("Tuning note: " + calculateNoteName(note));
 		
 		var tuningOffset = 0;
 		var noteLetter = getNoteLetter(note);
@@ -416,7 +384,7 @@ MuseScore
 		// steps in the circle of fifths to get to the altered note.
 		var tpcAccidental = Math.floor((note.tpc + 1) / 7) - 2;
 		tuningOffset -= tpcAccidental * 7 * fifthDeviation;
-		logMessage("Base tuning offset: " + tuningOffset);
+		//logMessage("Base tuning offset: " + tuningOffset);
 		
 		// Certain accidentals, like the microtonal accidentals, are not
 		// conveyed by the tpc property, but are instead handled directly via a
@@ -430,7 +398,7 @@ MuseScore
 			if (previousAccidentals.hasOwnProperty(noteNameOctave))
 			{
 				accidentalName = previousAccidentals[noteNameOctave];
-				logMessage("Applying to the following accidental to the current note from a previous note within the measure: " + accidentalName);
+				//logMessage("Applying to the following accidental to the current note from a previous note within the measure: " + accidentalName);
 			}
 			// If the note still does not have an accidental applied to it,
 			// check if it's modified by a custom key signature.
@@ -439,7 +407,7 @@ MuseScore
 				if (currentCustomKeySignature.hasOwnProperty(noteLetter))
 				{
 					accidentalName = currentCustomKeySignature[noteLetter];
-					logMessage("Applying the following accidental from a custom key signature: " + accidentalName);
+					//logMessage("Applying the following accidental from a custom key signature: " + accidentalName);
 				}
 			}
 		}
@@ -463,16 +431,16 @@ MuseScore
 			var actualAccidentalOffset = supportedAccidentals[actualAccidentalName]["DEFAULT_OFFSET"];
 			if (actualAccidentalOffset !== undefined)
 			{
-				logMessage("Undoing the default tuning offset of: " + defaultAccidentalOffset);
+				//logMessage("Undoing the default tuning offset of: " + defaultAccidentalOffset);
 				tuningOffset -= defaultAccidentalOffset;
 			}
 			
 			// Apply the tuning offset for this specific accidental.
 			var edoSteps = getAccidentalEdoSteps(accidentalName);
-			logMessage("Offsetting the tuning by the following amount of EDO steps: " + edoSteps);
+			//logMessage("Offsetting the tuning by the following amount of EDO steps: " + edoSteps);
 			tuningOffset += edoSteps * stepSize;
 		}
-		logMessage("Final tuning offset: " + tuningOffset);
+		//logMessage("Final tuning offset: " + tuningOffset);
 
 		return tuningOffset;
 	}
@@ -709,6 +677,6 @@ MuseScore
 		{
 			isErrorMessage = false;
 		}
-		debugLogger.log(message, isErrorMessage);
+		//debugLogger.log(message, isErrorMessage);
 	}
 }

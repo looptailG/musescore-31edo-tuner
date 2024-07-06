@@ -31,6 +31,115 @@ MuseScore
 	categoryCode: "playback";
 	thumbnailName: "31EdoThumbnail.png";
 	version: "2.0.0-alpha";
+
+	// Size in cents of an EDO step.
+	property var stepSize: 1200.0 / 31;
+	// Difference in cents between a 12EDO and a 31EDO fifth.
+	property var fifthDeviation: 700 - 18 * stepSize;
+	
+	// Map containing the amount of EDO steps of every supporte accidental.
+	property variant supportedAccidentals:
+	{
+		"NONE":
+		{
+			"EDO_STEPS": 0,
+		},
+		"FLAT":
+		{
+			"EDO_STEPS": -2,
+		},
+		"NATURAL":
+		{
+			"EDO_STEPS": 0,
+		},
+		"SHARP":
+		{
+			"EDO_STEPS": 2,
+		},
+		"SHARP2":
+		{
+			"EDO_STEPS": 4,
+		},
+		"FLAT2":
+		{
+			"EDO_STEPS": -4,
+		},
+		"SHARP3":
+		{
+			"EDO_STEPS": 6,
+		},
+		"FLAT3":
+		{
+			"EDO_STEPS": -6,
+		},
+		"NATURAL_FLAT":
+		{
+			"EDO_STEPS": -2,
+		},
+		"NATURAL_SHARP":
+		{
+			"EDO_STEPS": 2,
+		},
+		"ARROW_DOWN":
+		{
+			"EDO_STEPS": -1,
+		},
+		"MIRRORED_FLAT":  // Half flat
+		{
+			"EDO_STEPS": -1,
+		},
+		"MIRRORED_FLAT2":  // Sesqui flat
+		{
+			"EDO_STEPS": -3,
+		},
+		"SHARP_SLASH":  // Half sharp
+		{
+			"EDO_STEPS": 1,
+		},
+		"LOWER_ONE_SEPTIMAL_COMMA":
+		{
+			"EDO_STEPS": -1,
+		},
+		"SHARP_SLASH4":  // Sesqui sharp
+		{
+			"EDO_STEPS": 3,
+		},
+		"SAGITTAL_11MDD":  // Sagittal quarter tone down
+		{
+			"EDO_STEPS": -1,
+		},
+		"SAGITTAL_11MDU":  // Sagittal quarter tone up
+		{
+			"EDO_STEPS": 1,
+		},
+		"SAGITTAL_FLAT":  // Sagittal half tone down
+		{
+			"EDO_STEPS": -2,
+		},
+		"SAGITTAL_SHARP":  // Sagittal half tone up
+		{
+			"EDO_STEPS": 2,
+		},
+	}
+	
+	// Map containing the previous microtonal accidentals in the current
+	// measure.  The keys are formatted as note letter concatenated with the
+	// note octave, for example C4.  The value is the last microtonal accidental
+	// that was applied to that note within the current measure.
+	property variant previousAccidentals:
+	{}
+	
+	// Map containing the alteration presents in the current custom key
+	// signature, if any.  The keys are the names of the notes, and the values
+	// are the accidentals applied to them.  It supports only octave-repeating
+	// key signatures.
+	property variant currentCustomKeySignature:
+	{}
+	// Regex used for checking if a string is valid as a custom key signature.
+	property var customKeySignatureRegex: /^(x|t#|#|t|h|d|b|db|bb|)(?:\.(?:x|t#|#|t|h|d|b|db|bb|)){6}$/;
+	// Array containing the notes in the order they appear in the custom key
+	// signature string.
+	property var customKeySignatureNoteOrder: ["F", "C", "G", "D", "A", "E", "B"];
 	
 	FileIO
 	{
@@ -85,29 +194,22 @@ MuseScore
 			write(logMessages);
 		}
 	}
-	
-	FileIO
-	{
-		id: backupLogger;
-		source: "C:/MSPlugins/log.txt";
-	}
 
 	onRun:
 	{
 		try
 		{
-//			logger.log("hello world");
-			backupLogger.write("hello world");
+			logger.log("-- 31EDO Tuner -- Version " + version + " --");
 		}
 		catch (error)
 		{
-			backupLogger.write(error);
+			logger.fatal(error);
 		}
 		finally
 		{
-//			logger.writeLogMessages();
+			logger.writeLogMessages();
+			
+			quit();
 		}
-
-		quit();
 	}
 }

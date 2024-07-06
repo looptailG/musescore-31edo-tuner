@@ -22,6 +22,7 @@ import MuseScore 3.0
 import "libs/AccidentalUtils.js" as AccidentalUtils
 import "libs/DateUtils.js" as DateUtils
 import "libs/NoteUtils.js" as NoteUtils
+import "libs/StringUtils.js" as StringUtils
 import "libs/TuningUtils.js" as TuningUtils
 
 MuseScore
@@ -31,6 +32,8 @@ MuseScore
 	categoryCode: "playback";
 	thumbnailName: "31EdoThumbnail.png";
 	version: "2.0.0-alpha";
+	
+	property variant settings: {};
 
 	// Size in cents of an EDO step.
 	property var stepSize: 1200.0 / 31;
@@ -140,11 +143,39 @@ MuseScore
 		}
 	}
 
+	FileIO
+	{
+		id: settingsReader;
+		source: Qt.resolvedUrl(".").toString().substring(8) + "Settings.tsv";
+		
+		onError:
+		{
+			logger.error(msg);
+		}
+	}
+
 	onRun:
 	{
 		try
 		{
 			logger.log("-- 31EDO Tuner -- Version " + version + " --");
+			
+			// Read settings file.
+			logger.log("Reading config file: " + settingsReader.source);
+			settings = {};
+			var settingsFileContent = settingsReader.read().split("\n");
+			for (var i = 0; i < settingsFileContent.length; i++)
+			{
+				if (settingsFileContent[i].trim() != "")
+				{
+					var rowData = StringUtils.parseTsvRow(settingsFileContent[i]);
+					settings[rowData[0]] = rowData[1];
+				}
+			}
+			logger.currentLogLevel = parseInt(settings["LogLevel"]);
+			logger.log("Log level set to: " + logger.currentLogLevel);
+			referenceNote = settings["ReferenceNote"];
+			logger.log("Reference note set to: " + referenceNote);
 			
 			curScore.startCmd();
 			

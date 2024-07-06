@@ -88,7 +88,7 @@ MuseScore
 		id: logger;
 		source: Qt.resolvedUrl(".").toString().substring(8) + "logs/" + DateUtils.getFileDateTime() + "_log.txt";
 		property var logMessages: "";
-		property var currentLogLevel: 0;
+		property var currentLogLevel: 2;
 		property variant logLevels:
 		{
 			0: " | TRACE   | ",
@@ -133,7 +133,10 @@ MuseScore
 		
 		function writeLogMessages()
 		{
-			write(logMessages);
+			if (logMessages != "")
+			{
+				write(logMessages);
+			}
 		}
 	}
 

@@ -36,8 +36,10 @@ MuseScore
 	property var stepSize: 1200.0 / 31;
 	// Difference in cents between a 12EDO and a 31EDO fifth.
 	property var fifthDeviation: 700 - 18 * stepSize;
+	// Reference note, which has a tuning offset of zero.
+	property var referenceNote: "C";
 	
-	// Map containing the amount of EDO steps of every supporte accidental.
+	// Map containing the amount of EDO steps of every supported accidental.
 	property variant supportedAccidentals:
 	{
 		"NONE":
@@ -181,7 +183,7 @@ MuseScore
 		
 		function error(message)
 		{
-			log(measure, 3);
+			log(message, 3);
 		}
 		
 		function fatal(message)
@@ -259,7 +261,6 @@ MuseScore
 						{
 							// New measure, empty the previous accidentals map.
 							previousAccidentals = {};
-							logger.trace("----");
 						}
 						
 						// Check for key signature change.
@@ -378,7 +379,7 @@ MuseScore
 									}
 									catch (error)
 									{
-										logger.errror(error);
+										logger.error(error);
 									}
 								}
 							}
@@ -408,6 +409,30 @@ MuseScore
 	 */
 	function calculateTuningOffset(note)
 	{
-		return 0;
+		var noteLetter = NoteUtils.getNoteLetter(note, "tpc");
+		var accidentalName = AccidentalUtils.getAccidentalName(note);
+		var noteOctave = NoteUtils.getOctave(note);
+		var noteNameOctave = noteLetter + noteOctave;
+		logger.trace("Tuning note: " + noteLetter + " " + accidentalName + " " + noteOctave);
+		
+		var tuningOffset = -TuningUtils.circleOfFifthsDistance(note, referenceNote) * fifthDeviation;
+		logger.trace("Base tuning offset: " + tuningOffset);
+		
+		// Certain accidentals, like the microtonal accidentals, are not
+		// conveyed by the tpc property, but are instead handled directly via a
+		// tuning offset.
+		// Check which accidental is applied to the note.
+		if (accidentalName == "NONE")
+		{
+			// If the note does not have any accidental applied to it, check if
+			// the same note previously in the measure was modified by a
+			// microtonal accidental.
+			if (previousAccidentals.hasOwrProperty(noteNameOctave))
+			{
+				
+			}
+		}
+		
+		return tuningOffset;
 	}
 }

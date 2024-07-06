@@ -40,7 +40,7 @@ MuseScore
 	// Difference in cents between a 12EDO and a 31EDO fifth.
 	property var fifthDeviation: 700 - 18 * stepSize;
 	// Reference note, which has a tuning offset of zero.
-	property var referenceNote: "A";
+	property var referenceNote: "";
 	
 	// Map containing the amount of EDO steps of every supported accidental.
 	property variant supportedAccidentals:

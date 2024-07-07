@@ -86,6 +86,11 @@ MuseScore
 	// signature string.
 	property var customKeySignatureNoteOrder: ["F", "C", "G", "D", "A", "E", "B"];
 	
+	// Amount of notes which were tuned successfully.
+	property var tunedNotes: 0;
+	// Total amount of notes encountered in the portion of the score to tune.
+	property var totalNotes: 0;
+	
 	FileIO
 	{
 		id: logger;
@@ -215,8 +220,8 @@ MuseScore
 				logger.trace("Tuning only staffs: " + startStaff + " - " + endStaff);
 			}
 			
-			var tunedNotes = 0;
-			var totalNotes = 0;
+			tunedNotes = 0;
+			totalNotes = 0;
 			// Loop on the portion of the score to tune.
 			for (var staff = startStaff; staff <= endStaff; staff++)
 			{
@@ -334,11 +339,9 @@ MuseScore
 									var notes = graceChords[i].notes;
 									for (var j = 0; j < notes.length; j++)
 									{
-										totalNotes += 1;
 										try
 										{
 											notes[j].tuning = calculateTuningOffset(notes[j]);
-											tunedNotes += 1;
 										}
 										catch (error)
 										{
@@ -351,11 +354,9 @@ MuseScore
 								var notes = cursor.element.notes;
 								for (var i = 0; i < notes.length; i++)
 								{
-									totalNotes += 1;
 									try
 									{
 										notes[i].tuning = calculateTuningOffset(notes[i]);
-										tunedNotes += 1;
 									}
 									catch (error)
 									{
@@ -391,71 +392,84 @@ MuseScore
 	 */
 	function calculateTuningOffset(note)
 	{
+		totalNotes += 1;
+	
 		var noteLetter = NoteUtils.getNoteLetter(note, "tpc");
 		var accidentalName = AccidentalUtils.getAccidentalName(note);
 		var noteOctave = NoteUtils.getOctave(note);
 		var noteNameOctave = noteLetter + noteOctave;
-		logger.trace("Tuning note: " + noteLetter + " " + accidentalName + " " + noteOctave);
+		var completeNoteName = noteLetter + " " + accidentalName + " " + noteOctave;
+		logger.trace("Tuning note: " + completeNoteName);
 		
-		var tuningOffset = -TuningUtils.circleOfFifthsDistance(note, referenceNote) * fifthDeviation;
-		logger.trace("Base tuning offset: " + tuningOffset);
-		
-		// Certain accidentals, like the microtonal accidentals, are not
-		// conveyed by the tpc property, but are instead handled directly via a
-		// tuning offset.
-		// Check which accidental is applied to the note.
-		if (accidentalName == "NONE")
+		try
 		{
-			// If the note does not have any accidental applied to it, check if
-			// the same note previously in the measure was modified by a
-			// microtonal accidental.
-			if (previousAccidentals.hasOwnProperty(noteNameOctave))
-			{
-				accidentalName = previousAccidentals[noteNameOctave];
-				logger.trace("Applying to the following accidental to the current note from a previous note within the measure: " + accidentalName);
-			}
-			// If the note still does not have an accidental applied to it,
-			// check if it's modified by a custom key signature.
+			var tuningOffset = -TuningUtils.circleOfFifthsDistance(note, referenceNote) * fifthDeviation;
+			logger.trace("Base tuning offset: " + tuningOffset);
+			
+			// Certain accidentals, like the microtonal accidentals, are not
+			// conveyed by the tpc property, but are instead handled directly
+			// via a tuning offset.
+			// Check which accidental is applied to the note.
 			if (accidentalName == "NONE")
 			{
-				if (currentCustomKeySignature.hasOwnProperty(noteLetter))
+				// If the note does not have any accidental applied to it, check
+				// if the same note previously in the measure was modified by a
+				// microtonal accidental.
+				if (previousAccidentals.hasOwnProperty(noteNameOctave))
 				{
-					accidentalName = currentCustomKeySignature[noteLetter];
-					logger.trace("Applying the following accidental from a custom key signature: " + accidentalName);
+					accidentalName = previousAccidentals[noteNameOctave];
+					logger.trace("Applying to the following accidental to the current note from a previous note within the measure: " + accidentalName);
+				}
+				// If the note still does not have an accidental applied to it,
+				// check if it's modified by a custom key signature.
+				if (accidentalName == "NONE")
+				{
+					if (currentCustomKeySignature.hasOwnProperty(noteLetter))
+					{
+						accidentalName = currentCustomKeySignature[noteLetter];
+						logger.trace("Applying the following accidental from a custom key signature: " + accidentalName);
+					}
 				}
 			}
-		}
-		else
-		{
-			// Save the accidental in the previous accidentals map for this
-			// note.
-			previousAccidentals[noteNameOctave] = accidentalName;
-		}
-		// Check if the accidental is handled by a tuning offset.
-		if (!AccidentalUtils.ACCIDENTAL_DATA[accidentalName]["TPC"])
-		{
-			// Undo the default tuning offset which is applied to certain
-			// accidentals.
-			// The default tuning offset is applied only if an actual microtonal
-			// accidental is applied to the current note.  For this reason, we
-			// must check getAccidentalName() on the current note, it is not
-			// sufficient to check the value saved in accidentalName.
-			var actualAccidentalName = AccidentalUtils.getAccidentalName(note);
-			var actualAccidentalOffset = AccidentalUtils.ACCIDENTAL_DATA[actualAccidentalName]["DEFAULT_OFFSET"];
-			tuningOffset -= actualAccidentalOffset;
-			logger.trace("Undoing the default tuning offset of: " + actualAccidentalOffset);
-			
-			// Apply the tuning offset for this specific accidental.
-			var edoSteps = supportedAccidentals[accidentalName];
-			if (edoSteps === undefined)
+			else
 			{
-				throw "Unsupported accidental: " + accidentalName;
+				// Save the accidental in the previous accidentals map for this
+				// note.
+				previousAccidentals[noteNameOctave] = accidentalName;
 			}
-			tuningOffset += edoSteps * stepSize;
-			logger.trace("Offsetting the tuning by " + edoSteps + " EDO steps.");
+			// Check if the accidental is handled by a tuning offset.
+			if (!AccidentalUtils.ACCIDENTAL_DATA[accidentalName]["TPC"])
+			{
+				// Undo the default tuning offset which is applied to certain
+				// accidentals.
+				// The default tuning offset is applied only if an actual
+				// microtonal accidental is applied to the current note.  For
+				// this reason, we must check getAccidentalName() on the current
+				// note, it is not sufficient to check the value saved in
+				// accidentalName.
+				var actualAccidentalName = AccidentalUtils.getAccidentalName(note);
+				var actualAccidentalOffset = AccidentalUtils.ACCIDENTAL_DATA[actualAccidentalName]["DEFAULT_OFFSET"];
+				tuningOffset -= actualAccidentalOffset;
+				logger.trace("Undoing the default tuning offset of: " + actualAccidentalOffset);
+				
+				// Apply the tuning offset for this specific accidental.
+				var edoSteps = supportedAccidentals[accidentalName];
+				if (edoSteps === undefined)
+				{
+					throw "Unsupported accidental: " + accidentalName;
+				}
+				tuningOffset += edoSteps * stepSize;
+				logger.trace("Offsetting the tuning by " + edoSteps + " EDO steps.");
+			}
+			
+			tunedNotes += 1;
+			logger.trace("Final tuning offset: " + tuningOffset);
+			return tuningOffset;
 		}
-		
-		logger.trace("Final tuning offset: " + tuningOffset);
-		return tuningOffset;
+		catch (error)
+		{
+			logger.error("Encontered the following exception while tuning " + completeNoteName + ": " + error);
+			return 0;
+		}
 	}
 }

@@ -164,7 +164,6 @@ MuseScore
 		try
 		{
 			// Read settings file.
-			logger.log("Reading config file: " + settingsReader.source);
 			settings = {};
 			var settingsFileContent = settingsReader.read().split("\n");
 			for (var i = 0; i < settingsFileContent.length; i++)

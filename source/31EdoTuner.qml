@@ -71,15 +71,13 @@ MuseScore
 	// measure.  The keys are formatted as note letter concatenated with the
 	// note octave, for example C4.  The value is the last microtonal accidental
 	// that was applied to that note within the current measure.
-	property variant previousAccidentals:
-	{}
+	property variant previousAccidentals: {}
 	
 	// Map containing the alteration presents in the current custom key
 	// signature, if any.  The keys are the names of the notes, and the values
 	// are the accidentals applied to them.  It supports only octave-repeating
 	// key signatures.
-	property variant currentCustomKeySignature:
-	{}
+	property variant currentCustomKeySignature: {}
 	// Regex used for checking if a string is valid as a custom key signature.
 	property var customKeySignatureRegex: /^(x|t#|#|t|h|d|b|db|bb|)(?:\.(?:x|t#|#|t|h|d|b|db|bb|)){6}$/;
 	// Array containing the notes in the order they appear in the custom key

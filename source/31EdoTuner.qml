@@ -256,6 +256,7 @@ MuseScore
 				cursor.rewindToTick(startTick);
 				
 				currentCustomKeySignature = {};
+				previousAccidentals = {};
 
 				// Loop on elements of a voice.
 				while (cursor.segment && (cursor.tick < endTick))

@@ -163,8 +163,6 @@ MuseScore
 	{
 		try
 		{
-			logger.log("-- 31EDO Tuner -- Version " + version + " --");
-			
 			// Read settings file.
 			logger.log("Reading config file: " + settingsReader.source);
 			settings = {};
@@ -178,8 +176,10 @@ MuseScore
 				}
 			}
 			logger.currentLogLevel = parseInt(settings["LogLevel"]);
-			logger.log("Log level set to: " + logger.currentLogLevel);
 			referenceNote = settings["ReferenceNote"];
+			
+			logger.log("-- 31EDO Tuner -- Version " + version + " --");
+			logger.log("Log level set to: " + logger.currentLogLevel);
 			logger.log("Reference note set to: " + referenceNote);
 			
 			curScore.startCmd();
@@ -234,6 +234,7 @@ MuseScore
 					cursor.rewindToTick(startTick);
 					
 					currentCustomKeySignature = {};
+					previousAccidentals = {};
 
 					// Loop on elements of a voice.
 					while (cursor.segment && (cursor.tick < endTick))

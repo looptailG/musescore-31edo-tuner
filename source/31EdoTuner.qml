@@ -341,40 +341,37 @@ MuseScore
 					}
 					
 					// Tune notes.
-					if (cursor.element)
+					if (cursor.element && (cursor.element.type == Element.CHORD))
 					{
-						if (cursor.element.type == Element.CHORD)
+						// Iterate through every grace chord.
+						var graceChords = cursor.element.graceNotes;
+						for (var i = 0; i < graceChords.length; i++)
 						{
-							// Iterate through every grace chord.
-							var graceChords = cursor.element.graceNotes;
-							for (var i = 0; i < graceChords.length; i++)
-							{
-								var notes = graceChords[i].notes;
-								for (var j = 0; j < notes.length; j++)
-								{
-									try
-									{
-										notes[j].tuning = calculateTuningOffset(notes[j]);
-									}
-									catch (error)
-									{
-										logMessage(error, true);
-									}
-								}
-							}
-
-							// Iterate through every chord note.
-							var notes = cursor.element.notes;
-							for (var i = 0; i < notes.length; i++)
+							var notes = graceChords[i].notes;
+							for (var j = 0; j < notes.length; j++)
 							{
 								try
 								{
-									notes[i].tuning = calculateTuningOffset(notes[i]);
+									notes[j].tuning = calculateTuningOffset(notes[j]);
 								}
 								catch (error)
 								{
 									logMessage(error, true);
 								}
+							}
+						}
+
+						// Iterate through every chord note.
+						var notes = cursor.element.notes;
+						for (var i = 0; i < notes.length; i++)
+						{
+							try
+							{
+								notes[i].tuning = calculateTuningOffset(notes[i]);
+							}
+							catch (error)
+							{
+								logMessage(error, true);
 							}
 						}
 					}

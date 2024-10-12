@@ -24,7 +24,7 @@ MuseScore
 {
 	menuPath: "Plugins.Tuner.31EDO";
 	description: "Retune the selection, or the whole score if nothing is selected, to 31EDO.";
-	version: "1.5.4";
+	version: "1.5.5";
 	
 	Component.onCompleted:
 	{

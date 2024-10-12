@@ -114,6 +114,7 @@ MuseScore
 			if (logLevel >= currentLogLevel)
 			{
 				logMessages += DateUtils.getRFC3339DateTime() + logLevels[logLevel] + message + "\n";
+				write(logMessages);
 			}
 		}
 		
@@ -135,14 +136,6 @@ MuseScore
 		function fatal(message)
 		{
 			log(message, 4);
-		}
-		
-		function writeLogMessages()
-		{
-			if (logMessages != "")
-			{
-				write(logMessages);
-			}
 		}
 	}
 
@@ -376,8 +369,6 @@ MuseScore
 		}
 		finally
 		{
-			logger.writeLogMessages();
-			
 			quit();
 		}
 	}

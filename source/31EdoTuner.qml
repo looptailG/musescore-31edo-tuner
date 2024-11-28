@@ -279,6 +279,23 @@ MuseScore
 	{
 		totalNotes++;
 		
+		try
+		{
+			note.tuning = TuningUtils.edoTuningOffset(
+				note, NoteUtils.getNoteLetter(note, "tpc"), AccidentalUtils.getAccidentalName(note), NoteUtils.getOctave(note), referenceNote,
+				stepSize, fifthDeviation, supportedAccidentals, AccidentalUtils.ACCIDENTAL_DATA,
+				previousAccidentals, currentCustomKeySignature,
+				logger
+			);
+			tunedNotes++;
+		}
+		catch (error)
+		{
+			logger.error(error);
+		}
+	
+/*		totalNotes++;
+		
 		let tuningOffset;
 		
 		let noteLetter = NoteUtils.getNoteLetter(note, "tpc");
@@ -359,6 +376,6 @@ MuseScore
 		}
 		
 		note.tuning = tuningOffset;
-		tunedNotes++;
+		tunedNotes++;*/
 	}
 }

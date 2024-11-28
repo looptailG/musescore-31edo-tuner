@@ -21,6 +21,7 @@ import FileIO 3.0
 import MuseScore 3.0
 import "libs/AccidentalUtils.js" as AccidentalUtils
 import "libs/DateUtils.js" as DateUtils
+import "libs/IterationUtils.js" as IterationUtils
 import "libs/NoteUtils.js" as NoteUtils
 import "libs/StringUtils.js" as StringUtils
 import "libs/TuningUtils.js" as TuningUtils
@@ -31,14 +32,14 @@ MuseScore
 	description: "Retune the selection, or the whole score if nothing is selected, to 31EDO.";
 	categoryCode: "playback";
 	thumbnailName: "31EdoThumbnail.png";
-	version: "2.0.1";
+	version: "2.1.0";
 	
 	property variant settings: {};
 
 	// Size in cents of an EDO step.
 	property var stepSize: 1200.0 / 31;
 	// Difference in cents between a 12EDO and a 31EDO fifth.
-	property var fifthDeviation: 700 - 18 * stepSize;
+	property var fifthDeviation: 700.0 - 18 * stepSize;
 	// Reference note, which has a tuning offset of zero.
 	property var referenceNote: "";
 	
@@ -172,196 +173,19 @@ MuseScore
 			logger.log("Log level set to: " + logger.currentLogLevel);
 			logger.log("Reference note set to: " + referenceNote);
 			
-			curScore.startCmd();
-			
-			// Calculate the portion of the score to tune.
-			var cursor = curScore.newCursor();
-			var startStaff;
-			var endStaff;
-			var startTick;
-			var endTick;
-			cursor.rewind(Cursor.SELECTION_START);
-			if (!cursor.segment)
-			{
-				logger.log("Tuning the entire score.");
-				startStaff = 0;
-				endStaff = curScore.nstaves - 1;
-				startTick = 0;
-				endTick = curScore.lastSegment.tick + 1;
-			}
-			else
-			{
-				logger.log("Tuning only the current selection.");
-				startStaff = cursor.staffIdx;
-				startTick = cursor.tick;
-				cursor.rewind(Cursor.SELECTION_END);
-				endStaff = cursor.staffIdx;
-				if (cursor.tick == 0)
+			IterationUtils.iterate(
+				curScore,
 				{
-					// If the selection includes the last measure of the score,
-					// .rewind() overflows and goes back to tick 0.
-					endTick = curScore.lastSegment.tick + 1;
-				}
-				else
-				{
-					endTick = cursor.tick;
-				}
-				logger.trace("Tuning only ticks: " + startTick + " - " + endTick);
-				logger.trace("Tuning only staffs: " + startStaff + " - " + endStaff);
-			}
-			
-			tunedNotes = 0;
-			totalNotes = 0;
-			// Loop on the portion of the score to tune.
-			for (var staff = startStaff; staff <= endStaff; staff++)
-			{
-				for (var voice = 0; voice < 4; voice++)
-				{
-					logger.log("Tuning Staff: " + staff + "; Voice: " + voice);
-					
-					cursor.voice = voice;
-					cursor.staffIdx = staff;
-					cursor.rewindToTick(startTick);
-					
-					currentCustomKeySignature = {};
-					previousAccidentals = {};
-
-					// Loop on elements of a voice.
-					while (cursor.segment && (cursor.tick < endTick))
-					{
-						if (cursor.segment.tick == cursor.measure.firstSegment.tick)
-						{
-							// New measure, empty the previous accidentals map.
-							previousAccidentals = {};
-						}
-						
-						// Check for key signature change.
-						// TODO: This implementation is very ineffcient, as this piece of code is called on every element when the key signature is not empty.  Find a way to call this only when the key signature actually change.
-						if (cursor.keySignature)
-						{
-							// The key signature has changed, empty the custom
-							// key signature map.
-							// TODO: This if is necessary only because the previous if is not true only when there is an actual key signature change.  This way we check if the mapping was not empty before, and thus actually needs to be emptied now.
-							if (Object.keys(currentCustomKeySignature).length != 0)
-							{
-								logger.log("Key signature change, emptying the custom key signature map.");
-								currentCustomKeySignature = {};
-							}
-						}
-						// Check if there is a text indicating a custom key
-						// signature change.
-						for (var i = 0; i < cursor.segment.annotations.length; i++)
-						{
-							var annotationText = cursor.segment.annotations[i].text;
-							if (annotationText)
-							{
-								annotationText = annotationText.replace(/\s*/g, "");
-								if (customKeySignatureRegex.test(annotationText))
-								{
-									logger.log("Applying the current custom key signature: " + annotationText);
-									currentCustomKeySignature = {};
-									try
-									{
-										var annotationTextSplitted = annotationText.split(".");
-										for (var j = 0; j < annotationTextSplitted.length; j++)
-										{
-											var currentNote = customKeySignatureNoteOrder[j];
-											var currentAccidental = annotationTextSplitted[j].trim();
-											var accidentalName = "";
-											switch (currentAccidental)
-											{
-												// Non-microtonal accidentals
-												// are automatically handled by
-												// Musescore even in custom key
-												// signatures, so we only have
-												// to check for microtonal
-												// accidentals.
-												case "bb":
-												case "b":
-												case "":
-												case "h":
-												case "#":
-												case "x":
-													break;
-												
-												case "db":
-													accidentalName = "MIRRORED_FLAT2";
-													break;
-												
-												case "d":
-													accidentalName = "MIRRORED_FLAT";
-													break;
-												
-												case "t":
-													accidentalName = "SHARP_SLASH";
-													break;
-												
-												case "t#":
-													accidentalName = "SHARP_SLASH4";
-													break;
-												
-												default:
-													throw "Unsupported accidental in the custom key signature: " + currentAccidental;
-											}
-											if (accidentalName != "")
-											{
-												currentCustomKeySignature[currentNote] = accidentalName;
-											}
-										}
-									}
-									catch (error)
-									{
-										logger.error(error);
-										currentCustomKeySignature = {};
-									}
-								}
-							}
-						}
-						
-						// Tune notes.
-						if (cursor.element && (cursor.element.type == Element.CHORD))
-						{
-							// Iterate through every grace chord.
-							var graceChords = cursor.element.graceNotes;
-							for (var i = 0; i < graceChords.length; i++)
-							{
-								var notes = graceChords[i].notes;
-								for (var j = 0; j < notes.length; j++)
-								{
-									try
-									{
-										notes[j].tuning = calculateTuningOffset(notes[j]);
-									}
-									catch (error)
-									{
-										logger.error(error);
-									}
-								}
-							}
-								
-							// Iterate through every chord note.
-							var notes = cursor.element.notes;
-							for (var i = 0; i < notes.length; i++)
-							{
-								try
-								{
-									notes[i].tuning = calculateTuningOffset(notes[i]);
-								}
-								catch (error)
-								{
-									logger.error(error);
-								}
-							}
-						}
-
-						cursor.next();
-					}
-				}
-			}
+					"onStaffStart": onStaffStart,
+					"onNewMeasure": onNewMeasure,
+					"onKeySignatureChange": onKeySignatureChange,
+					"onAnnotation": onAnnotation,
+					"onNote": onNote
+				},
+				logger
+			);
 			
 			logger.log("Notes tuned: " + tunedNotes + " / " + totalNotes);
-			
-			curScore.endCmd();
 		}
 		catch (error)
 		{
@@ -372,91 +196,102 @@ MuseScore
 			quit();
 		}
 	}
-
-	/**
-	 * Returns the amount of cents necessary to tune the input note to 31EDO.
-	 */
-	function calculateTuningOffset(note)
-	{
-		totalNotes += 1;
 	
-		var noteLetter = NoteUtils.getNoteLetter(note, "tpc");
-		var accidentalName = AccidentalUtils.getAccidentalName(note);
-		var noteOctave = NoteUtils.getOctave(note);
-		var noteNameOctave = noteLetter + noteOctave;
-		var completeNoteName = noteLetter + " " + accidentalName + " " + noteOctave;
-		logger.trace("Tuning note: " + completeNoteName);
-		
-		try
+	function onStaffStart()
+	{
+		currentCustomKeySignature = {};
+		previousAccidentals = {};
+	}
+	
+	function onNewMeasure()
+	{
+		previousAccidentals = {};
+	}
+	
+	function onKeySignatureChange(keySignature)
+	{
+		logger.log("Key signature change, emptying the custom key signature map.");
+		currentCustomKeySignature = {};
+	}
+	
+	function onAnnotation(annotation)
+	{
+		let annotationText = annotation.text.replace(/\s*/g, "");
+		if (customKeySignatureRegex.test(annotationText))
 		{
-			var tuningOffset = -TuningUtils.circleOfFifthsDistance(note, referenceNote) * fifthDeviation;
-			logger.trace("Base tuning offset: " + tuningOffset);
-			
-			// Certain accidentals, like the microtonal accidentals, are not
-			// conveyed by the tpc property, but are instead handled directly
-			// via a tuning offset.
-			// Check which accidental is applied to the note.
-			if (accidentalName == "NONE")
+			logger.log("Applying custom key signature: " + annotationText);
+			currentCustomKeySignature = {};
+			try
 			{
-				// If the note does not have any accidental applied to it, check
-				// if the same note previously in the measure was modified by a
-				// microtonal accidental.
-				if (previousAccidentals.hasOwnProperty(noteNameOctave))
+				let annotationTextSplitted = annotationText.split(".");
+				for (let i = 0; i < annotationTextSplitted.length; i++)
 				{
-					accidentalName = previousAccidentals[noteNameOctave];
-					logger.trace("Applying to the following accidental to the current note from a previous note within the measure: " + accidentalName);
-				}
-				// If the note still does not have an accidental applied to it,
-				// check if it's modified by a custom key signature.
-				if (accidentalName == "NONE")
-				{
-					if (currentCustomKeySignature.hasOwnProperty(noteLetter))
+					let currentNote = customKeySignatureNoteOrder[i];
+					let currentAccidental = annotationTextSplitted[i];
+					let accidentalName = "";
+					switch (currentAccidental)
 					{
-						accidentalName = currentCustomKeySignature[noteLetter];
-						logger.trace("Applying the following accidental from a custom key signature: " + accidentalName);
+						// Non-microtonal accidentals are automatically handled
+						// by Musescore even in custom key signatures, so we
+						// only have to check for microtonal accidentals.
+						case "bb":
+						case "b":
+						case "":
+						case "h":
+						case "#":
+						case "x":
+							break;
+						
+						case "db":
+							accidentalName = "MIRRORED_FLAT2";
+							break;
+						
+						case "d":
+							accidentalName = "MIRRORED_FLAT";
+							break;
+
+						case "t":
+							accidentalName = "SHARP_SLASH";
+							break;
+
+						case "t#":
+							accidentalName = "SHARP_SLASH4";
+							break;
+
+						default:
+							throw "Unsupported accidental in the custom key signature: " + currentAccidental;
+					}
+					if (accidentalName != "")
+					{
+						currentCustomKeySignature[currentNote] = accidentalName;
 					}
 				}
 			}
-			else
+			catch (error)
 			{
-				// Save the accidental in the previous accidentals map for this
-				// note.
-				previousAccidentals[noteNameOctave] = accidentalName;
+				logger.error(error);
+				currentCustomKeySignature = {};
 			}
-			// Check if the accidental is handled by a tuning offset.
-			if (!AccidentalUtils.ACCIDENTAL_DATA[accidentalName]["TPC"])
-			{
-				// Undo the default tuning offset which is applied to certain
-				// accidentals.
-				// The default tuning offset is applied only if an actual
-				// microtonal accidental is applied to the current note.  For
-				// this reason, we must check getAccidentalName() on the current
-				// note, it is not sufficient to check the value saved in
-				// accidentalName.
-				var actualAccidentalName = AccidentalUtils.getAccidentalName(note);
-				var actualAccidentalOffset = AccidentalUtils.ACCIDENTAL_DATA[actualAccidentalName]["DEFAULT_OFFSET"];
-				tuningOffset -= actualAccidentalOffset;
-				logger.trace("Undoing the default tuning offset of: " + actualAccidentalOffset);
-				
-				// Apply the tuning offset for this specific accidental.
-				var edoSteps = supportedAccidentals[accidentalName];
-				if (edoSteps === undefined)
-				{
-					throw "Unsupported accidental: " + accidentalName;
-				}
-				tuningOffset += edoSteps * stepSize;
-				logger.trace("Offsetting the tuning by " + edoSteps + " EDO steps.");
-			}
-			
-			tunedNotes += 1;
-			logger.trace("Final tuning offset: " + tuningOffset);
-			return tuningOffset;
+		}
+	}
+	
+	function onNote(note)
+	{
+		totalNotes++;
+		
+		try
+		{
+			note.tuning = TuningUtils.edoTuningOffset(
+				note, NoteUtils.getNoteLetter(note, "tpc"), AccidentalUtils.getAccidentalName(note), NoteUtils.getOctave(note), referenceNote,
+				stepSize, fifthDeviation, supportedAccidentals, AccidentalUtils.ACCIDENTAL_DATA,
+				previousAccidentals, currentCustomKeySignature,
+				logger
+			);
+			tunedNotes++;
 		}
 		catch (error)
 		{
-			logger.error("Encontered the following exception while tuning " + completeNoteName + ": " + error);
-			// Leave the tuning of the input note unchanged.
-			return note.tuning;
+			logger.error(error);
 		}
 	}
 }

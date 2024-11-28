@@ -16,10 +16,10 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-const VERSION = "1.1.1";
+const VERSION = "1.3.0";
 
 // Size in cents of a justly tuned perfect fifth.
-const JUST_FIFTH = 1200.0 * Math.log2(3 / 2);
+const JUST_FIFTH = intervalInCents(3 / 2);
 // Size in cents of a 12EDO perfect fifth.
 const DEFAULT_FIFTH = 700.0;
 // Size in cents of the smallest fifth in the diatonic range.  It's equal to the
@@ -30,7 +30,7 @@ const SMALLEST_DIATONIC_FIFTH = 1200.0 / 7 * 4;
 const LARGEST_DIATONIC_FIFTH = 1200.0 / 5 * 3;
 
 // Size in cents of the syntonic comma.
-const SYNTONIC_COMMA = 1200.0 * Math.log2(81 / 80);
+const SYNTONIC_COMMA = intervalInCents(81 / 80);
 
 // Note distance in the circle of fifths, from the note C.
 const CIRCLE_OF_FIFTHS_DISTANCE = {
@@ -79,4 +79,149 @@ function circleOfFifthsDistance(n1, n2, tpcMode = "tpc1")
 	}
 	
 	return n1Tpc - n2Tpc;
+}
+
+/**
+ * Return the input frequency ratio in cents.
+ */
+function intervalInCents(frequencyRatio)
+{
+	return 1200 * Math.log2(frequencyRatio);
+}
+
+/**
+ * Return the offset in cents for the input scale degree in the harmonic scale.
+ */
+function harmonicScaleOffset(scaleDegree)
+{
+	var harmonic = harmonicScaleHarmonic(scaleDegree);
+	var interval = intervalInCents(harmonic / 16);
+	var defaultTuning = 100.0 * scaleDegree;
+	return interval - defaultTuning;
+}
+
+/**
+ * Return the harmonic corresponding to the input scale degree in the harmonic
+ * scale.
+ */
+function harmonicScaleHarmonic(scaleDegree)
+{
+	switch (scaleDegree)
+	{
+		case 0:
+			return 16;
+		
+		case 1:
+			return 17;
+		
+		case 2:
+			return 18;
+		
+		case 3:
+			return 19;
+		
+		case 4:
+			return 20;
+		
+		case 5:
+			return 21;
+		
+		case 6:
+			return 22;
+		
+		case 7:
+			return 24;
+		
+		case 8:
+			return 26;
+		
+		case 9:
+			return 27;
+		
+		case 10:
+			return 28;
+		
+		case 11:
+			return 30;
+		
+		default:
+			throw "Invalid scale degree: " + scaleDegree;
+	}
+}
+
+/**
+ * Calculate the tuning offset for an EDO tuning.
+ */
+function edoTuningOffset(
+	note, noteName, accidental, octave, referenceNote,
+	stepSize, fifthDeviation, supportedAccidentals, accidentalData,
+	previousAccidentals, customKeySignature,
+	logger
+) {
+	logger.trace("Tuning note: " + noteName + " " + accidental + " " + octave);
+	let actualAccidental = accidental;
+	let effectiveAccidental = accidental;
+	let fullNoteName = noteName + accidental;
+	let noteNameOctave = noteName + octave;
+	
+	let tuningOffset;
+	
+	tuningOffset = -circleOfFifthsDistance(note, referenceNote) * fifthDeviation;
+	logger.trace("Base tuning offset: " + tuningOffset);
+	
+	// Certain accidentals, like the microtonal accidentals, are not
+	// conveyed by the tpc property, but are instead handled directly via a
+	// tuning offset.
+	// Check which accidental is applied to the note.
+	if (effectiveAccidental == "NONE")
+	{
+		// If the note does not have any accidental applied to it, check if
+		// the same note previously in the measure was modified by a
+		// microtonal accidental.
+		if (previousAccidentals.hasOwnProperty(noteNameOctave))
+		{
+			effectiveAccidental = previousAccidentals[noteNameOctave];
+			logger.trace("Applying the following accidental to the current note from a previous note in the measure: " + effectiveAccidental);
+		}
+		// If the note still does not have an accidental applied to itself,
+		// check if it's modified by a custom key signature.
+		if (effectiveAccidental == "NONE")
+		{
+			if (customKeySignature.hasOwnProperty(noteName))
+			{
+				effectiveAccidental = customKeySignature[noteName];
+				logger.trace("Applying the following accidental from the custom key signature: " + effectiveAccidental);
+			}
+		}
+	}
+	else
+	{
+		// Save the accidental in the previous accidentals map for this
+		// note.
+		previousAccidentals[noteNameOctave] = actualAccidental;
+	}
+	
+	// Check if the accidental is handled by a tuning offset.
+	if (!accidentalData[effectiveAccidental]["TPC"])
+	{
+		// Undo the default tuning offset which is applied to certain
+		// accidentals.
+		// The default tuning offset is applied only if an actual microtonal
+		// accidental is applied to the current note.
+		let actualAccidentalOffset = accidentalData[actualAccidental]["DEFAULT_OFFSET"];
+		tuningOffset -= actualAccidentalOffset;
+		logger.trace("Undoing the default tuning offset of: " + actualAccidentalOffset);
+		
+		// Apply the tuning offset for this specific accidental.
+		let edoSteps = supportedAccidentals[effectiveAccidental];
+		if (edoSteps === undefined)
+		{
+			throw "Unsupported accidental: " + effectiveAccidental;
+		}
+		tuningOffset += edoSteps * stepSize;
+		logger.trace("Offsetting the tuning by " + edoSteps + " EDO steps.");
+	}
+	
+	logger.trace("Final tuning offset: " + tuningOffset);
+	return tuningOffset;
 }

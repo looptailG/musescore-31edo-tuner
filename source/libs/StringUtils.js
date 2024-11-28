@@ -16,7 +16,7 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-const VERSION = "1.0.0";
+const VERSION = "1.0.1";
 
 /**
  * Split the input string using the tab character, and replace the escaped
@@ -25,12 +25,50 @@ const VERSION = "1.0.0";
 function parseTsvRow(s)
 {
 	s = s.split("\t");
-	for (var i = 0; i < s.length; i++)
+	// QML does not support lookbehind in regex, which would be necessary to
+	// properly unescape the characters, so we have to manually loop on the
+	// strings and check for escape characters.
+	for (let i = 0; i < s.length; i++)
 	{
-		s[i] = s[i].replace(/\\t/g, "\t");
-		s[i] = s[i].replace(/\\\\/g, "\\");
-		s[i] = s[i].replace(/\\n/g, "\n");
-		s[i] = s[i].replace(/\\r/g, "\r");
+		let unescapedString = "";
+		let escapedString = s[i];
+		let j = 0;
+		while (j < escapedString.length)
+		{
+			let c = escapedString.charAt(j);
+			if (c == "\\")
+			{
+				let nextCharacter = escapedString.charAt(++j);
+				switch (nextCharacter)
+				{
+					case "\\":
+						unescapedString += "\\";
+						break;
+					
+					case "n":
+						unescapedString += "\n";
+						break;
+					
+					case "r":
+						unescapedString += "\r";
+						break;
+					
+					case "t":
+						unescapedString += "\t";
+						break;
+					
+					default:
+						throw "Invalid escape sequence: " + c + nextCharacter;
+				}
+			}
+			else
+			{
+				unescapedString += c;
+			}
+
+			j++;
+		}
+		s[i] = unescapedString;
 	}
 	return s;
 }
@@ -54,7 +92,7 @@ function formatForTsv(s)
 function removeEmptyRows(s)
 {
 	s = s.split("\n");
-	for (var i = s.length - 1; i >= 0; i--)
+	for (let i = s.length - 1; i >= 0; i--)
 	{
 		if (s[i].trim() == "")
 		{
@@ -75,7 +113,7 @@ function roundToOneDecimalDigit(n)
 		{
 			throw "The input is not numeric: " + n;
 		}
-		var roundedNumber = "" + (Math.round(n * 10) / 10);
+		let roundedNumber = "" + (Math.round(n * 10) / 10);
 		if (Number.isInteger(n))
 		{
 			roundedNumber += ".0";

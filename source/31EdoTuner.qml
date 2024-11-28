@@ -214,9 +214,9 @@ MuseScore
 		currentCustomKeySignature = {};
 	}
 	
-	function onAnnotation(annotationText)
+	function onAnnotation(annotation)
 	{
-		annotationText = annotationText.replace(/\s*/g, "");
+		let annotationText = annotation.text.replace(/\s*/g, "");
 		if (customKeySignatureRegex.test(annotationText))
 		{
 			logger.log("Applying custom key signature: " + annotationText);

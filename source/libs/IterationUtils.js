@@ -18,12 +18,15 @@
 
 const VERSION = "1.0.0";
 
+const ELEMENT_STAFF_TEXT = 48;
+
 function iterate(curScore, actions, logger)
 {
 	let onStaffStart = actions.onStaffStart || null;
 	let onNewMeasure = actions.onNewMeasure || null;
 	let onKeySignatureChange = actions.onKeySignatureChange || null;
 	let onAnnotation = actions.onAnnotation || null;
+	let staffTextOnCurrentStaffOnly = actions.staffTextOnCurrentStaffOnly || true;
 	let onNote = actions.onNote || null;
 	
 	curScore.startCmd();
@@ -104,12 +107,24 @@ function iterate(curScore, actions, logger)
 				
 				for (let i = 0; i < cursor.segment.annotations.length; i++)
 				{
-					let annotationText = cursor.segment.annotations[i].text;
+					let annotation = cursor.segment.annotations[i];
+					let annotationText = annotation.text;
 					if (annotationText)
 					{
 						if (onAnnotation)
 						{
-							onAnnotation(annotationText);
+							if ((annotation.type === ELEMENT_STAFF_TEXT) && staffTextOnCurrentStaffOnly)
+							{
+								let annotationPart = annotation.staff.part;
+								if ((4 * staff >= annotationPart.startTrack) && (4 * staff < annotationPart.endTrack))
+								{
+									onAnnotation(annotation);
+								}
+							}
+							else
+							{
+								onAnnotation(annotation);
+							}
 						}
 					}
 				}

@@ -20,7 +20,6 @@ import QtQuick 2.2
 import FileIO 3.0
 import MuseScore 3.0
 import "libs/AccidentalUtils.js" as AccidentalUtils
-import "libs/DateUtils.js" as DateUtils
 import "libs/IterationUtils.js" as IterationUtils
 import "libs/NoteUtils.js" as NoteUtils
 import "libs/StringUtils.js" as StringUtils
@@ -32,7 +31,7 @@ MuseScore
 	description: "Retune the selection, or the whole score if nothing is selected, to 31EDO.";
 	categoryCode: "playback";
 	thumbnailName: "31EdoThumbnail.png";
-	version: "2.1.0";
+	version: "2.1.1";
 	
 	property variant settings: {};
 
@@ -90,54 +89,9 @@ MuseScore
 	// Total amount of notes encountered in the portion of the score to tune.
 	property var totalNotes: 0;
 	
-	FileIO
+	Logger
 	{
 		id: logger;
-		source: Qt.resolvedUrl(".").toString().substring(8) + "logs/" + DateUtils.getFileDateTime() + "_log.txt";
-		property var logMessages: "";
-		property var currentLogLevel: 2;
-		property variant logLevels:
-		{
-			0: " | TRACE   | ",
-			1: " | INFO    | ",
-			2: " | WARNING | ",
-			3: " | ERROR   | ",
-			4: " | FATAL   | ",
-		}
-		
-		function log(message, logLevel)
-		{
-			if (logLevel === undefined)
-			{
-				logLevel = 1;
-			}
-			
-			if (logLevel >= currentLogLevel)
-			{
-				logMessages += DateUtils.getRFC3339DateTime() + logLevels[logLevel] + message + "\n";
-				write(logMessages);
-			}
-		}
-		
-		function trace(message)
-		{
-			log(message, 0);
-		}
-		
-		function warning(message)
-		{
-			log(message, 2);
-		}
-		
-		function error(message)
-		{
-			log(message, 3);
-		}
-		
-		function fatal(message)
-		{
-			log(message, 4);
-		}
 	}
 
 	FileIO
@@ -166,11 +120,11 @@ MuseScore
 					settings[rowData[0]] = rowData[1];
 				}
 			}
-			logger.currentLogLevel = parseInt(settings["LogLevel"]);
+			logger.logLevel = parseInt(settings["LogLevel"]);
 			referenceNote = settings["ReferenceNote"];
 			
-			logger.log("-- 31EDO Tuner -- Version " + version + " --");
-			logger.log("Log level set to: " + logger.currentLogLevel);
+			logger.log("-- " + title + " -- Version " + version + " --");
+			logger.log("Log level set to: " + logger.logLevel);
 			logger.log("Reference note set to: " + referenceNote);
 			
 			IterationUtils.iterate(
@@ -193,7 +147,16 @@ MuseScore
 		}
 		finally
 		{
-			quit();
+			try
+			{
+				quit();
+			}
+			catch (erorr)
+			{
+				logger.error(error);
+			}
+			
+			logger.writeLogs();
 		}
 	}
 	

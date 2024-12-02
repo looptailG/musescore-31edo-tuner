@@ -120,11 +120,11 @@ MuseScore
 					settings[rowData[0]] = rowData[1];
 				}
 			}
-			logger.currentLogLevel = parseInt(settings["LogLevel"]);
+			logger.logLevel = parseInt(settings["LogLevel"]);
 			referenceNote = settings["ReferenceNote"];
 			
 			logger.log("-- 31EDO Tuner -- Version " + version + " --");
-			logger.log("Log level set to: " + logger.currentLogLevel);
+			logger.log("Log level set to: " + logger.logLevel);
 			logger.log("Reference note set to: " + referenceNote);
 			
 			IterationUtils.iterate(

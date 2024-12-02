@@ -28,7 +28,7 @@ FileIO
 	source: Qt.resolvedUrl(".").toString().substring(8) + "logs/" + getFileDateTime() + "_log.txt";
 	
 	property var logMessages: "";
-	property var currentLogLevel: 0;
+	property var logLevel: 2;
 	property variant logLevels:
 	{
 		0: " | TRACE   | ",
@@ -45,7 +45,7 @@ FileIO
 			logLevel = 1;
 		}
 		
-		if (logLevel >= currentLogLevel)
+		if (logLevel >= logLevel)
 		{
 			logMessages += getRFC3339DateTime() + logLevels[logLevel] + message + "\n";
 			write(logMessages);

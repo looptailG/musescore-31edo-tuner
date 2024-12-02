@@ -16,9 +16,7 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.2
 import FileIO 3.0
-import MuseScore 3.0
 
 FileIO
 {

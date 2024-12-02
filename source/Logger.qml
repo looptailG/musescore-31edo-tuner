@@ -36,14 +36,14 @@ FileIO
 		" | FATAL   | ",
 	]
 	
-	function log(message, logLevel)
+	function log(message, level)
 	{
-		if (logLevel === undefined)
+		if (level === undefined)
 		{
-			logLevel = 1;
+			level = 1;
 		}
 		
-		if (logLevel >= logLevel)
+		if (level >= logLevel)
 		{
 			logMessages += getRFC3339DateTime() + logLevels[logLevel] + message + "\n";
 		}

@@ -30,13 +30,13 @@ FileIO
 	property var logMessages: "";
 	property var logLevel: 2;
 	property variant logLevels:
-	{
-		0: " | TRACE   | ",
-		1: " | INFO    | ",
-		2: " | WARNING | ",
-		3: " | ERROR   | ",
-		4: " | FATAL   | ",
-	}
+	[
+		" | TRACE   | ",
+		" | INFO    | ",
+		" | WARNING | ",
+		" | ERROR   | ",
+		" | FATAL   | ",
+	]
 	
 	function log(message, logLevel)
 	{

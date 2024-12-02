@@ -147,7 +147,14 @@ MuseScore
 		}
 		finally
 		{
-			quit();
+			try
+			{
+				quit();
+			}
+			catch (erorr)
+			{
+				logger.error(error);
+			}
 			
 			logger.writeLogs();
 		}

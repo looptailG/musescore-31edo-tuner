@@ -46,7 +46,6 @@ FileIO
 		if (logLevel >= logLevel)
 		{
 			logMessages += getRFC3339DateTime() + logLevels[logLevel] + message + "\n";
-			write(logMessages);
 		}
 	}
 	
@@ -68,6 +67,14 @@ FileIO
 	function fatal(message)
 	{
 		log(message, 4);
+	}
+	
+	function writeLogs()
+	{
+		if (logMessages != "")
+		{
+			write(logMessages);
+		}
 	}
 	
 	function getFileDateTime()

@@ -148,6 +148,8 @@ MuseScore
 		finally
 		{
 			quit();
+			
+			logger.writeLogs();
 		}
 	}
 	

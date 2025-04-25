@@ -31,7 +31,7 @@ MuseScore
 	description: "Retune the selection, or the whole score if nothing is selected, to 31EDO.";
 	categoryCode: "playback";
 	thumbnailName: "31EdoThumbnail.png";
-	version: "2.1.1";
+	version: "2.2.0";
 	
 	property variant settings: {};
 

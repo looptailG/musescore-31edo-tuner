@@ -19,6 +19,7 @@
 import QtQuick 2.2
 import FileIO 3.0
 import MuseScore 3.0
+import "libs/IterationUtils.js" as IterationUtils
 
 MuseScore
 {
@@ -99,6 +100,14 @@ MuseScore
 					settings[rowData[0]] = rowData[1];
 				}
 			}
+			
+			IterationUtils.iterate(
+				curScore,
+				{
+					"onNote": onNote
+				},
+				logger
+			);
 		}
 		catch (error)
 		{
@@ -117,5 +126,10 @@ MuseScore
 			
 			logger.writeLogs();
 		}
+	}
+	
+	function onNote(note)
+	{
+
 	}
 }

@@ -1,6 +1,6 @@
 /*
 	QML component for writing log messages from a MuseScore plugin.
-	Copyright (C) 2024 Alessandro Culatti
+	Copyright (C) 2024 - 2025 Alessandro Culatti
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ import FileIO 3.0
 FileIO
 {
 	id: logger;
-	property var version: "1.0.0";
+	property var version: "1.1.0";
 	
 	source: Qt.resolvedUrl(".").toString().substring(8) + "logs/" + getFileDateTime() + "_log.txt";
 	
@@ -45,7 +45,7 @@ FileIO
 		
 		if (level >= logLevel)
 		{
-			logMessages += getRFC3339DateTime() + logLevels[logLevel] + message + "\n";
+			logMessages += getRFC3339DateTime() + logLevels[level] + message + "\n";
 		}
 	}
 	
@@ -75,6 +75,16 @@ FileIO
 		{
 			write(logMessages);
 		}
+	}
+	
+	function getProperties(obj)
+	{
+		var s = "" + obj + ":";
+		for (var key in obj)
+		{
+			s += "\n" + key + ": " + obj[key];
+		}
+		return s;
 	}
 	
 	function getFileDateTime()

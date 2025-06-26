@@ -101,6 +101,12 @@ MuseScore
 					settings[rowData[0]] = rowData[1];
 				}
 			}
+			logger.logLevel = parseInt(settings["LogLevel"]);
+			referenceNote = settings["ReferenceNote"];
+			
+			logger.log("-- " + title + " -- Version " + version + " --");
+			logger.log("Log level set to: " + logger.logLevel);
+			logger.log("Reference note set to: " + referenceNote);
 			
 			IterationUtils.iterate(
 				curScore,

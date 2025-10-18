@@ -17,3 +17,31 @@
 */
 
 const VERSION = "1.0.0";
+
+// Distance of each note in EDO steps from the letter C.
+const SCALE_STEPS = {
+	"C": 0,
+	"D": 5,
+	"E": 10,
+	"F": 13,
+	"G": 18,
+	"A": 23,
+	"B": 28,
+};
+
+/**
+ * Return a Set containing every note that is enharmonically equivalent to the
+ * input note.
+ */
+function getEnharmonicEquivalents(note)
+{
+	
+}
+
+/**
+ * Choose the most appropriate enharmonic spelling for the input note.
+ */
+function chooseEnharmonicEquivalent(note, keySignature, previousAccidentals)
+{
+	
+}

@@ -31,13 +31,13 @@ const NOTES_STEPS = {
 
 // Size in EDO stpes of each accidental.
 const ACCIDENTALS_STPES = {
-	"bbb": -3,
-	"bb": -2,
-	"b": -1,
+	"bbb": -6,
+	"bb": -4,
+	"b": -2,
 	"": 0,
-	"#": 1,
-	"x": 2,
-	"#x": 3
+	"#": 2,
+	"x": 4,
+	"#x": 6
 };
 
 // Map every EDO step to an array of every possible enharmonic spelling for that

@@ -47,9 +47,9 @@ for (let i = 0; i < 31; i++)
 {
 	let enharmonicequivalents = [];
 	
-	for (const note of NOTES_STEPS.keys())
+	for (const note in NOTES_STEPS)
 	{
-		for (const accidentals of ACCIDENTALS_STPES.keys())
+		for (const accidental in ACCIDENTALS_STPES)
 		{
 			let edoSteps = NOTES_STEPS[note] + ACCIDENTALS_STPES[accidental];
 			edoSteps %= 31;

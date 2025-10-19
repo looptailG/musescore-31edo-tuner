@@ -45,7 +45,7 @@ const ACCIDENTALS_STPES = {
 };
 
 // Map every EDO step to an array of every possible enharmonic spelling for that
-// note.  The array are ordered alphabetically.
+// note.  The arrays are ordered alphabetically.
 const ENHARMONIC_EQUIVALENTS = {};
 for (let i = 0; i < 31; i++)
 {
@@ -69,6 +69,7 @@ for (let i = 0; i < 31; i++)
 		}
 	}
 	
+	enharmonicequivalents.sort();
 	ENHARMONIC_EQUIVALENTS[i] = enharmonicequivalents;
 }
 

@@ -29,8 +29,9 @@ const NOTES_STEPS = {
 	"B": 28
 };
 
-// Size in EDO stpes of each accidental.
-const ACCIDENTALS_STPES = {
+// Size in EDO stpes of each accidental that can be used for respelling notes
+// according to enharmonic equivalence.
+const ENHARMONIC_ACCIDENTALS_STEPS = {
 	"FLAT3": -6,
 	"FLAT2": -4,
 	"MIRRORED_FLAT2": -3,
@@ -55,9 +56,9 @@ for (let i = 0; i < 31; i++)
 }
 for (const note in NOTES_STEPS)
 {
-	for (const accidental in ACCIDENTALS_STPES)
+	for (const accidental in ENHARMONIC_ACCIDENTALS_STEPS)
 	{
-		let edoSteps = NOTES_STEPS[note] + ACCIDENTALS_STPES[accidental];
+		let edoSteps = NOTES_STEPS[note] + ENHARMONIC_ACCIDENTALS_STEPS[accidental];
 		edoSteps %= 31;
 		while (edoSteps < 0)
 		{
@@ -72,7 +73,7 @@ for (const note in NOTES_STEPS)
 }
 for (let i = 0; i < 31; i++)
 {
-	ENHARMONIC_EQUIVALENTS[i].sort((a, b) => ACCIDENTALS_STPES[a["ACCIDENTAL"]] - ACCIDENTALS_STPES[b["ACCIDENTAL"]]);
+	ENHARMONIC_EQUIVALENTS[i].sort((a, b) => ENHARMONIC_ACCIDENTALS_STEPS[a["ACCIDENTAL"]] - ENHARMONIC_ACCIDENTALS_STEPS[b["ACCIDENTAL"]]);
 }
 
 /**
@@ -85,6 +86,7 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 	
 	for (let i = 0; i < ENHARMONIC_EQUIVALENTS[edoStep].length; i++)
 	{
-		
+		let possibleNoteName = ENHARMONIC_EQUIVALENTS[edoStep][i]["NOTE_NAME"];
+		let possibleAccidental = ENHARMONIC_EQUIVALENTS[edoStep][i]["ACCIDENTAL"];
 	}
 }

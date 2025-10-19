@@ -150,7 +150,7 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 	// smaller accidentals if possible.
 	if (!noteName || !accidental)
 	{
-		outerLoop: for (let i = 0; i < ENHARMONIC_EQUIVALENTS[edoStep].length; i++)
+		for (let i = 0; i < ENHARMONIC_EQUIVALENTS[edoStep].length; i++)
 		{
 			let currentNoteName = ENHARMONIC_EQUIVALENTS[edoStep][i]["NOTE_NAME"];
 			let currentAccidental = ENHARMONIC_EQUIVALENTS[edoStep][i]["ACCIDENTAL"];
@@ -175,28 +175,28 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 						accidental = "NATURAL";
 					}
 				}
+				// Break the loop, as we can't find anything better than a
+				// natural.
 				break;
 			}
+			
+			if (
+				(sharpFound && (ENHARMONIC_ACCIDENTALS_STEPS[currentAccidental] > 0))
+				|| (flatFound && (ENHARMONIC_ACCIDENTALS_STEPS[currentAccidental] < 0))
+			) {
+				if (abs(ENHARMONIC_ACCIDENTALS_STEPS[currentAccidental]) < abs(ENHARMONIC_ACCIDENTALS_STEPS[accidental]))
+				{
+					noteName = currentNoteName;
+					accidental = currentAccidental;
+				}
+			}
 		}
+	}
+	
+	// If we still haven't found any suitable accidental, simply return the
+	// smallest possible accidental for this EDO step.
+	if (!noteName || !accidental)
+	{
 		
-		
-		// If the note can be written withoun any alteration, return a note name
-		// without an alteration, or a natural sign if necessary.
-		if (naturalFound)
-		{
-			
-		}
-		else if (sharpFound && !flatFound)
-		{
-			
-		}
-		else if (flatFound && !sharpFound)
-		{
-			
-		}
-		else
-		{
-			
-		}
 	}
 }

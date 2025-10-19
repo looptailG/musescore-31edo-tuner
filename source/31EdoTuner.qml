@@ -194,15 +194,25 @@ MuseScore
 					let accidentalName = "";
 					switch (currentAccidental)
 					{
-						// Non-microtonal accidentals are automatically handled
-						// by Musescore even in custom key signatures, so we
-						// only have to check for microtonal accidentals.
 						case "bb":
+							accidentalName = "FLAT2";
+							break;
+						
 						case "b":
+							accidentalName = "FLAT";
+							break;
+						
 						case "":
 						case "h":
+							accidentalName = "NONE";
+							break;
+						
 						case "#":
+							accidentalName = "SHARP";
+							break;
+						
 						case "x":
+							accidentalName = "SHARP2";
 							break;
 						
 						case "db":

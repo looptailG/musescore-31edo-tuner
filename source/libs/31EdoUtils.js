@@ -77,7 +77,8 @@ for (let i = 0; i < 31; i++)
 }
 
 /**
- * Choose the most appropriate enharmonic spelling for the input note.
+ * Choose the most appropriate enharmonic spelling for the input note, according
+ * to the key signature and the eventual accidentals in the measure.
  */
 function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 {
@@ -88,5 +89,18 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 	{
 		let possibleNoteName = ENHARMONIC_EQUIVALENTS[edoStep][i]["NOTE_NAME"];
 		let possibleAccidental = ENHARMONIC_EQUIVALENTS[edoStep][i]["ACCIDENTAL"];
+		
+		if (keySignature.hasOwnProperty(possibleNoteName))
+		{
+			let keySignatureAccidental = keySignature[possibleNoteName];
+			if (possibleAccidental === keySignatureAccidental)
+			{
+				noteName = possibleNoteName;
+				accidental = possibleAccidental;
+				break;
+			}
+		}
+		
+		
 	}
 }

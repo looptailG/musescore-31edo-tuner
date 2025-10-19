@@ -33,9 +33,13 @@ const NOTES_STEPS = {
 const ACCIDENTALS_STPES = {
 	"bbb": -6,
 	"bb": -4,
+	"db": -3,
 	"b": -2,
+	"d": -1,
 	"": 0,
+	"t": 1,
 	"#": 2,
+	"t#": 3,
 	"x": 4,
 	"#x": 6
 };

@@ -94,18 +94,18 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 	{
 		let possibleNoteName = ENHARMONIC_EQUIVALENTS[edoStep][i]["NOTE_NAME"];
 		let possibleAccidental = ENHARMONIC_EQUIVALENTS[edoStep][i]["ACCIDENTAL"];
-		if (ENHARMONIC_ACCIDENTALS_STEPS[possibleAccidental] > 0)
-		{
-			sharpFound = true;
-		}
-		else if (ENHARMONIC_ACCIDENTALS_STEPS[possibleAccidental] < 0)
-		{
-			flatFound = true;
-		}
 		
 		if (keySignature.hasOwnProperty(possibleNoteName))
 		{
 			let keySignatureAccidental = keySignature[possibleNoteName];
+			if (ENHARMONIC_ACCIDENTALS_STEPS[keySignatureAccidental] > 0)
+			{
+				sharpFound = true;
+			}
+			else if (ENHARMONIC_ACCIDENTALS_STEPS[keySignatureAccidental] < 0)
+			{
+				flatFound = true;
+			}
 			if (possibleAccidental === keySignatureAccidental)
 			{
 				noteName = possibleNoteName;
@@ -142,5 +142,10 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 				}
 			}
 		}
+	}
+	
+	if (!noteName || !accidental)
+	{
+		
 	}
 }

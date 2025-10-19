@@ -184,7 +184,15 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 				(sharpFound && (ENHARMONIC_ACCIDENTALS_STEPS[currentAccidental] > 0))
 				|| (flatFound && (ENHARMONIC_ACCIDENTALS_STEPS[currentAccidental] < 0))
 			) {
-				if (abs(ENHARMONIC_ACCIDENTALS_STEPS[currentAccidental]) < abs(ENHARMONIC_ACCIDENTALS_STEPS[accidental]))
+				if (accidental)
+				{
+					if (abs(ENHARMONIC_ACCIDENTALS_STEPS[currentAccidental]) < abs(ENHARMONIC_ACCIDENTALS_STEPS[accidental]))
+					{
+						noteName = currentNoteName;
+						accidental = currentAccidental;
+					}
+				}
+				else
 				{
 					noteName = currentNoteName;
 					accidental = currentAccidental;
@@ -197,6 +205,24 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 	// smallest possible accidental for this EDO step.
 	if (!noteName || !accidental)
 	{
+		let smallestAccidental = Number.MAX_VALUE;
 		
+		for (let i = 0; i < ENHARMONIC_EQUIVALENTS[edoStep].length; i++)
+		{
+			let currentNoteName = ENHARMONIC_EQUIVALENTS[edoStep][i]["NOTE_NAME"];
+			let currentAccidental = ENHARMONIC_EQUIVALENTS[edoStep][i]["ACCIDENTAL"];
+			
+			if (abs(ENHARMONIC_ACCIDENTALS_STEPS[currentAccidental]) < smallestAccidental)
+			{
+				smallestAccidental = abs(ENHARMONIC_ACCIDENTALS_STEPS[currentAccidental]);
+				noteName = noteName;
+				accidental = currentAccidental;
+			}
+		}
 	}
+	
+	let returnValue = {};
+	returnValue["NOTE_NAME"] = noteName;
+	returnValue["ACCIDENTAL"] = accidental;
+	return returnValue;
 }

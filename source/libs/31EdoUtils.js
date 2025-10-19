@@ -85,10 +85,23 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 	let noteName = "";
 	let accidental = "";
 	
-	for (let i = 0; i < ENHARMONIC_EQUIVALENTS[edoStep].length; i++)
+	let flatFound = false;
+	let sharpFound = false;
+	
+	// Search if the input EDO step is present in the key signature, or as a
+	// previously altered note in the current measure.
+	outerLoop: for (let i = 0; i < ENHARMONIC_EQUIVALENTS[edoStep].length; i++)
 	{
 		let possibleNoteName = ENHARMONIC_EQUIVALENTS[edoStep][i]["NOTE_NAME"];
 		let possibleAccidental = ENHARMONIC_EQUIVALENTS[edoStep][i]["ACCIDENTAL"];
+		if (ENHARMONIC_ACCIDENTALS_STEPS[possibleAccidental] > 0)
+		{
+			sharpFound = true;
+		}
+		else if (ENHARMONIC_ACCIDENTALS_STEPS[possibleAccidental] < 0)
+		{
+			flatFound = true;
+		}
 		
 		if (keySignature.hasOwnProperty(possibleNoteName))
 		{
@@ -101,6 +114,33 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 			}
 		}
 		
-		
+		// previousAccidentals has as keys both the note names and the octave in
+		// which the accidental was found.  For the purpose of choosing the most
+		// appropriate accidental, we don't consider the octave, as if the
+		// accidental is found in a specific octave, it's likely to be the
+		// correct enharmonic spelling in another octave as well.
+		for (let previousAlteredNote in previousAccidentals)
+		{
+			let previousAccidental = previousAccidentals[previousAlteredNote];
+			if (ENHARMONIC_ACCIDENTALS_STEPS[previousAccidental] > 0)
+			{
+				sharpFound = true;
+			}
+			else if (ENHARMONIC_ACCIDENTALS_STEPS[previousAccidental] < 0)
+			{
+				flatFound = true;
+			}
+			
+			// By using inclutdes() we ignore the octave in the string.
+			if (previousAlteredNote.includes(possibleNoteName))
+			{
+				if (possibleAccidental === previousAccidental)
+				{
+					noteName = possibleNoteName;
+					accidental = possibleAccidental;
+					break outerLoop;
+				}
+			}
+		}
 	}
 }

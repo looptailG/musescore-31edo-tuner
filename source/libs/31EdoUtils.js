@@ -45,32 +45,34 @@ const ACCIDENTALS_STPES = {
 };
 
 // Map every EDO step to an array of every possible enharmonic spelling for that
-// EDO step.  The arrays are ordered alphabetically.
+// EDO step.  The arrays contains objects with the properties "NOTE_NAME" and
+// "ACCIDENTAL", and are ordered according to the number of EDO steps of the
+// accidental applied to the note.
 const ENHARMONIC_EQUIVALENTS = {};
 for (let i = 0; i < 31; i++)
 {
-	let enharmonicEquivalents = [];
-	
-	for (const note in NOTES_STEPS)
+	ENHARMONIC_EQUIVALENTS[i] = [];
+}
+for (const note in NOTES_STEPS)
+{
+	for (const accidental in ACCIDENTALS_STPES)
 	{
-		for (const accidental in ACCIDENTALS_STPES)
+		let edoSteps = NOTES_STEPS[note] + ACCIDENTALS_STPES[accidental];
+		edoSteps %= 31;
+		while (edoSteps < 0)
 		{
-			let edoSteps = NOTES_STEPS[note] + ACCIDENTALS_STPES[accidental];
-			edoSteps %= 31;
-			while (edoSteps < 0)
-			{
-				edoSteps += 31;
-			}
-			
-			if (i == edoSteps)
-			{
-				enharmonicEquivalents.push(note + accidental);
-			}
+			edoSteps += 31;
 		}
+		
+		let newEnharmonicEquivalent = {};
+		newEnharmonicEquivalent["NOTE_NAME"] = note;
+		newEnharmonicEquivalent["ACCIDENTAL"] = accidental;
+		ENHARMONIC_EQUIVALENTS[edoSteps].push(newEnharmonicEquivalent);
 	}
-	
-	enharmonicEquivalents.sort();
-	ENHARMONIC_EQUIVALENTS[i] = enharmonicEquivalents;
+}
+for (let i = 0; i < 31; i++)
+{
+	ENHARMONIC_EQUIVALENTS[i].sort((a, b) => ACCIDENTALS_STPES[a["ACCIDENTAL"]] - ACCIDENTALS_STPES[b["ACCIDENTAL"]]);
 }
 
 /**

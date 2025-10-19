@@ -85,8 +85,9 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 	let noteName = "";
 	let accidental = "";
 	
-	let flatFound = false;
 	let sharpFound = false;
+	let flatFound = false;
+	let naturalFound = false;
 	
 	// Search if the input EDO step is present in the key signature, or as a
 	// previously altered note in the current measure.
@@ -106,6 +107,11 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 			{
 				flatFound = true;
 			}
+			else
+			{
+				naturalFound = true;
+			}
+			
 			if (possibleAccidental === keySignatureAccidental)
 			{
 				noteName = possibleNoteName;
@@ -130,8 +136,12 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 			{
 				flatFound = true;
 			}
+			else
+			{
+				naturalFound = true;
+			}
 			
-			// By using inclutdes() we ignore the octave in the string.
+			// By using includes() we ignore the octave in the string.
 			if (previousAlteredNote.includes(possibleNoteName))
 			{
 				if (possibleAccidental === previousAccidental)
@@ -144,8 +154,27 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 		}
 	}
 	
+	// If there weren't a suitable note and accidental in the key signature or
+	// in the previously altered notes, try to find the best guess.
 	if (!noteName || !accidental)
 	{
-		
+		// If the note can be written withoun any alteration, return a note name
+		// without an alteration, or a natural sign if necessary.
+		if (naturalFound)
+		{
+			
+		}
+		else if (sharpFound && !flatFound)
+		{
+			
+		}
+		else if (flatFound && !sharpFound)
+		{
+			
+		}
+		else
+		{
+			
+		}
 	}
 }

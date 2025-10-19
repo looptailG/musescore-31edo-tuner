@@ -31,25 +31,25 @@ const NOTES_STEPS = {
 
 // Size in EDO stpes of each accidental.
 const ACCIDENTALS_STPES = {
-	"bbb": -6,
-	"bb": -4,
-	"db": -3,
-	"b": -2,
-	"d": -1,
-	"": 0,
-	"t": 1,
-	"#": 2,
-	"t#": 3,
-	"x": 4,
-	"#x": 6
+	"FLAT3": -6,
+	"FLAT2": -4,
+	"MIRRORED_FLAT2": -3,
+	"FLAT": -2,
+	"MIRRORED_FLAT": -1,
+	"NONE": 0,
+	"SHARP_SLASH": 1,
+	"SHARP": 2,
+	"SHARP_SLASH4": 3,
+	"SHARP2": 4,
+	"SHARP3": 6
 };
 
 // Map every EDO step to an array of every possible enharmonic spelling for that
-// note.  The arrays are ordered alphabetically.
+// EDO step.  The arrays are ordered alphabetically.
 const ENHARMONIC_EQUIVALENTS = {};
 for (let i = 0; i < 31; i++)
 {
-	let enharmonicequivalents = [];
+	let enharmonicEquivalents = [];
 	
 	for (const note in NOTES_STEPS)
 	{
@@ -64,28 +64,25 @@ for (let i = 0; i < 31; i++)
 			
 			if (i == edoSteps)
 			{
-				enharmonicequivalents.push(note + accidental);
+				enharmonicEquivalents.push(note + accidental);
 			}
 		}
 	}
 	
-	enharmonicequivalents.sort();
-	ENHARMONIC_EQUIVALENTS[i] = enharmonicequivalents;
-}
-
-/**
- * Return a Set containing every note that is enharmonically equivalent to the
- * input note.
- */
-function getEnharmonicEquivalents(note)
-{
-	
+	enharmonicEquivalents.sort();
+	ENHARMONIC_EQUIVALENTS[i] = enharmonicEquivalents;
 }
 
 /**
  * Choose the most appropriate enharmonic spelling for the input note.
  */
-function chooseEnharmonicEquivalent(note, keySignature, previousAccidentals)
+function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 {
+	let noteName = "";
+	let accidental = "";
 	
+	for (let i = 0; i < ENHARMONIC_EQUIVALENTS[edoStep].length; i++)
+	{
+		
+	}
 }

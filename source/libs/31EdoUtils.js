@@ -87,7 +87,6 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 	
 	let sharpFound = false;
 	let flatFound = false;
-	let naturalFound = false;
 	
 	// Search if the input EDO step is present in the key signature, or as a
 	// previously altered note in the current measure.
@@ -106,10 +105,6 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 			else if (ENHARMONIC_ACCIDENTALS_STEPS[keySignatureAccidental] < 0)
 			{
 				flatFound = true;
-			}
-			else
-			{
-				naturalFound = true;
 			}
 			
 			if (possibleAccidental === keySignatureAccidental)
@@ -136,10 +131,6 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 			{
 				flatFound = true;
 			}
-			else
-			{
-				naturalFound = true;
-			}
 			
 			// By using includes() we ignore the octave in the string.
 			if (previousAlteredNote.includes(possibleNoteName))
@@ -155,9 +146,40 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 	}
 	
 	// If there weren't a suitable note and accidental in the key signature or
-	// in the previously altered notes, try to find the best guess.
+	// in the previously altered notes, try to find the best guess.  Prefer
+	// smaller accidentals if possible.
 	if (!noteName || !accidental)
 	{
+		outerLoop: for (let i = 0; i < ENHARMONIC_EQUIVALENTS[edoStep].length; i++)
+		{
+			let currentNoteName = ENHARMONIC_EQUIVALENTS[edoStep][i]["NOTE_NAME"];
+			let currentAccidental = ENHARMONIC_EQUIVALENTS[edoStep][i]["ACCIDENTAL"];
+			
+			if (currentAccidental === "NONE")
+			{
+				noteName = currentNoteName;
+				accidental = currentAccidental;
+				
+				// Check if the note is altered by the key signature or by a
+				// previous accidental in the measure, and in case replace the
+				// accidental with a natural sign.
+				if (keySignature.hasOwnProperty(noteName))
+				{
+					accidental = "NATURAL";
+				}
+				for (let previousAlteredNote in previousAccidentals)
+				{
+					let previousAccidental = previousAccidentals[previousAlteredNote];
+					if (previousAccidental !== "NATURAL")
+					{
+						accidental = "NATURAL";
+					}
+				}
+				break;
+			}
+		}
+		
+		
 		// If the note can be written withoun any alteration, return a note name
 		// without an alteration, or a natural sign if necessary.
 		if (naturalFound)

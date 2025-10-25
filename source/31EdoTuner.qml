@@ -101,7 +101,7 @@ MuseScore
 		
 		onError:
 		{
-			logger.error(msg);
+			logger.err(msg);
 		}
 	}
 
@@ -153,7 +153,7 @@ MuseScore
 			}
 			catch (erorr)
 			{
-				logger.error(error);
+				logger.err(error);
 			}
 			
 			logger.writeLogs();
@@ -232,7 +232,7 @@ MuseScore
 			}
 			catch (error)
 			{
-				logger.error(error);
+				logger.err(error);
 				currentCustomKeySignature = {};
 			}
 		}
@@ -254,7 +254,7 @@ MuseScore
 		}
 		catch (error)
 		{
-			logger.error(error);
+			logger.err(error);
 		}
 	}
 }

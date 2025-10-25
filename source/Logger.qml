@@ -109,7 +109,7 @@ FileIO
 		var hours = String(currentDate.getHours()).padStart(2, "0");
 		var minutes = String(currentDate.getMinutes()).padStart(2, "0");
 		var seconds = String(currentDate.getSeconds()).padStart(2, "0");
-		var milliseconds = String(currentDate.getMilliseconds());
+		var milliseconds = String(currentDate.getMilliseconds()).padStart(3, "0");
 		return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milliseconds}`;
 	}
 }

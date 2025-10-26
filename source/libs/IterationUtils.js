@@ -1,6 +1,6 @@
 /*
 	A collection of functions and constants for iterating over a score.
-	Copyright (C) 2024 Alessandro Culatti
+	Copyright (C) 2024 - 2025 Alessandro Culatti
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-const VERSION = "1.0.2";
+const VERSION = "1.0.3";
 
 function iterate(curScore, actions, logger)
 {
@@ -54,7 +54,8 @@ function iterate(curScore, actions, logger)
 		if (cursor.tick == 0)
 		{
 			// If the selection includes the last note of the score, .rewind()
-			// overflows and goes back to tick 0.
+			// overflows and goes back to tick 0.  In this case, set the end
+			// tick manually to the last tick of the score.
 			endTick = curScore.lastSegment.tick;
 		}
 		else
@@ -74,21 +75,30 @@ function iterate(curScore, actions, logger)
 			
 			cursor.voice = voice;
 			cursor.staffIdx = staff;
-			cursor.rewindToTick(startTick);
+			if (startTick == 0)
+			{
+				// This is necessary in case nothing is selected before running
+				// the plugin, in which case SELECTION_START is not valorised.
+				cursor.rewind(Cursor.SCORE_START);
+			}
+			else
+			{
+				cursor.rewind(Cursor.SELECTION_START);
+			}
 			
-			let previousKeySignature = cursor.keySignature;
+			let previousKeySignature = null;
 			
 			if (onStaffStart)
 			{
 				onStaffStart();
 			}
 			
-			// Loop on the element of the current staff.
+			// Loop on the elements of the current staff.
 			while (cursor.segment && (cursor.tick <= endTick))
 			{
 				if (onNewMeasure)
 				{
-					if (cursor.segment.tick == cursor.measure.firstSegment.tick)
+					if (cursor.segment.tick === cursor.measure.firstSegment.tick)
 					{
 						onNewMeasure();
 					}
@@ -130,7 +140,7 @@ function iterate(curScore, actions, logger)
 				
 				if (onNote)
 				{
-					if (cursor.element && (cursor.element.type == Element.CHORD))
+					if (cursor.element && (cursor.element.type === Element.CHORD))
 					{
 						let graceChords = cursor.element.graceNotes;
 						for (let i = 0; i < graceChords.length; i++)

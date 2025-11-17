@@ -31,7 +31,7 @@ MuseScore
 	description: "Retune the selection, or the whole score if nothing is selected, to 31EDO.";
 	categoryCode: "playback";
 	thumbnailName: "31EdoThumbnail.png";
-	version: "2.1.2";
+	version: "2.1.3";
 	
 	property variant settings: {};
 
@@ -97,7 +97,7 @@ MuseScore
 	FileIO
 	{
 		id: settingsReader;
-		source: Qt.resolvedUrl(".").toString().substring(8) + "Settings.tsv";
+		source: Qt.resolvedUrl(".").toString() + "Settings.tsv";
 		
 		onError:
 		{

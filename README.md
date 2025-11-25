@@ -22,7 +22,7 @@ This plugin is compatible with the following notation systems:
 
 These notation systems are not mutually exclusive, the plugin can correctly tune a score which uses a mixture of them.
 
-See [here](https://github.com/looptailG/musescore-31edo-tuner/wiki/Supported-Accidentals) for a list of every supported accidental.
+Be sure to use the correct accidental, as there are several microtonal accidentals that look similar to each other, but not all of them are supported by this plugin.  See [here](https://github.com/looptailG/musescore-31edo-tuner/wiki/Supported-Accidentals) for a list of every supported accidental, and their name in Musescore.
 
 This plugin remembers which accidental is applied to any given note, and will automatically apply the correct tuning offset to the following notes within the same measure.  This is also true for microtonal accidentals, for which this is usually not automatically done in Musescore.  A limitation of this is that the plugin only checks for accidentals for each voice individually, so if there are multiple voices with microtonal accidentals, it might be necessary to add an extra accidental for the first modified note in each voice.  This extra accidental can be safely made invisible, as that won't affect the plugin, as in the following example:
 

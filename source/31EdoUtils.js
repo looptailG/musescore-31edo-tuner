@@ -196,6 +196,7 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 				{
 					accidental = "NATURAL";
 				}
+				// TODO: this logic is probably wrong.
 				for (let previousAlteredNote in previousAccidentals)
 				{
 					let previousAccidental = previousAccidentals[previousAlteredNote];
@@ -204,6 +205,7 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 						accidental = "NATURAL";
 					}
 				}
+				
 				// Break the loop, as we can't find anything better than a
 				// natural.
 				break;

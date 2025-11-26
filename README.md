@@ -20,11 +20,11 @@ This plugin is compatible with the following notation systems:
 
 ![image](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/eea3a806-9c91-436c-8e0b-3cfefbeb46f3)
 
-These notation systems are not mutually exclusive, the plugin can correctly tune a score which uses a mixture of them.
+These notation systems are not mutually exclusive, this plugin can correctly tune a score which uses a mixture of them.
 
-See [here](https://github.com/looptailG/musescore-31edo-tuner/wiki/Supported-Accidentals) for a list of every supported accidental.
+Be sure to use the correct accidental, as there are several microtonal accidentals that look similar to each other, but not all of them are supported by this plugin.  See [here](https://github.com/looptailG/musescore-31edo-tuner/wiki/Supported-Accidentals) for a list of every supported accidental, and their name in Musescore Studio.
 
-This plugin remembers which accidental is applied to any given note, and will automatically apply the correct tuning offset to the following notes within the same measure.  This is also true for microtonal accidentals, for which this is usually not automatically done in Musescore.  A limitation of this is that the plugin only checks for accidentals for each voice individually, so if there are multiple voices with microtonal accidentals, it might be necessary to add an extra accidental for the first modified note in each voice.  This extra accidental can be safely made invisible, as that won't affect the plugin, as in the following example:
+This plugin remembers which accidental is applied to any given note, and will automatically apply the correct tuning offset to the following notes within the same measure.  This is also true for microtonal accidentals, for which this is usually not automatically done in Musescore Studio.  A limitation of this is that the plugin only checks for accidentals for each voice individually, so if there are multiple voices with microtonal accidentals, it might be necessary to add an extra accidental for the first modified note in each voice.  This extra accidental can be safely made invisible, as that won't affect the plugin, as in the following example:
 
 ![image](https://github.com/looptailG/musescore-31edo-tuner/assets/99362337/ae091a16-ded2-43df-aa22-28144d39982c)
 

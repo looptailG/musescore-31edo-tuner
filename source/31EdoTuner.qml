@@ -97,11 +97,11 @@ MuseScore
 	FileIO
 	{
 		id: settingsReader;
-		source: Qt.resolvedUrl(".").toString().substring(8) + "Settings.tsv";
+		source: Qt.resolvedUrl(".").toString() + "Settings.tsv";
 		
 		onError:
 		{
-			logger.error(msg);
+			logger.err(msg);
 		}
 	}
 
@@ -153,7 +153,7 @@ MuseScore
 			}
 			catch (erorr)
 			{
-				logger.error(error);
+				logger.err(error);
 			}
 			
 			logger.writeLogs();
@@ -242,7 +242,7 @@ MuseScore
 			}
 			catch (error)
 			{
-				logger.error(error);
+				logger.err(error);
 				currentCustomKeySignature = {};
 			}
 		}
@@ -264,7 +264,7 @@ MuseScore
 		}
 		catch (error)
 		{
-			logger.error(error);
+			logger.err(error);
 		}
 	}
 }

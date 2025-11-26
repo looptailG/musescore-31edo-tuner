@@ -21,7 +21,7 @@ import FileIO 3.0
 FileIO
 {
 	id: logger;
-	property var version: "1.1.0";
+	property var version: "1.2.0";
 	
 	source: Qt.resolvedUrl(".").toString().substring(8) + "logs/" + getFileDateTime() + "_log.txt";
 	
@@ -29,12 +29,13 @@ FileIO
 	property var logLevel: 2;
 	property variant logLevels:
 	[
-		" | TRACE   | ",
-		" | INFO    | ",
-		" | WARNING | ",
-		" | ERROR   | ",
-		" | FATAL   | ",
+		"TRACE",
+		"INFO",
+		"WARNING",
+		"ERROR",
+		"FATAL",
 	]
+	property var separator: "\t";
 	
 	function log(message, level)
 	{
@@ -45,7 +46,7 @@ FileIO
 		
 		if (level >= logLevel)
 		{
-			logMessages += getRFC3339DateTime() + logLevels[level] + message + "\n";
+			logMessages += getRFC3339DateTime() + separator + logLevels[level] + separator + message + "\n";
 		}
 	}
 	
@@ -59,7 +60,7 @@ FileIO
 		log(message, 2);
 	}
 	
-	function error(message)
+	function err(message)
 	{
 		log(message, 3);
 	}
@@ -108,7 +109,7 @@ FileIO
 		var hours = String(currentDate.getHours()).padStart(2, "0");
 		var minutes = String(currentDate.getMinutes()).padStart(2, "0");
 		var seconds = String(currentDate.getSeconds()).padStart(2, "0");
-		var centiseconds = String(currentDate.getMilliseconds()).padStart(3, "0").slice(0, 2);
-		return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${centiseconds}`;
+		var milliseconds = String(currentDate.getMilliseconds()).padStart(3, "0");
+		return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milliseconds}`;
 	}
 }

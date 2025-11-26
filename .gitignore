@@ -1,2 +1,4 @@
 out/*
 !out/Generate31EDOPlugin.py
+
+source/TEST*

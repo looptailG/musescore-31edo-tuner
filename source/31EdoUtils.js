@@ -18,6 +18,11 @@
 
 const VERSION = "1.0.0";
 
+// Size in cents of an EDO step.
+const STEP_SIZE = 1200.0 / 31;
+// Difference in cents between a 12EDO and a 31EDO fifth.
+const FIFTH_DEVIATION = 700.0 - 18 * STEP_SIZE;
+
 // Distance of each note in EDO steps from the note C.
 const NOTES_STEPS = {
 	"C": 0,

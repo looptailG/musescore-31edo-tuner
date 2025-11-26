@@ -19,6 +19,7 @@
 import QtQuick 2.2
 import FileIO 3.0
 import MuseScore 3.0
+import "31EdoUtils.js" as EdoUtils
 import "AccidentalUtils.js" as AccidentalUtils
 import "IterationUtils.js" as IterationUtils
 import "Logger.js" as Logger
@@ -36,10 +37,6 @@ MuseScore
 	
 	property variant settings: {};
 
-	// Size in cents of an EDO step.
-	property var stepSize: 1200.0 / 31;
-	// Difference in cents between a 12EDO and a 31EDO fifth.
-	property var fifthDeviation: 700.0 - 18 * stepSize;
 	// Reference note, which has a tuning offset of zero.
 	property var referenceNote: "";
 	
@@ -257,7 +254,7 @@ MuseScore
 		{
 			note.tuning = TuningUtils.edoTuningOffset(
 				note, NoteUtils.getNoteLetter(note, "tpc"), AccidentalUtils.getAccidentalName(note), NoteUtils.getOctave(note), referenceNote,
-				stepSize, fifthDeviation, supportedAccidentals, AccidentalUtils.ACCIDENTAL_DATA,
+				EdoUtils.STEP_SIZE, EdoUtils.FIFTH_DEVIATION, supportedAccidentals, AccidentalUtils.ACCIDENTAL_DATA,
 				previousAccidentals, currentCustomKeySignature,
 				Logger
 			);

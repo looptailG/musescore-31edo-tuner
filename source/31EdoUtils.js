@@ -23,6 +23,30 @@ const STEP_SIZE = 1200.0 / 31;
 // Difference in cents between a 12EDO and a 31EDO fifth.
 const FIFTH_DEVIATION = 700.0 - 18 * STEP_SIZE;
 
+// Map containing the amount of EDO steps of every supported accidental.
+const SUPPORTED_ACCIDENTALS = {
+	"NONE": 0,
+	"FLAT": -2,
+	"NATURAL": 0,
+	"SHARP": 2,
+	"SHARP2": 4,
+	"FLAT2": -4,
+	"SHARP3": 6,
+	"FLAT3": -6,
+	"NATURAL_FLAT": -2,
+	"NATURAL_SHARP": 2,
+	"ARROW_DOWN": -1,
+	"MIRRORED_FLAT": -1,
+	"MIRRORED_FLAT2": -3,
+	"SHARP_SLASH": 1,
+	"LOWER_ONE_SEPTIMAL_COMMA": -1,
+	"SHARP_SLASH4": 3,
+	"SAGITTAL_11MDD": -1,
+	"SAGITTAL_11MDU": 1,
+	"SAGITTAL_FLAT": -2,
+	"SAGITTAL_SHARP": 2,
+};
+
 // Distance of each note in EDO steps from the note C.
 const NOTES_STEPS = {
 	"C": 0,

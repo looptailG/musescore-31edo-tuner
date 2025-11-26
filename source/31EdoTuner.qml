@@ -40,31 +40,6 @@ MuseScore
 	// Reference note, which has a tuning offset of zero.
 	property var referenceNote: "";
 	
-	// Map containing the amount of EDO steps of every supported accidental.
-	property variant supportedAccidentals:
-	{
-		"NONE": 0,
-		"FLAT": -2,
-		"NATURAL": 0,
-		"SHARP": 2,
-		"SHARP2": 4,
-		"FLAT2": -4,
-		"SHARP3": 6,
-		"FLAT3": -6,
-		"NATURAL_FLAT": -2,
-		"NATURAL_SHARP": 2,
-		"ARROW_DOWN": -1,
-		"MIRRORED_FLAT": -1,
-		"MIRRORED_FLAT2": -3,
-		"SHARP_SLASH": 1,
-		"LOWER_ONE_SEPTIMAL_COMMA": -1,
-		"SHARP_SLASH4": 3,
-		"SAGITTAL_11MDD": -1,
-		"SAGITTAL_11MDU": 1,
-		"SAGITTAL_FLAT": -2,
-		"SAGITTAL_SHARP": 2,
-	}
-	
 	// Map containing the previous microtonal accidentals in the current
 	// measure.  The keys are formatted as note letter concatenated with the
 	// note octave, for example C4.  The value is the last microtonal accidental
@@ -254,7 +229,7 @@ MuseScore
 		{
 			note.tuning = TuningUtils.edoTuningOffset(
 				note, NoteUtils.getNoteLetter(note, "tpc"), AccidentalUtils.getAccidentalName(note), NoteUtils.getOctave(note), referenceNote,
-				EdoUtils.STEP_SIZE, EdoUtils.FIFTH_DEVIATION, supportedAccidentals, AccidentalUtils.ACCIDENTAL_DATA,
+				EdoUtils.STEP_SIZE, EdoUtils.FIFTH_DEVIATION, EdoUtils.SUPPORTED_ACCIDENTALS, AccidentalUtils.ACCIDENTAL_DATA,
 				previousAccidentals, currentCustomKeySignature,
 				Logger
 			);

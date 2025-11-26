@@ -19,11 +19,12 @@
 import QtQuick 2.2
 import FileIO 3.0
 import MuseScore 3.0
-import "libs/AccidentalUtils.js" as AccidentalUtils
-import "libs/IterationUtils.js" as IterationUtils
-import "libs/NoteUtils.js" as NoteUtils
-import "libs/StringUtils.js" as StringUtils
-import "libs/TuningUtils.js" as TuningUtils
+import "AccidentalUtils.js" as AccidentalUtils
+import "IterationUtils.js" as IterationUtils
+import "Logger.js" as Logger
+import "NoteUtils.js" as NoteUtils
+import "StringUtils.js" as StringUtils
+import "TuningUtils.js" as TuningUtils
 
 MuseScore
 {
@@ -89,9 +90,9 @@ MuseScore
 	// Total amount of notes encountered in the portion of the score to tune.
 	property var totalNotes: 0;
 	
-	Logger
+	FileIO
 	{
-		id: logger;
+		id: loggerId;
 	}
 
 	FileIO
@@ -101,7 +102,7 @@ MuseScore
 		
 		onError:
 		{
-			logger.err(msg);
+			Logger.err(msg);
 		}
 	}
 
@@ -120,12 +121,12 @@ MuseScore
 					settings[rowData[0]] = rowData[1];
 				}
 			}
-			logger.logLevel = parseInt(settings["LogLevel"]);
-			referenceNote = settings["ReferenceNote"];
 			
-			logger.log("-- " + title + " -- Version " + version + " --");
-			logger.log("Log level set to: " + logger.logLevel);
-			logger.log("Reference note set to: " + referenceNote);
+			Logger.initialise(loggerId, parseInt(settings["LogLevel"]));
+			Logger.log("-- " + title + " -- Version " + version + " --");
+			
+			referenceNote = settings["ReferenceNote"];
+			Logger.log("Reference note set to: " + referenceNote);
 			
 			IterationUtils.iterate(
 				curScore,
@@ -136,14 +137,14 @@ MuseScore
 					"onAnnotation": onAnnotation,
 					"onNote": onNote
 				},
-				logger
+				Logger
 			);
 			
-			logger.log("Notes tuned: " + tunedNotes + " / " + totalNotes);
+			Logger.log("Notes tuned: " + tunedNotes + " / " + totalNotes);
 		}
 		catch (error)
 		{
-			logger.fatal(error);
+			Logger.fatal(error);
 		}
 		finally
 		{
@@ -153,10 +154,10 @@ MuseScore
 			}
 			catch (erorr)
 			{
-				logger.err(error);
+				Logger.err(error);
 			}
 			
-			logger.writeLogs();
+			Logger.writeLogs();
 		}
 	}
 	
@@ -173,7 +174,7 @@ MuseScore
 	
 	function onKeySignatureChange(keySignature)
 	{
-		logger.log("Key signature change, emptying the custom key signature map.");
+		Logger.log("Key signature change, emptying the custom key signature map.");
 		currentCustomKeySignature = {};
 	}
 	
@@ -182,7 +183,7 @@ MuseScore
 		let annotationText = annotation.text.replace(/\s*/g, "");
 		if (customKeySignatureRegex.test(annotationText))
 		{
-			logger.log("Applying custom key signature: " + annotationText);
+			Logger.log("Applying custom key signature: " + annotationText);
 			currentCustomKeySignature = {};
 			try
 			{
@@ -242,7 +243,7 @@ MuseScore
 			}
 			catch (error)
 			{
-				logger.err(error);
+				Logger.err(error);
 				currentCustomKeySignature = {};
 			}
 		}
@@ -258,13 +259,13 @@ MuseScore
 				note, NoteUtils.getNoteLetter(note, "tpc"), AccidentalUtils.getAccidentalName(note), NoteUtils.getOctave(note), referenceNote,
 				stepSize, fifthDeviation, supportedAccidentals, AccidentalUtils.ACCIDENTAL_DATA,
 				previousAccidentals, currentCustomKeySignature,
-				logger
+				Logger
 			);
 			tunedNotes++;
 		}
 		catch (error)
 		{
-			logger.err(error);
+			Logger.err(error);
 		}
 	}
 }

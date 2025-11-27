@@ -47,6 +47,12 @@ const SUPPORTED_ACCIDENTALS = {
 	"SAGITTAL_SHARP": 2,
 };
 
+// Regex used for checking if a string is valid as a custom key signature.
+const KEY_SIGNATURE_REGEX = /^(x|t#|#|t|h|d|b|db|bb|)(?:\.(?:x|t#|#|t|h|d|b|db|bb|)){6}$/;
+// Array containing the notes in the order they appear in the custom key
+// signature string.
+const KEY_SIGNATURE_NOTE_ORDER = ["F", "C", "G", "D", "A", "E", "B"];
+
 // Distance of each note in EDO steps from the note C.
 const NOTES_STEPS = {
 	"C": 0,

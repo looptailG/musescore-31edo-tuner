@@ -42,8 +42,8 @@ MuseScore
 	
 	// Map containing the previous microtonal accidentals in the current
 	// measure.  The keys are formatted as note letter concatenated with the
-	// note octave, for example C4.  The value is the last microtonal accidental
-	// that was applied to that note within the current measure.
+	// note octave, for example "C4".  The value is the last microtonal
+	// accidental that was applied to that note within the current measure.
 	property variant previousAccidentals: {}
 	
 	// Map containing the alteration presents in the current custom key
@@ -51,11 +51,6 @@ MuseScore
 	// are the accidentals applied to them.  It supports only octave-repeating
 	// key signatures.
 	property variant currentCustomKeySignature: {}
-	// Regex used for checking if a string is valid as a custom key signature.
-	property var customKeySignatureRegex: /^(x|t#|#|t|h|d|b|db|bb|)(?:\.(?:x|t#|#|t|h|d|b|db|bb|)){6}$/;
-	// Array containing the notes in the order they appear in the custom key
-	// signature string.
-	property var customKeySignatureNoteOrder: ["F", "C", "G", "D", "A", "E", "B"];
 	
 	// Amount of notes which were tuned successfully.
 	property var tunedNotes: 0;
@@ -153,7 +148,7 @@ MuseScore
 	function onAnnotation(annotation)
 	{
 		let annotationText = annotation.text.replace(/\s*/g, "");
-		if (customKeySignatureRegex.test(annotationText))
+		if (EdoUtils.KEY_SIGNATURE_REGEX.test(annotationText))
 		{
 			Logger.log("Applying custom key signature: " + annotationText);
 			currentCustomKeySignature = {};
@@ -162,7 +157,7 @@ MuseScore
 				let annotationTextSplitted = annotationText.split(".");
 				for (let i = 0; i < annotationTextSplitted.length; i++)
 				{
-					let currentNote = customKeySignatureNoteOrder[i];
+					let currentNote = EdoUtils.KEY_SIGNATURE_NOTE_ORDER[i];
 					let currentAccidental = annotationTextSplitted[i];
 					let accidentalName = "";
 					switch (currentAccidental)

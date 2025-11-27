@@ -112,6 +112,108 @@ for (let i = 0; i < 31; i++)
 }
 
 /**
+ * Check if the input text is valid as a custom key signature, and if yes parse
+ * it and update the input key signature map.
+ */
+function parseCustomKeySignature(annotationText, customKeySignature, logger = null)
+{
+	annotationText = annotationText.replace(/\s*/g, "");
+	if (KEY_SIGNATURE_REGEX.test(annotationText))
+	{
+		if (logger)
+		{
+			logger.log("Applying custom key signature: " + annotationText);
+		}
+		
+		// Empty the input key signature.  Can't use `customKeySignature = {}`,
+		// because that would break the reference, and the new key signature
+		// wouldn't be visible from outside this function.
+		for (let key in customKeySignature)
+		{
+			delete customKeySignature[key];
+		}
+		try
+		{
+			let annotationTextSplitted = annotationText.split(".");
+			for (let i = 0; i < annotationTextSplitted.length; i++)
+			{
+				let currentNote = KEY_SIGNATURE_NOTE_ORDER[i];
+				let currentAccidental = annotationTextSplitted[i];
+				let accidentalName = "";
+				
+				switch (currentAccidental)
+				{
+					case "bb":
+							accidentalName = "FLAT2";
+							break;
+						
+						case "b":
+							accidentalName = "FLAT";
+							break;
+						
+						case "":
+						case "h":
+							accidentalName = "NONE";
+							break;
+						
+						case "#":
+							accidentalName = "SHARP";
+							break;
+						
+						case "x":
+							accidentalName = "SHARP2";
+							break;
+						
+						case "db":
+							accidentalName = "MIRRORED_FLAT2";
+							break;
+						
+						case "d":
+							accidentalName = "MIRRORED_FLAT";
+							break;
+
+						case "t":
+							accidentalName = "SHARP_SLASH";
+							break;
+
+						case "t#":
+							accidentalName = "SHARP_SLASH4";
+							break;
+
+						default:
+							throw "Unsupported accidental in the custom key signature: " + currentAccidental;
+				}
+				if (accidentalName)
+				{
+					if (logger)
+					{
+						logger.trace("Note: " + currentNote + "; Accidental: " + accidentalName);
+					}
+					
+					customKeySignature[currentNote] = accidentalName;
+				}
+			}
+		}
+		catch (error)
+		{
+			if (logger)
+			{
+				logger.err(error);
+			}
+			
+			customKeySignature = {};
+		}
+	}
+	else
+	{
+		if (logger)
+		{
+			logger.trace("Text not valid as a key signature: " + annotationText);
+		}
+	}
+}
+
+/**
  * Choose the most appropriate enharmonic spelling for the input note, according
  * to the key signature and the eventual accidentals in the measure.
  */

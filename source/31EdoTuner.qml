@@ -147,72 +147,9 @@ MuseScore
 	
 	function onAnnotation(annotation)
 	{
-		let annotationText = annotation.text.replace(/\s*/g, "");
-		if (EdoUtils.KEY_SIGNATURE_REGEX.test(annotationText))
+		if (annotation.text)
 		{
-			Logger.log("Applying custom key signature: " + annotationText);
-			currentCustomKeySignature = {};
-			try
-			{
-				let annotationTextSplitted = annotationText.split(".");
-				for (let i = 0; i < annotationTextSplitted.length; i++)
-				{
-					let currentNote = EdoUtils.KEY_SIGNATURE_NOTE_ORDER[i];
-					let currentAccidental = annotationTextSplitted[i];
-					let accidentalName = "";
-					switch (currentAccidental)
-					{
-						case "bb":
-							accidentalName = "FLAT2";
-							break;
-						
-						case "b":
-							accidentalName = "FLAT";
-							break;
-						
-						case "":
-						case "h":
-							accidentalName = "NONE";
-							break;
-						
-						case "#":
-							accidentalName = "SHARP";
-							break;
-						
-						case "x":
-							accidentalName = "SHARP2";
-							break;
-						
-						case "db":
-							accidentalName = "MIRRORED_FLAT2";
-							break;
-						
-						case "d":
-							accidentalName = "MIRRORED_FLAT";
-							break;
-
-						case "t":
-							accidentalName = "SHARP_SLASH";
-							break;
-
-						case "t#":
-							accidentalName = "SHARP_SLASH4";
-							break;
-
-						default:
-							throw "Unsupported accidental in the custom key signature: " + currentAccidental;
-					}
-					if (accidentalName != "")
-					{
-						currentCustomKeySignature[currentNote] = accidentalName;
-					}
-				}
-			}
-			catch (error)
-			{
-				Logger.err(error);
-				currentCustomKeySignature = {};
-			}
+			EdoUtils.parseCustomKeySignature(annotation.text, currentCustomKeySignature, Logger);
 		}
 	}
 	

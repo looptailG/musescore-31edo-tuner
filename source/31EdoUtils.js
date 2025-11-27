@@ -91,9 +91,9 @@ for (let i = 0; i < 31; i++)
 }
 for (const note in NOTES_STEPS)
 {
-	for (const accidental in ENHARMONIC_ACCIDENTALS)
+	for (const accidental of ENHARMONIC_ACCIDENTALS)
 	{
-		let edoSteps = NOTES_STEPS[note] + SUPPORTED_ACCIDENTALS[ENHARMONIC_ACCIDENTALS[accidental]];
+		let edoSteps = NOTES_STEPS[note] + SUPPORTED_ACCIDENTALS[accidental];
 		edoSteps %= 31;
 		while (edoSteps < 0)
 		{
@@ -108,7 +108,7 @@ for (const note in NOTES_STEPS)
 }
 for (let i = 0; i < 31; i++)
 {
-	ENHARMONIC_EQUIVALENTS[i].sort((a, b) => SUPPORTED_ACCIDENTALS[ENHARMONIC_ACCIDENTALS[a["ACCIDENTAL"]]] - SUPPORTED_ACCIDENTALS[ENHARMONIC_ACCIDENTALS[b["ACCIDENTAL"]]]);
+	ENHARMONIC_EQUIVALENTS[i].sort((a, b) => SUPPORTED_ACCIDENTALS[a["ACCIDENTAL"]] - SUPPORTED_ACCIDENTALS[b["ACCIDENTAL"]]);
 }
 
 /**

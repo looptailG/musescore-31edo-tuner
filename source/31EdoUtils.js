@@ -58,21 +58,21 @@ const NOTES_STEPS = {
 	"B": 28
 };
 
-// Size in EDO stpes of each accidental that can be used for respelling notes
-// according to enharmonic equivalence.
-const ENHARMONIC_ACCIDENTALS_STEPS = {
-	"FLAT3": -6,
-	"FLAT2": -4,
-	"MIRRORED_FLAT2": -3,
-	"FLAT": -2,
-	"MIRRORED_FLAT": -1,
-	"NONE": 0,
-	"SHARP_SLASH": 1,
-	"SHARP": 2,
-	"SHARP_SLASH4": 3,
-	"SHARP2": 4,
-	"SHARP3": 6
-};
+// List of accidentals that can be used for respelling notes according to
+// enharmonic equivalence.
+const ENHARMONIC_ACCIDENTALS = [
+	"FLAT3",
+	"FLAT2",
+	"MIRRORED_FLAT2",
+	"FLAT",
+	"MIRRORED_FLAT",
+	"NONE",
+	"SHARP_SLASH",
+	"SHARP",
+	"SHARP_SLASH4",
+	"SHARP2",
+	"SHARP3"
+];
 
 // Map every EDO step to an array of every possible enharmonic spelling for that
 // EDO step.  The arrays contains objects with the properties "NOTE_NAME" and
@@ -85,9 +85,9 @@ for (let i = 0; i < 31; i++)
 }
 for (const note in NOTES_STEPS)
 {
-	for (const accidental in ENHARMONIC_ACCIDENTALS_STEPS)
+	for (const accidental in ENHARMONIC_ACCIDENTALS)
 	{
-		let edoSteps = NOTES_STEPS[note] + ENHARMONIC_ACCIDENTALS_STEPS[accidental];
+		let edoSteps = NOTES_STEPS[note] + SUPPORTED_ACCIDENTALS[ENHARMONIC_ACCIDENTALS[accidental]];
 		edoSteps %= 31;
 		while (edoSteps < 0)
 		{
@@ -102,7 +102,7 @@ for (const note in NOTES_STEPS)
 }
 for (let i = 0; i < 31; i++)
 {
-	ENHARMONIC_EQUIVALENTS[i].sort((a, b) => ENHARMONIC_ACCIDENTALS_STEPS[a["ACCIDENTAL"]] - ENHARMONIC_ACCIDENTALS_STEPS[b["ACCIDENTAL"]]);
+	ENHARMONIC_EQUIVALENTS[i].sort((a, b) => SUPPORTED_ACCIDENTALS[ENHARMONIC_ACCIDENTALS[a["ACCIDENTAL"]]] - SUPPORTED_ACCIDENTALS[ENHARMONIC_ACCIDENTALS[b["ACCIDENTAL"]]]);
 }
 
 /**
@@ -127,11 +127,11 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 		if (keySignature.hasOwnProperty(possibleNoteName))
 		{
 			let keySignatureAccidental = keySignature[possibleNoteName];
-			if (ENHARMONIC_ACCIDENTALS_STEPS[keySignatureAccidental] > 0)
+			if (SUPPORTED_ACCIDENTALS[ENHARMONIC_ACCIDENTALS[keySignatureAccidental]] > 0)
 			{
 				sharpFound = true;
 			}
-			else if (ENHARMONIC_ACCIDENTALS_STEPS[keySignatureAccidental] < 0)
+			else if (SUPPORTED_ACCIDENTALS[ENHARMONIC_ACCIDENTALS[keySignatureAccidental]] < 0)
 			{
 				flatFound = true;
 			}
@@ -152,11 +152,11 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 		for (let previousAlteredNote in previousAccidentals)
 		{
 			let previousAccidental = previousAccidentals[previousAlteredNote];
-			if (ENHARMONIC_ACCIDENTALS_STEPS[previousAccidental] > 0)
+			if (SUPPORTED_ACCIDENTALS[ENHARMONIC_ACCIDENTALS[previousAccidental]] > 0)
 			{
 				sharpFound = true;
 			}
-			else if (ENHARMONIC_ACCIDENTALS_STEPS[previousAccidental] < 0)
+			else if (SUPPORTED_ACCIDENTALS[ENHARMONIC_ACCIDENTALS[previousAccidental]] < 0)
 			{
 				flatFound = true;
 			}
@@ -212,12 +212,12 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 			}
 			
 			if (
-				(sharpFound && (ENHARMONIC_ACCIDENTALS_STEPS[currentAccidental] > 0))
-				|| (flatFound && (ENHARMONIC_ACCIDENTALS_STEPS[currentAccidental] < 0))
+				(sharpFound && (SUPPORTED_ACCIDENTALS[ENHARMONIC_ACCIDENTALS[currentAccidental]] > 0))
+				|| (flatFound && (SUPPORTED_ACCIDENTALS[ENHARMONIC_ACCIDENTALS[currentAccidental]] < 0))
 			) {
 				if (accidental)
 				{
-					if (abs(ENHARMONIC_ACCIDENTALS_STEPS[currentAccidental]) < abs(ENHARMONIC_ACCIDENTALS_STEPS[accidental]))
+					if (abs(SUPPORTED_ACCIDENTALS[ENHARMONIC_ACCIDENTALS[currentAccidental]]) < abs(SUPPORTED_ACCIDENTALS[ENHARMONIC_ACCIDENTALS[accidental]]))
 					{
 						noteName = currentNoteName;
 						accidental = currentAccidental;
@@ -243,9 +243,9 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 			let currentNoteName = ENHARMONIC_EQUIVALENTS[edoStep][i]["NOTE_NAME"];
 			let currentAccidental = ENHARMONIC_EQUIVALENTS[edoStep][i]["ACCIDENTAL"];
 			
-			if (abs(ENHARMONIC_ACCIDENTALS_STEPS[currentAccidental]) < smallestAccidental)
+			if (abs(SUPPORTED_ACCIDENTALS[ENHARMONIC_ACCIDENTALS[currentAccidental]]) < smallestAccidental)
 			{
-				smallestAccidental = abs(ENHARMONIC_ACCIDENTALS_STEPS[currentAccidental]);
+				smallestAccidental = abs(SUPPORTED_ACCIDENTALS[ENHARMONIC_ACCIDENTALS[currentAccidental]]);
 				noteName = noteName;
 				accidental = currentAccidental;
 			}

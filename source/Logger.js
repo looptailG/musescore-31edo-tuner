@@ -16,7 +16,7 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-const VERSION = "2.1.0";
+const VERSION = "2.1.1";
 
 let loggerId = null;
 
@@ -25,7 +25,7 @@ const INFO = 1;
 const WARNING = 2;
 const ERROR = 3;
 const FATAL = 4;
-let logLevelNames = [
+const LOG_LEVEL_NAMES = [
 	"TRACE",
 	"INFO",
 	"WARNING",
@@ -37,7 +37,7 @@ let logLevelNames = [
 let logLevel = null;
 
 let logMessages = null;
-const separator = "\t";
+const SEPARATOR = "\t";
 
 /**
  * Initialise the logger with input ID, and optionally with the input log level.
@@ -62,7 +62,7 @@ function log(message, level = INFO)
 {
 	if (level >= logLevel)
 	{
-		logMessages += `${getRFC3339DateTime()}${separator}${logLevelNames[level]}${separator}${message}\n`;
+		logMessages += `${getRFC3339DateTime()}${SEPARATOR}${LOG_LEVEL_NAMES[level]}${SEPARATOR}${message}\n`;
 	}
 }
 

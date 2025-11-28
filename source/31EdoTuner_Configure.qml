@@ -16,12 +16,14 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.2
-import FileIO 3.0
-import MuseScore 3.0
+import QtQuick
+import QtQuick.Controls
+import FileIO
+import MuseScore
 import "Logger.js" as Logger
+import "SettingsIO.js" as SettingsIO
 
-Musescore
+MuseScore
 {
 	title: "31EDO Tuner - Configure";
 	description: "Configure the reference note for the 31EDO tuner."
@@ -29,8 +31,29 @@ Musescore
 	thumbnailName: "31EdoThumbnail.png";
 	version: "2.2.0";
 	
+	pluginType: "dialog";
+	property var padding: 10;
+	width: mainWindow.implicitWidth + 2 * padding;
+	height: mainWindow.implicitHeight + 2 * padding;
+	
+	Row
+	{
+		id: mainWindow;
+		spacing: padding;
+		
+		Text
+		{
+			text: "Reference Note:";
+			font: ui.theme.bodyBoldFont;
+			color: ui.theme.fontPrimaryColor;
+		}
+	}
+	
 	onRun:
 	{
-		
+		if (typeof curScore === "undefined")
+		{
+			quit();
+		}
 	}
 }

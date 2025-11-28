@@ -23,7 +23,7 @@ import "Logger.js" as Logger
 
 Musescore
 {
-	title: "Configure 31EDO Tuner";
+	title: "31EDO Tuner - Configure";
 	description: "Configure the reference note for the 31EDO tuner."
 	categoryCode: "playback";
 	thumbnailName: "31EdoThumbnail.png";

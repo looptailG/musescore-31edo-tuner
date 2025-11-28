@@ -46,11 +46,13 @@ function readTsvFile(fileIO, keyColumn = 0, valueColumn = 1)
 function writeTsvFile(settings, fileIO)
 {
 	let fileContent = "";
+	
 	for (let key in settings)
 	{
 		let value = settings[key];
 		fileContent += formatForTsv(key.toString()) + "\t" + formatForTsv(value.toString()) + "\n";
 	}
+	
 	fileIO.write(fileContent);
 }
 

@@ -40,12 +40,28 @@ function readTsvFile(filePath, fileIO, keyColumn = 0, valueColumn = 1)
 }
 
 /**
+ * Write the content of the input dictionary to the specified TSV file.  The
+ * keys will be written in column 0, and the values in column 1.
+ */
+function writeTsvFile(filePath, settings, fileIO)
+{
+	let fileContent = "";
+	for (let key in settings)
+	{
+		let value = settings[key];
+		fileContent += formatForTsv(key.toString()) + "\t" + formatForTsv(value.toString()) + "\n";
+	}
+	fileIO.write(fileContent);
+}
+
+/**
  * Split the input string using the tab character, and replace the escaped
  * characters.
  */
 function parseTsvRow(s)
 {
 	s = s.split("\t");
+	
 	// QML does not support lookbehind in regex, which would be necessary to
 	// properly unescape the characters, so we have to manually loop on the
 	// strings and check for escape characters.
@@ -91,6 +107,7 @@ function parseTsvRow(s)
 		}
 		s[i] = unescapedString;
 	}
+	
 	return s;
 }
 

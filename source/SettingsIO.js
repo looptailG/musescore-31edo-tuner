@@ -122,20 +122,3 @@ function formatForTsv(s)
 	s = s.replace(/\r/g, "\\r");
 	return s;
 }
-
-/**
- * Remove the empty rows from the input string.  The resulting string will have
- * a new line character at the end.
- */
-function removeEmptyRows(s)
-{
-	s = s.split("\n");
-	for (let i = s.length - 1; i >= 0; i--)
-	{
-		if (s[i].trim() == "")
-		{
-			s.splice(i, 1);
-		}
-	}
-	return s.join("\n") + "\n";
-}

@@ -22,7 +22,7 @@ const VERSION = "1.0.0";
  * Read the input TSV file, and return its content as a dictionary, where the
  * keys are the content of keyColumn, and the values the content of valueColumn.
  */
-function readTsvFile(filePath, fileIO, keyColumn = 0, valueColumn = 1)
+function readTsvFile(fileIO, keyColumn = 0, valueColumn = 1)
 {
 	let settings = {};
 	
@@ -43,7 +43,7 @@ function readTsvFile(filePath, fileIO, keyColumn = 0, valueColumn = 1)
  * Write the content of the input dictionary to the specified TSV file.  The
  * keys will be written in column 0, and the values in column 1.
  */
-function writeTsvFile(filePath, settings, fileIO)
+function writeTsvFile(settings, fileIO)
 {
 	let fileContent = "";
 	for (let key in settings)

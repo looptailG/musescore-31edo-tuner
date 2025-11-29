@@ -54,7 +54,25 @@ MuseScore
 		"\uE261": "",
 		"\uE262": "#",
 		"\uE263": "x",
-		"\uE265": "#x",
+		"\uE265": "#x"
+	}
+	property variant noteNameToIndex: {
+		"A": 0,
+		"B": 1,
+		"C": 2,
+		"D": 3,
+		"E": 4,
+		"F": 5,
+		"G": 6
+	}
+	property variant accidentalToIndex: {
+		"bbb": 0,
+		"bb": 1,
+		"b": 2,
+		"": 3,
+		"#": 4,
+		"x": 5,
+		"#x": 6
 	}
 	
 	FileIO

@@ -103,6 +103,11 @@ MuseScore
 		{
 			id: referenceNoteNameComboBox;
 			model: ["A", "B", "C", "D", "E", "F", "G"];
+			
+			onActivated:
+			{
+				onReferenceNoteChange();
+			}
 		}
 		
 		ComboBox
@@ -124,6 +129,11 @@ MuseScore
 				text: modelData;
 				font: ui.theme.musicalFont;
 				height: 30;
+			}
+			
+			onActivated:
+			{
+				onReferenceNoteChange();
 			}
 		}
 	}
@@ -163,6 +173,27 @@ MuseScore
 		if (typeof curScore === "undefined")
 		{
 			quit();
+		}
+	}
+	
+	function onReferenceNoteChange()
+	{
+		try
+		{
+			let selectedNoteName = referenceNoteNameComboBox.currentText;
+			let selectedAccidental = unicodeToAscii[referenceNoteAccidentalComboBox.currentText];
+			let newReferenceNote = selectedNoteName + selectedAccidental;
+			Logger.log("Reference note set to: " + newReferenceNote);
+			settings["ReferenceNote"] = newReferenceNote;
+			SettingsIO.writeTsvFile(settings, settingsId);
+		}
+		catch (error)
+		{
+			Logger.err(error);
+		}
+		finally
+		{
+			Logger.writeLogs();
 		}
 	}
 }

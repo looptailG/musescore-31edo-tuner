@@ -47,6 +47,15 @@ MuseScore
 	property var sharp: "\uE262";
 	property var doubleSharp: "\uE263";
 	property var tripleSharp: "\uE265";
+	property variant unicodeToAscii: {
+		"\uE266": "bbb",
+		"\uE264": "bb",
+		"\uE260": "b",
+		"\uE261": "",
+		"\uE262": "#",
+		"\uE263": "x",
+		"\uE265": "#x",
+	}
 	
 	FileIO
 	{
@@ -108,7 +117,7 @@ MuseScore
 		
 		try
 		{
-		
+			
 		}
 		catch (error)
 		{

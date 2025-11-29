@@ -32,7 +32,7 @@ MuseScore
 	title: "31EDO Tuner";
 	description: "Retune the selection, or the whole score if nothing is selected, to 31EDO.";
 	categoryCode: "playback";
-	thumbnailName: "31EdoThumbnail.png";
+	thumbnailName: "thumbnails/31Edo_Tuner_Thumbnail.png";
 	version: "2.2.0";
 	
 	property variant settings: {};

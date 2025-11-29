@@ -1,5 +1,5 @@
 /*
-	Plugin for Musescore to move the selected notes up by a 31EDO step.
+	Plugin for Musescore for respelling the selected notes according to 31EDO.
 	Copyright (C) 2024 - 2025 Alessandro Culatti
 
 	This program is free software: you can redistribute it and/or modify
@@ -22,8 +22,8 @@ import MuseScore
 
 MuseScore
 {
-	title: "31EDO Tuner - Pitch Up";
-	description: "Move the selection, or the whole score if nothing is selected, up by a 31EDO step.";
+	title: "31EDO Tuner - Respell";
+	description: "Respelle the selection, or the whole score if nothing is selected, according to 31EDO.";
 	categoryCode: "playback";
 	thumbnailName: "31EdoThumbnail.png";
 	version: "2.2.0"

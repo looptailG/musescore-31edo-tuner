@@ -24,7 +24,7 @@ import "AccidentalUtils.js" as AccidentalUtils
 import "IterationUtils.js" as IterationUtils
 import "Logger.js" as Logger
 import "NoteUtils.js" as NoteUtils
-import "StringUtils.js" as StringUtils
+import "SettingsIO.js" as SettingsIO
 import "TuningUtils.js" as TuningUtils
 
 MuseScore
@@ -64,13 +64,8 @@ MuseScore
 
 	FileIO
 	{
-		id: settingsReader;
+		id: settingsId;
 		source: Qt.resolvedUrl(".").toString() + "Settings.tsv";
-		
-		onError:
-		{
-			Logger.err(msg);
-		}
 	}
 
 	onRun:
@@ -78,16 +73,7 @@ MuseScore
 		try
 		{
 			// Read settings file.
-			settings = {};
-			var settingsFileContent = settingsReader.read().split("\n");
-			for (var i = 0; i < settingsFileContent.length; i++)
-			{
-				if (settingsFileContent[i].trim() != "")
-				{
-					var rowData = StringUtils.parseTsvRow(settingsFileContent[i]);
-					settings[rowData[0]] = rowData[1];
-				}
-			}
+			settings = SettingsIO.readTsvFile(settingsId);
 			
 			Logger.initialise(loggerId, parseInt(settings["LogLevel"]));
 			Logger.log("-- " + title + " -- Version " + version + " --");

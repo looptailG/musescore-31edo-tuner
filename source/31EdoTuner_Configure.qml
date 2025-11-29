@@ -36,6 +36,14 @@ MuseScore
 	width: mainWindow.implicitWidth + 2 * padding;
 	height: mainWindow.implicitHeight + 2 * padding;
 	
+	property var tripleFlat: "\uE266";
+	property var doubleFlat: "\uE264";
+	property var flat: "\uE260";
+	property var natural: "\uE261";
+	property var sharp: "\uE262";
+	property var doubleSharp: "\uE263";
+	property var tripleSharp: "\uE265";
+	
 	Row
 	{
 		id: mainWindow;
@@ -53,6 +61,21 @@ MuseScore
 		{
 			id: referenceNoteNameComboBox;
 			model: ["A", "B", "C", "D", "E", "F", "G"];
+		}
+		
+		ComboBox
+		{
+			id: referenceNoteAccidentalComboBox;
+			model: [
+				tripleFlat,
+				doubleFlat,
+				flat,
+				natural,
+				sharp,
+				doubleSharp,
+				tripleSharp
+			];
+			font: ui.theme.musicalFont;
 		}
 	}
 	

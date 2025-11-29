@@ -39,6 +39,7 @@ MuseScore
 	Row
 	{
 		id: mainWindow;
+		anchors.centerIn: parent;
 		spacing: padding;
 		
 		Text
@@ -46,6 +47,12 @@ MuseScore
 			text: "Reference Note:";
 			font: ui.theme.bodyBoldFont;
 			color: ui.theme.fontPrimaryColor;
+		}
+		
+		ComboBox
+		{
+			id: referenceNoteNameComboBox;
+			model: ["A", "B", "C", "D", "E", "F", "G"];
 		}
 	}
 	

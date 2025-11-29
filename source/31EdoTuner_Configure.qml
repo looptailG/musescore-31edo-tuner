@@ -34,7 +34,7 @@ MuseScore
 	pluginType: "dialog";
 	property var padding: 10;
 	width: mainWindow.implicitWidth + 2 * padding;
-	height: mainWindow.implicitHeight + 2 * padding;
+	height: Math.max(mainWindow.implicitHeight, 250) + 2 * padding;
 	
 	property var tripleFlat: "\uE266";
 	property var doubleFlat: "\uE264";
@@ -47,7 +47,6 @@ MuseScore
 	Row
 	{
 		id: mainWindow;
-		anchors.centerIn: parent;
 		spacing: padding;
 		
 		Text
@@ -76,6 +75,13 @@ MuseScore
 				tripleSharp
 			];
 			font: ui.theme.musicalFont;
+			
+			delegate: ItemDelegate
+			{
+				text: modelData;
+				font: ui.theme.musicalFont;
+				height: 30;
+			}
 		}
 	}
 	

@@ -36,13 +36,28 @@ MuseScore
 	width: mainWindow.implicitWidth + 2 * padding;
 	height: Math.max(mainWindow.implicitHeight, 250) + 2 * padding;
 	
+	property variant settings: {};
+	
 	property var tripleFlat: "\uE266";
 	property var doubleFlat: "\uE264";
+	// Naming this variable "flat" doesn't work properly, possibily because it's
+	// a reserved keyword.
 	property var flat_: "\uE260";
 	property var natural: "\uE261";
 	property var sharp: "\uE262";
 	property var doubleSharp: "\uE263";
 	property var tripleSharp: "\uE265";
+	
+	FileIO
+	{
+		id: loggerId;
+	}
+	
+	FileIO
+	{
+		id: settingsId;
+		source: Qt.resolvedUrl(".").toString() + "Settings.tsv";
+	}
 	
 	Row
 	{
@@ -82,6 +97,26 @@ MuseScore
 				font: ui.theme.musicalFont;
 				height: 30;
 			}
+		}
+	}
+	
+	Component.onCompleted:
+	{
+		settings = SettingsIO.readTsvFile(settingsId);
+		
+		Logger.initialise(loggerId, parseInt(settings["LogLevel"]));
+		
+		try
+		{
+		
+		}
+		catch (error)
+		{
+			Logger.fatal(error);
+		}
+		finally
+		{
+			Logger.writeLogs();
 		}
 	}
 	

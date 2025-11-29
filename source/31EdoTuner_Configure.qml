@@ -74,6 +74,7 @@ MuseScore
 		"x": 5,
 		"#x": 6
 	}
+	property var referenceNoteRegex: /^\s*(A|B|C|D|E|F|G)\s*(bbb|bb|b||#|x|#x)\s*$/i;
 	
 	FileIO
 	{
@@ -135,7 +136,17 @@ MuseScore
 		
 		try
 		{
+			let referenceNoteMatch = settings["ReferenceNote"].match(referenceNoteRegex);
+			if (!referenceNoteMatch)
+			{
+				throw "Invalid reference note in the configuration file: " + settings["ReferenceNote"];
+			}
+			let referenceNoteName = referenceNoteMatch[1];
+			let referenceNoteAccidental = referenceNoteMatch[2];
+			Logger.log("Reference note name: " + referenceNoteName + "; Accidental: " + referenceNoteAccidental);
 			
+			referenceNoteNameComboBox.currentIndex = noteNameToIndex[referenceNoteName];
+			referenceNoteAccidentalComboBox.currentIndex = accidentalToIndex[referenceNoteAccidental];
 		}
 		catch (error)
 		{

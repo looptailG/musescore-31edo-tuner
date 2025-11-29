@@ -38,7 +38,7 @@ MuseScore
 	
 	property var tripleFlat: "\uE266";
 	property var doubleFlat: "\uE264";
-	property var flat: "\uE260";
+	property var flat_: "\uE260";
 	property var natural: "\uE261";
 	property var sharp: "\uE262";
 	property var doubleSharp: "\uE263";
@@ -68,7 +68,7 @@ MuseScore
 			model: [
 				tripleFlat,
 				doubleFlat,
-				flat,
+				flat_,
 				natural,
 				sharp,
 				doubleSharp,

@@ -28,7 +28,7 @@ MuseScore
 	title: "31EDO Tuner - Configure";
 	description: "Configure the reference note for the 31EDO tuner."
 	categoryCode: "playback";
-	thumbnailName: "31EdoThumbnail.png";
+	thumbnailName: "thumbnails/31Edo_Configure_Thumbnail.png";
 	version: "2.2.0";
 	
 	pluginType: "dialog";

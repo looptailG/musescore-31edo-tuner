@@ -25,7 +25,7 @@ MuseScore
 	title: "31EDO Tuner - Respell";
 	description: "Respelle the selection, or the whole score if nothing is selected, according to 31EDO.";
 	categoryCode: "playback";
-	thumbnailName: "31EdoThumbnail.png";
+	thumbnailName: "thumbnails/31Edo_Respell_Thumbnail.png";
 	version: "2.2.0"
 
 	onRun:

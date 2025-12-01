@@ -127,6 +127,10 @@ MuseScore
 				(
 					curScore,
 					{
+						"onStaffStart": onStaffStart,
+						"onNewMeasure": onNewMeasure,
+						"onKeySignatureChange": onKeySignatureChange,
+						"onAnnotation": onAnnotation
 					},
 					Logger
 				);
@@ -142,6 +146,31 @@ MuseScore
 		else
 		{
 			Logger.trace("Iterating over the entire score, no need to back search for accidentals.");
+		}
+	}
+	
+	function onStaffStart()
+	{
+		currentCustomKeySignature = {};
+		previousAccidentals = {};
+	}
+	
+	function onNewMeasure()
+	{
+		previousAccidentals = {};
+	}
+	
+	function onKeySignatureChange(keySignature)
+	{
+		Logger.log("Key signature change, emptying the custom key signature map.");
+		currentCustomKeySignature = {};
+	}
+	
+	function onAnnotation(annotation)
+	{
+		if (annotation.text)
+		{
+			EdoUtils.parseCustomKeySignature(annotation.text, currentCustomKeySignature, Logger);
 		}
 	}
 }

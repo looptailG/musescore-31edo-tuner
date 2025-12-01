@@ -25,7 +25,7 @@ import "SettingsIO.js" as SettingsIO
 
 MuseScore
 {
-	title: "31EDO Tuner - Configure";
+	title: "31EDO Configure";
 	description: "Configure the reference note for the 31EDO tuner."
 	categoryCode: "playback";
 	thumbnailName: "thumbnails/31Edo_Configure_Thumbnail.png";

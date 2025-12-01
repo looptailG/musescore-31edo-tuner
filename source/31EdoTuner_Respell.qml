@@ -22,7 +22,7 @@ import MuseScore
 
 MuseScore
 {
-	title: "31EDO Tuner - Respell";
+	title: "31EDO Respell";
 	description: "Respelle the selection, or the whole score if nothing is selected, according to 31EDO.";
 	categoryCode: "playback";
 	thumbnailName: "thumbnails/31Edo_Respell_Thumbnail.png";

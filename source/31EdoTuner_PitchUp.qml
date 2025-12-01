@@ -20,6 +20,7 @@ import QtQuick
 import FileIO
 import MuseScore
 import "31EdoUtils.js" as EdoUtils
+import "IterationUtils.js" as IterationUtils
 import "Logger.js" as Logger
 import "SettingsIO.js" as SettingsIO
 
@@ -32,6 +33,18 @@ MuseScore
 	version: "2.2.0";
 	
 	property variant settings: {};
+	
+	// Map containing the previous microtonal accidentals in the current
+	// measure.  The keys are formatted as note letter concatenated with the
+	// note octave, for example "C4".  The value is the last microtonal
+	// accidental that was applied to that note within the current measure.
+	property variant previousAccidentals: {}
+	
+	// Map containing the alteration presents in the current custom key
+	// signature, if any.  The keys are the names of the notes, and the values
+	// are the accidentals applied to them.  It supports only octave-repeating
+	// key signatures.
+	property variant currentCustomKeySignature: {}
 	
 	FileIO
 	{
@@ -53,7 +66,13 @@ MuseScore
 			Logger.initialise(loggerId, parseInt(settings["LogLevel"]));
 			Logger.log("-- " + title + " -- Version " + version + " --");
 			
-			
+			IterationUtils.iterate(
+				curScore,
+				{
+					"onStaffStart": searchAccidentals
+				},
+				Logger
+			);
 		}
 		catch (error)
 		{
@@ -72,5 +91,19 @@ MuseScore
 			
 			Logger.writeLogs();
 		}
+	}
+	
+	function searchAccidentals()
+	{
+		currentCustomKeySignature = {};
+		previousAccidentals = {};
+		
+		IterationUtils.iterate
+		(
+			curScore,
+			{
+			},
+			Logger
+		);
 	}
 }

@@ -98,12 +98,50 @@ MuseScore
 		currentCustomKeySignature = {};
 		previousAccidentals = {};
 		
-		IterationUtils.iterate
-		(
-			curScore,
+		if (curScore.selection.startSegment)
+		{
+			let originalSelectionStartTick = curScore.selection.startSegment.tick;
+			
+			if (originalSelectionStartTick > 0)
 			{
-			},
-			Logger
-		);
+				let originalSelectionEndTick;
+				if (curScore.selection.endSegment)
+				{
+					originalSelectionEndTick = curScore.selection.endSegment.tick;
+				}
+				else
+				{
+					// If the selection includes the last note of the score,
+					// tick overflows and goes back to tick 0.  In this case,
+					// set the end tick manually to the last tick of the score.
+					originalSelectionEndTick = curScore.lastSegment.tick;
+				}
+				
+				let originalSelectionStartStaff = curScore.selection.startStaff;
+				let originalSelectionEndStaff = curScore.selection.endStaff;
+				
+				curScore.selection.selectRange(0, originalSelectionStartTick, originalSelectionStartStaff, originalSelectionEndStaff);
+				
+				Logger.log("Back searching accidentals before tick " + originalSelectionStartTick + " for staff " + originalSelectionStartStaff);
+				IterationUtils.iterate
+				(
+					curScore,
+					{
+					},
+					Logger
+				);
+				
+				// TODO: check if adding 1 is sufficient to offset the fact that when selecting a range the last tick is not included.
+				curScore.selection.selectRange(originalSelectionStartTick, originalSelectionEndTick + 1, originalSelectionStartStaff, originalSelectionEndStaff);
+			}
+			else
+			{
+				Logger.trace("Starting from the beginning of the score, no need to back search for accidentals.");
+			}
+		}
+		else
+		{
+			Logger.trace("Iterating over the entire score, no need to back search for accidentals.");
+		}
 	}
 }

@@ -365,3 +365,11 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 	returnValue["ACCIDENTAL"] = accidental;
 	return returnValue;
 }
+
+/**
+ * Starting from the current position in the score
+ */
+function backSearchAccidentals(curScore, keySignature, previousAccidentals, logger = null)
+{
+	
+}

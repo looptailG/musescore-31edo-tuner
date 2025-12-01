@@ -369,7 +369,41 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 /**
  * Starting from the current position in the score
  */
-function backSearchAccidentals(curScore, keySignature, previousAccidentals, logger = null)
+function backSearchAccidentals(cursor, keySignature, previousAccidentals, logger = null)
 {
+	// Empty the key signature and the previous accidentals in the measure.
+	// Can't assign them to {}, because that would break the reference, and they
+	// wouldn't be visible from outside this function.
+	for (let key in keySignature)
+	{
+		delete keySignature[key];
+	}
+	for (let key in previousAccidentals)
+	{
+		delete previousAccidentals[key];
+	}
 	
+	if (cursor.segment)
+	{
+		cursor.rewind(Cursor.SELECTION_START);
+		let startTick = cursor.tick;
+		if (startTick != 0)
+		{
+			
+		}
+		else
+		{
+			if (logger)
+			{
+				logger.trace("Starting from the beginning of the score, no need to back search accidentals.");
+			}
+		}
+	}
+	else
+	{
+		if (logger)
+		{
+			logger.trace("Iterating over the entire score, no need to back search accidentals.");
+		}
+	}
 }

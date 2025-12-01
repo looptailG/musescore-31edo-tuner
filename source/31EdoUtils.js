@@ -389,7 +389,21 @@ function backSearchAccidentals(cursor, keySignature, previousAccidentals, logger
 		let startTick = cursor.tick;
 		if (startTick != 0)
 		{
+			if (logger)
+			{
+				logger.log("Back searching accidentals from tick: " + startTick);
+			}
 			
+			let measureChanged = false;
+			
+			while (cursor.segment)
+			{
+				
+				
+				cursor.prev();
+			}
+			
+			cursor.rewind(Cursor.SELECTION_START);
 		}
 		else
 		{

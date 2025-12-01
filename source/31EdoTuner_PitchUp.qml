@@ -19,6 +19,9 @@
 import QtQuick
 import FileIO
 import MuseScore
+import "31EdoUtils.js" as EdoUtils
+import "Logger.js" as Logger
+import "SettingsIO.js" as SettingsIO
 
 MuseScore
 {
@@ -26,8 +29,48 @@ MuseScore
 	description: "Move the selection, or the whole score if nothing is selected, up by a 31EDO step.";
 	categoryCode: "playback";
 	thumbnailName: "thumbnails/31Edo_PitchUp_Thumbnail.png";
-	version: "2.2.0"
+	version: "2.2.0";
+	
+	property variant settings: {};
+	
+	FileIO
+	{
+		id: loggerId;
+	}
+	
+	FileIO
+	{
+		id: settingsId;
+		source: Qt.resolvedUrl(".").toString() + "Settings.tsv";
+	}
 
 	onRun:
-	{}
+	{
+		try
+		{
+			settings = SettingsIO.readTsvFile(settingsId);
+			
+			Logger.initialise(loggerId, parseInt(settings["LogLevel"]));
+			Logger.log("-- " + title + " -- Version " + version + " --");
+			
+			
+		}
+		catch (error)
+		{
+			Logger.fatal(error);
+		}
+		finally
+		{
+			try
+			{
+				quit();
+			}
+			catch (error)
+			{
+				Logger.err(error);
+			}
+			
+			Logger.writeLogs();
+		}
+	}
 }

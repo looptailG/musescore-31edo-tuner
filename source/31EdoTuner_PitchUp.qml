@@ -123,9 +123,8 @@ MuseScore
 					let originalSelectionStartStaff = curScore.selection.startStaff;
 					let originalSelectionEndStaff = curScore.selection.endStaff;
 					
+					Logger.log("Back searching accidentals before tick " + originalSelectionStartTick + " for staffs " + originalSelectionStartStaff + " - " + originalSelectionEndStaff);
 					curScore.selection.selectRange(0, originalSelectionStartTick, originalSelectionStartStaff, originalSelectionEndStaff);
-					
-					Logger.log("Back searching accidentals before tick " + originalSelectionStartTick + " for staff " + originalSelectionStartStaff);
 					IterationUtils.iterate
 					(
 						curScore,
@@ -148,11 +147,38 @@ MuseScore
 			}
 			else
 			{
+				// TODO: check if this case can happen, after having added the case for isRange == false it might no longer be possible.
 				Logger.trace("Iterating over the entire score, no need to back search for accidentals.");
 			}
 		}
 		else
 		{
+			let originalSelection = curScore.selection;
+			
+			if (curScore.selection.elements)
+			{
+				let originalSelectionStartTick = curScore.selection.elements[0].parent.tick;
+				let originalSelectionStartStaff = curScore.selection.startStaff;
+				let originalSelectionEndStaff = curScore.selection.endStaff;
+				
+				Logger.log("Back searching accidentals before tick " + originalSelectionStartTick + " for staffs " + originalSelectionStartStaff + " - " + originalSelectionEndStaff);
+				curScore.selection.selectRange(0, originalSelectionStartTick, originalSelectionStartStaff, originalSelectionEndStaff);
+				IterationUtils.iterate
+				(
+					curScore,
+					{
+						"onStaffStart": onStaffStart,
+						"onNewMeasure": onNewMeasure,
+						"onKeySignatureChange": onKeySignatureChange,
+						"onAnnotation": onAnnotation
+					},
+					Logger
+				);
+			}
+			else
+			{
+				Logger.trace("Iterating over the entire score, no need to back search for accidentals.");
+			}
 		}
 	}
 	

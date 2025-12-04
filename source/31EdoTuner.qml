@@ -72,7 +72,6 @@ MuseScore
 	{
 		try
 		{
-			// Read settings file.
 			settings = SettingsIO.readTsvFile(settingsId);
 			
 			Logger.initialise(loggerId, parseInt(settings["LogLevel"]));

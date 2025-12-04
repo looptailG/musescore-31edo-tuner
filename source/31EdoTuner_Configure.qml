@@ -1,5 +1,5 @@
 /*
-	Small GUI plugin to configuer the 31EDO Tuner for Musescore.
+	Small GUI plugin to configure the 31EDO Tuner for Musescore.
 	Copyright (C) 2024 - 2025 Alessandro Culatti
 
 	This program is free software: you can redistribute it and/or modify
@@ -40,19 +40,27 @@ MuseScore
 	
 	property var tripleFlat: "\uE266";
 	property var doubleFlat: "\uE264";
+	property var sesquiFlat: "\uE281";
 	// Naming this variable "flat" doesn't work properly, possibily because it's
 	// a reserved keyword.
 	property var flat_: "\uE260";
+	property var halfFlat: "\uE280";
 	property var natural: "\uE261";
+	property var halfSharp: "\uE282";
 	property var sharp: "\uE262";
+	property var sesquiSharp: "\uE283";
 	property var doubleSharp: "\uE263";
 	property var tripleSharp: "\uE265";
 	property variant unicodeToAscii: {
 		"\uE266": "bbb",
 		"\uE264": "bb",
+		"\uE281": "db",
 		"\uE260": "b",
+		"\uE280": "d",
 		"\uE261": "",
+		"\uE282": "t",
 		"\uE262": "#",
+		"\uE283": "t#",
 		"\uE263": "x",
 		"\uE265": "#x"
 	}
@@ -68,13 +76,17 @@ MuseScore
 	property variant accidentalToIndex: {
 		"bbb": 0,
 		"bb": 1,
-		"b": 2,
-		"": 3,
-		"#": 4,
-		"x": 5,
-		"#x": 6
+		"db": 2,
+		"b": 3,
+		"d": 4,
+		"": 5,
+		"t": 6,
+		"#": 7,
+		"t#": 8,
+		"x": 9,
+		"#x": 10
 	}
-	property var referenceNoteRegex: /^\s*(A|B|C|D|E|F|G)\s*(bbb|bb|b||#|x|#x)\s*$/i;
+	property var referenceNoteRegex: /^\s*(A|B|C|D|E|F|G)\s*(bbb|bb|db|b|d||t|#|t#|x|#x)\s*$/i;
 	
 	FileIO
 	{
@@ -116,9 +128,13 @@ MuseScore
 			model: [
 				tripleFlat,
 				doubleFlat,
+				sesquiFlat,
 				flat_,
+				halfFlat,
 				natural,
+				halfSharp,
 				sharp,
+				sesquiSharp,
 				doubleSharp,
 				tripleSharp
 			];

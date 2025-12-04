@@ -76,13 +76,17 @@ MuseScore
 	property variant accidentalToIndex: {
 		"bbb": 0,
 		"bb": 1,
-		"b": 2,
-		"": 3,
-		"#": 4,
-		"x": 5,
-		"#x": 6
+		"db": 2,
+		"b": 3,
+		"d": 4,
+		"": 5,
+		"t": 6,
+		"#": 7,
+		"t#": 8,
+		"x": 9,
+		"#x": 10
 	}
-	property var referenceNoteRegex: /^\s*(A|B|C|D|E|F|G)\s*(bbb|bb|b||#|x|#x)\s*$/i;
+	property var referenceNoteRegex: /^\s*(A|B|C|D|E|F|G)\s*(bbb|bb|db|b|d||t|#|t#|x|#x)\s*$/i;
 	
 	FileIO
 	{

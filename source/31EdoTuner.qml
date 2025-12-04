@@ -83,7 +83,7 @@ MuseScore
 			{
 				// Notes with microtonal accidentals are not supported for the
 				// circle of fifths distance, so use an enharmonic equivalent
-				// note.
+				// note spelled with regular accidentals only.
 				referenceNote = EdoUtils.getNonMicrotonalEnharmonicEquivalent(referenceNote);
 				Logger.log("Reference note changed to the enharmonically equivalent: " + referenceNote);
 			}

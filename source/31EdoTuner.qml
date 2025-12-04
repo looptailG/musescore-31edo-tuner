@@ -79,6 +79,14 @@ MuseScore
 			
 			referenceNote = settings["ReferenceNote"];
 			Logger.log("Reference note set to: " + referenceNote);
+			if (!TuningUtils.CIRCLE_OF_FIFTHS_DISTANCE.hasOwnProperty(referenceNote))
+			{
+				// Notes with microtonal accidentals are not supported for the
+				// circle of fifths distance, so use an enharmonic equivalent
+				// note.
+				referenceNote = EdoUtils.getNonMicrotonalEnharmonicEquivalent(referenceNote);
+				Logger.log("Reference note changed to the enharmonically equivalent: " + referenceNote);
+			}
 			
 			IterationUtils.iterate(
 				curScore,

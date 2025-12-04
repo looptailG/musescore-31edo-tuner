@@ -112,6 +112,103 @@ for (let i = 0; i < 31; i++)
 }
 
 /**
+ * Return a note enharmonically equivalent to the input one, but written without
+ * using microtonal accidentals.
+ */ 
+function getNonMicrotonalEnharmonicEquivalent(note)
+{
+	switch (note)
+	{
+		case "Cdb":
+			return "B";
+		
+		case "Cd":
+			return "B#";
+		
+		case "Ct":
+			return "Dbb";
+		
+		case "Ct#":
+			return "Db";
+		
+		case "Ddb":
+			return "C#";
+		
+		case "Dd":
+			return "Cx";
+		
+		case "Dt":
+			return "Ebb";
+		
+		case "Dt#":
+			return "Eb";
+		
+		case "Edb":
+			return "D#";
+		
+		case "Ed":
+			return "Dx";
+		
+		case "Et":
+			return "Fb";
+		
+		case "Et#":
+			return "F";
+		
+		case "Fdb":
+			return "E";
+		
+		case "Fd":
+			return "E#";
+		
+		case "Ft":
+			return "Gbb";
+		
+		case "Ft#":
+			return "Gb";
+		
+		case "Gdb":
+			return "F#";
+		
+		case "Gd":
+			return "Fx";
+		
+		case "Gt":
+			return "Abb";
+		
+		case "Gt#":
+			return "Ab";
+		
+		case "Adb":
+			return "G#";
+		
+		case "Ad":
+			return "Gx";
+		
+		case "At":
+			return "Bbb";
+		
+		case "At#":
+			return "Bb";
+		
+		case "Bdb":
+			return "A#";
+		
+		case "Bd":
+			return "Ax";
+		
+		case "Bt":
+			return "Cb";
+		
+		case "Bt#":
+			return "C";
+		
+		default:
+			throw "Unsupported note for respelling without microtonal accidentals: " + note;
+	}
+}
+
+/**
  * Check if the input text is valid as a custom key signature, and if yes parse
  * it and update the input key signature map.
  */

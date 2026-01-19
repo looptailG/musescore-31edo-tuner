@@ -15,7 +15,10 @@ FILES_TO_COPY = [LICENSE_PATH]
 
 def main():
     try:
-        shutil.copytree(SOURCE_FOLDER, PLUGIN_FOLDER_NAME, dirs_exist_ok=True)
+        shutil.copytree(
+                SOURCE_FOLDER, PLUGIN_FOLDER_NAME,
+                dirs_exist_ok=True, ignore=ignore_test_files
+        )
         for file_path in FILES_TO_COPY:
             file_name = file_path[file_path.rindex("/") + 1:]
             shutil.copyfile(file_path, f"{PLUGIN_FOLDER_NAME}/{file_name}")
@@ -60,6 +63,10 @@ def get_version_number() -> str:
 
 def simplify_file_name(file_name: str) -> str:
     return file_name.replace("_", "").lower()
+
+
+def ignore_test_files(directory, contents):
+    return [f for f in contents if f.startswith("TEST")]
 
 
 if __name__ == "__main__":

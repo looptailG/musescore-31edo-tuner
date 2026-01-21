@@ -55,6 +55,27 @@ MuseScore
 			
 			Logger.initialise(loggerId, parseInt(settings["LogLevel"]));
 			Logger.log("-- " + title + " -- Version " + version + " --");
+			
+			curScore.startCmd();
+			
+			for (var element of curScore.selection.elements)
+			{
+				if (element.type === Element.NOTE)
+				{
+					var segment = element.parent.parent;
+					var cursor = curScore.newCursor();
+					cursor.voice = element.voice;
+					cursor.staffIdx = element.staff.part.startTrack / 4;
+					cursor.rewindToTick(segment.tick);
+					
+					while (cursor.segment)
+					{
+						cursor.prev();
+					}
+				}
+			}
+			
+			curScore.endCmd();
 		}
 		catch (error)
 		{

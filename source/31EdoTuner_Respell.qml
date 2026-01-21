@@ -36,6 +36,23 @@ MuseScore
 	
 	property variant settings: {};
 	
+	property variant keySignatures: {
+		"-7": ["B", "E", "A", "D", "G", "C", "F"],
+		"-6": ["B", "E", "A", "D", "G", "C"],
+		"-5": ["B", "E", "A", "D", "G"],
+		"-4": ["B", "E", "A", "D"],
+		"-3": ["B", "E", "A"],
+		"-2": ["B", "E"],
+		"-1": ["B"],
+		"1": ["F"],
+		"2": ["F", "C"],
+		"3": ["F", "C", "G"],
+		"4": ["F", "C", "G", "D"],
+		"5": ["F", "C", "G", "D", "A"],
+		"6": ["F", "C", "G", "D", "A", "E"],
+		"7": ["F", "C", "G", "D", "A", "E", "B"]
+	};
+	
 	FileIO
 	{
 		id: loggerId;
@@ -66,14 +83,34 @@ MuseScore
 					var accidental = AccidentalUtils.getAccidentalName(element);
 					Logger.log("Respelling note: " + noteName + " " + accidental);
 					
+					var segment = element.parent.parent;
+					var cursor = curScore.newCursor();
+					cursor.voice = element.voice;
+					cursor.staffIdx = element.staff.part.startTrack / 4;
+					cursor.rewindToTick(segment.tick);
+					
+					// Check if a standard key signature changes the current
+					// note.
+					var keySignature = cursor.keySignature;
+					Logger.trace("Key signature: " + keySignature);
+					if ((keySignature !== 0) && keySignatures[keySignature].includes(noteName))
+					{
+						if (keySignature > 0)
+						{
+							accidental = "SHARP";
+						}
+						else
+						{
+							accidental = "FLAT";
+						}
+						Logger.log("accidental changed by key signature: " + accidental);
+					}
+					
 					if (accidental === "NONE")
 					{
-						var segment = element.parent.parent;
-						var cursor = curScore.newCursor();
-						cursor.voice = element.voice;
-						cursor.staffIdx = element.staff.part.startTrack / 4;
-						cursor.rewindToTick(segment.tick);
-						
+						// The note does not have an accidental applied to it,
+						// check if a previous key signature or accidental is
+						// applied to this note.
 						while (cursor.segment)
 						{
 							cursor.prev();

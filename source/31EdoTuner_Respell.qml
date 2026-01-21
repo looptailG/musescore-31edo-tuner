@@ -62,15 +62,22 @@ MuseScore
 			{
 				if (element.type === Element.NOTE)
 				{
-					var segment = element.parent.parent;
-					var cursor = curScore.newCursor();
-					cursor.voice = element.voice;
-					cursor.staffIdx = element.staff.part.startTrack / 4;
-					cursor.rewindToTick(segment.tick);
+					var noteName = NoteUtils.getNoteLetter(element, "tpc");
+					var accidental = AccidentalUtils.getAccidentalName(element);
+					Logger.log("Respelling note: " + noteName + " " + accidental);
 					
-					while (cursor.segment)
+					if (accidental === "NONE")
 					{
-						cursor.prev();
+						var segment = element.parent.parent;
+						var cursor = curScore.newCursor();
+						cursor.voice = element.voice;
+						cursor.staffIdx = element.staff.part.startTrack / 4;
+						cursor.rewindToTick(segment.tick);
+						
+						while (cursor.segment)
+						{
+							cursor.prev();
+						}
 					}
 				}
 			}

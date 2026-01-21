@@ -112,6 +112,7 @@ MuseScore
 						// check if a previous key signature or accidental is
 						// applied to this note.
 						var keySignatureChangeFound = false;
+						var accidentalFound = false;
 						while (cursor.segment)
 						{
 							// Check for a standard key signature change.
@@ -132,8 +133,27 @@ MuseScore
 								for (var i = 0; i < cursor.segment.annotations.length; i++)
 								{
 									var annotation = cursor.segment.annotations[i];
+									// TODO: check that staff text elements apply only to the current staff.
+									
 									var customKeySignature = {};
 									EdoUtils.parseCustomKeySignature(annotation.text, customKeySignature, Logger);
+									if (!isEmpty(customKeySignature))
+									{
+										keySignatureChangeFound = true;
+										
+										var customKeySignatureAccidental = customKeySignature[noteName];
+										if (customKeySignatureAccidental !== "NONE")
+										{
+											Logger.log("Accidental changed by a custom key signature: " + customKeySignatureAccidental);
+											accidental = customKeySignatureAccidental;
+											accidentalFound = true;
+											break;
+										}
+									}
+								}
+								if (accidentalFound)
+								{
+									break;
 								}
 							}
 							
@@ -162,5 +182,14 @@ MuseScore
 			
 			Logger.writeLogs();
 		}
+	}
+	
+	function isEmpty(o)
+	{
+		for (var key in o)
+		{
+			return false;
+		}
+		return true;
 	}
 }

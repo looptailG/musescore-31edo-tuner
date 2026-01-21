@@ -108,11 +108,35 @@ MuseScore
 					
 					if (accidental === "NONE")
 					{
-						// The note does not have an accidental applied to it,
+						// This note does not have an accidental applied to it,
 						// check if a previous key signature or accidental is
 						// applied to this note.
+						var keySignatureChangeFound = false;
 						while (cursor.segment)
 						{
+							// Check for a standard key signature change.
+							if (cursor.keySignature !== keySignature)
+							{
+								keySignatureChangeFound = true;
+								Logger.trace("Key signature change found.");
+							}
+							// Check for a custom key signature change.  This is
+							// only relevant if we didn't find a key signature
+							// change, because otherwise the custom key
+							// signature wouldn't be in effect for the note
+							// we're respelling.  Additionally, we only check if
+							// the key signature is 0, because that's what
+							// custom key signatures return.
+							if (!keySignatureChangeFound && (cursor.keySignature === 0))
+							{
+								for (var i = 0; i < cursor.segment.annotations.length; i++)
+								{
+									var annotation = cursor.segment.annotations[i];
+									var customKeySignature = {};
+									EdoUtils.parseCustomKeySignature(annotation.text, customKeySignature, Logger);
+								}
+							}
+							
 							cursor.prev();
 						}
 					}

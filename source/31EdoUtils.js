@@ -1,6 +1,6 @@
 /*
 	A collection of functions and constants about 31 EDO.
-	Copyright (C) 2025 Alessandro Culatti
+	Copyright (C) 2026 Alessandro Culatti
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by

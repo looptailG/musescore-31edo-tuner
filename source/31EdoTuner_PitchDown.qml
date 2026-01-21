@@ -1,6 +1,6 @@
 /*
 	Plugin for Musescore to move the selected notes down by a 31EDO step.
-	Copyright (C) 2024 - 2025 Alessandro Culatti
+	Copyright (C) 2024 - 2026 Alessandro Culatti
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by

@@ -26,7 +26,7 @@ MuseScore
 	description: "Respelle the selection, or the whole score if nothing is selected, according to 31EDO.";
 	categoryCode: "playback";
 	thumbnailName: "thumbnails/31Edo_Respell_Thumbnail.png";
-	version: "2.2.0"
+	version: "2.2.0";
 
 	onRun:
 	{}

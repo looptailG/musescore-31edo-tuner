@@ -19,6 +19,12 @@
 import QtQuick
 import FileIO
 import MuseScore
+import "31EdoUtils.js" as EdoUtils
+import "AccidentalUtils.js" as AccidentalUtils
+import "Logger.js" as Logger
+import "NoteUtils.js" as NoteUtils
+import "SettingsIO.js" as SettingsIO
+import "TuningUtils.js" as TuningUtils
 
 MuseScore
 {
@@ -27,7 +33,45 @@ MuseScore
 	categoryCode: "playback";
 	thumbnailName: "thumbnails/31Edo_Respell_Thumbnail.png";
 	version: "2.2.0"
+	
+	property variant settings: {};
+	
+	FileIO
+	{
+		id: loggerId;
+	}
+	
+	FileIO
+	{
+		id: settingsId;
+		source: Qt.resolvedUrl(".").toString() + "Settings.tsv";
+	}
 
 	onRun:
-	{}
+	{
+		try
+		{
+			settings = SettingsIO.readTsvFile(settingsId);
+			
+			Logger.initialise(loggerId, parseInt(settings["LogLevel"]));
+			Logger.log("-- " + title + " -- Version " + version + " --");
+		}
+		catch (error)
+		{
+			Logger.fatal(error);
+		}
+		finally
+		{
+			try
+			{
+				quit();
+			}
+			catch (error)
+			{
+				Logger.err(error);
+			}
+			
+			Logger.writeLogs();
+		}
+	}
 }

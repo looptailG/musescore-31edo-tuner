@@ -80,7 +80,7 @@ MuseScore
 				if (element.type === Element.NOTE)
 				{
 					var noteName = NoteUtils.getNoteLetter(element, "tpc");
-					var octave = NoteUtils.getOctave(note);
+					var octave = NoteUtils.getOctave(element);
 					var accidental = AccidentalUtils.getAccidentalName(element);
 					Logger.log("Respelling note: " + noteName + " " + octave + " " + accidental);
 					
@@ -165,11 +165,43 @@ MuseScore
 								var notes = cursor.element.notes;
 								for (var i = 0; i < notes.length; i++)
 								{
+									var currentAccidental = checkAccidental(notes[i], noteName, octave);
+									if (currentAccidental && (currentAccidental !== "NONE"))
+									{
+										Logger.log("Accidental changed by a previous note in the measure: " + currentAccidental);
+										accidental = currentAccidental;
+										accidentalFound = true;
+										break;
+									}
+								}
+								if (accidentalFound)
+								{
+									break;
 								}
 								
 								var graceChords = cursor.element.graceNotes;
 								for (var i = graceChords.length - 1; i >= 0; i--)
 								{
+									var graceNotes = graceChords[i].notes;
+									for (let j = 0; j < graceNotes.length; j++)
+									{
+										var currentAccidental = checkAccidental(graceNotes[j], noteName, octave);
+										if (currentAccidental && (currentAccidental !== "NONE"))
+										{
+											Logger.log("Accidental changed by a previous note in the measure: " + currentAccidental);
+											accidental = currentAccidental;
+											accidentalFound = true;
+											break;
+										}
+									}
+									if (accidentalFound)
+									{
+										break;
+									}
+								}
+								if (accidentalFound)
+								{
+									break;
 								}
 							}
 							

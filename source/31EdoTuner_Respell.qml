@@ -200,6 +200,20 @@ MuseScore
 		}
 	}
 	
+	function checkAccidental(note, targetNote, targetOctave)
+	{
+		var noteName = NoteUtils.getNoteLetter(note, "tpc");
+		var octave = NoteUtils.getOctave(note);
+		if ((noteName === targetNote) && (octave === targetOctave))
+		{
+			return AccidentalUtils.getAccidentalName(note);
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
 	function isEmpty(o)
 	{
 		for (var key in o)

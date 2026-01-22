@@ -113,6 +113,8 @@ MuseScore
 						// check if a previous key signature or accidental is
 						// applied to this note.
 						var keySignatureChangeFound = false;
+						var measureChanged = false;
+						var measureStartTick = cursor.measure.firstSegment.tick;
 						var accidentalFound = false;
 						while (cursor.segment)
 						{
@@ -158,9 +160,17 @@ MuseScore
 								}
 							}
 							
+							// Check if we moved to a previous measure, in which
+							// case we do not have to check for altered notes
+							// anymore.
+							if (!measureChanged && (cursor.tick < measureStartTick))
+							{
+								measureChanged = true;
+								Logger.trace("Measure changed.");
+							}
 							// Check if the same note previously in the measure
 							// was altered by an accidental.
-							if (cursor.element && (cursor.element.type === Element.CHORD))
+							if (!measureChanged && cursor.element && (cursor.element.type === Element.CHORD))
 							{
 								var notes = cursor.element.notes;
 								for (var i = 0; i < notes.length; i++)
@@ -203,6 +213,17 @@ MuseScore
 								{
 									break;
 								}
+							}
+							
+							// If the key signature was changed without an
+							// accidental for the current note, and we moved to
+							// a different measure without finding an accidental
+							// which alters the current note, there isn't any
+							// possible accidental which applies to the current
+							// note anymore that we could find.
+							if (keySignatureChangeFound && measureChanged)
+							{
+								break;
 							}
 							
 							cursor.prev();

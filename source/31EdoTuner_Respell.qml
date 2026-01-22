@@ -80,8 +80,9 @@ MuseScore
 				if (element.type === Element.NOTE)
 				{
 					var noteName = NoteUtils.getNoteLetter(element, "tpc");
+					var octave = NoteUtils.getOctave(note);
 					var accidental = AccidentalUtils.getAccidentalName(element);
-					Logger.log("Respelling note: " + noteName + " " + accidental);
+					Logger.log("Respelling note: " + noteName + " " + octave + " " + accidental);
 					
 					var segment = element.parent.parent;
 					var cursor = curScore.newCursor();
@@ -154,6 +155,21 @@ MuseScore
 								if (accidentalFound)
 								{
 									break;
+								}
+							}
+							
+							// Check if the same note previously in the measure
+							// was altered by an accidental.
+							if (cursor.element && (cursor.element.type === Element.CHORD))
+							{
+								var notes = cursor.element.notes;
+								for (var i = 0; i < notes.length; i++)
+								{
+								}
+								
+								var graceChords = cursor.element.graceNotes;
+								for (var i = graceChords.length - 1; i >= 0; i--)
+								{
 								}
 							}
 							

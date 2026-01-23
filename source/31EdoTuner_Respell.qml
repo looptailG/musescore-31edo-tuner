@@ -90,6 +90,9 @@ MuseScore
 					cursor.staffIdx = element.staff.part.startTrack / 4;
 					cursor.rewindToTick(segment.tick);
 					
+					// Check what accidental, if any, is applied to the current
+					// note by a previous key signature or accidental.
+					var previousAccidental = null;
 					// Check if a standard key signature changes the current
 					// note.
 					var keySignature = cursor.keySignature;
@@ -98,84 +101,93 @@ MuseScore
 					{
 						if (keySignature > 0)
 						{
-							accidental = "SHARP";
+							previousAccidental = "SHARP";
 						}
 						else
 						{
-							accidental = "FLAT";
+							previousAccidental = "FLAT";
 						}
-						Logger.log("accidental changed by key signature: " + accidental);
+						Logger.log("Previous accidental from a standard key signature: " + previousAccidental);
 					}
-					
-					if (accidental === "NONE")
+					// Iterate on the previous elements, to search for a custom
+					// key signature or an accidental applied to this note.
+					var accidentalFound = false;
+					var keySignatureChangeFound = false;
+					var measureChanged = false;
+					var measureStartTick = cursor.measure.firstSegment.tick;
+					while (cursor.segment)
 					{
-						// This note does not have an accidental applied to it,
-						// check if a previous key signature or accidental is
-						// applied to this note.
-						var keySignatureChangeFound = false;
-						var measureChanged = false;
-						var measureStartTick = cursor.measure.firstSegment.tick;
-						var accidentalFound = false;
-						while (cursor.segment)
+						// Check for a standard key signature change.
+						if (!keySignatureChangeFound && (cursor.keySignature !== keySignature))
 						{
-							// Check for a standard key signature change.
-							if (cursor.keySignature !== keySignature)
+							keySignatureChangeFound = true;
+							Logger.trace("Key signature change found.");
+						}
+						// Check for a custom key signature change.  This is
+						// only relevant if we didn't find a key signature
+						// change, because otherwise the custom key signature
+						// wouldn't be in effect for the note we're respelling.
+						// Additionally, we only check if the key signature is
+						// 0, because that's what custom key signatures return.
+						if (!keySignatureChangeFound && (cursor.keySignature === 0))
+						{
+							for (var i = 0; i < cursor.segment.annotations.length; i++)
 							{
-								keySignatureChangeFound = true;
-								Logger.trace("Key signature change found.");
-							}
-							// Check for a custom key signature change.  This is
-							// only relevant if we didn't find a key signature
-							// change, because otherwise the custom key
-							// signature wouldn't be in effect for the note
-							// we're respelling.  Additionally, we only check if
-							// the key signature is 0, because that's what
-							// custom key signatures return.
-							if (!keySignatureChangeFound && (cursor.keySignature === 0))
-							{
-								for (var i = 0; i < cursor.segment.annotations.length; i++)
+								var annotation = cursor.segment.annotations[i];
+								// TODO: check that staff text elements apply only to the current staff.
+								
+								var customKeySignature = {};
+								EdoUtils.parseCustomKeySignature(annotation.text, customKeySignature, Logger);
+								if (!isEmpty(customKeySignature))
 								{
-									var annotation = cursor.segment.annotations[i];
-									// TODO: check that staff text elements apply only to the current staff.
-									
-									var customKeySignature = {};
-									EdoUtils.parseCustomKeySignature(annotation.text, customKeySignature, Logger);
-									if (!isEmpty(customKeySignature))
-									{
-										keySignatureChangeFound = true;
-										
-										var customKeySignatureAccidental = customKeySignature[noteName];
-										if (customKeySignatureAccidental !== "NONE")
-										{
-											Logger.log("Accidental changed by a custom key signature: " + customKeySignatureAccidental);
-											accidental = customKeySignatureAccidental;
-											accidentalFound = true;
-											break;
-										}
-									}
-								}
-								if (accidentalFound)
-								{
+									keySignatureChangeFound = true;
+									var previousAccidental = customKeySignature[noteName];
+									Logger.log("Previous accidental from a standard key signature: " + previousAccidental);
 									break;
 								}
 							}
-							
-							// Check if we moved to a previous measure, in which
-							// case we do not have to check for altered notes
-							// anymore.
-							if (!measureChanged && (cursor.tick < measureStartTick))
+							if (keySignatureChangeFound)
 							{
-								measureChanged = true;
-								Logger.trace("Measure changed.");
+								break;
 							}
-							// Check if the same note previously in the measure
-							// was altered by an accidental.
-							if (!measureChanged && cursor.element && (cursor.element.type === Element.CHORD))
+						}
+						
+						// Check if we moved to a previous measure, in which
+						// case we do not have to check for altered notes
+						// anymore.
+						if (!measureChanged && (cursor.tick < measureStartTick))
+						{
+							measureChanged = true;
+							Logger.trace("Measure changed.");
+						}
+						// Check if the same note previously in the measure
+						// was altered by an accidental.
+						if (!measureChanged && cursor.element && (cursor.element.type === Element.CHORD))
+						{
+							var notes = cursor.element.notes;
+							for (var i = 0; i < notes.length; i++)
 							{
-								var notes = cursor.element.notes;
-								for (var i = 0; i < notes.length; i++)
+								var currentAccidental = checkAccidental(notes[i], noteName, octave);
+								if (currentAccidental && (currentAccidental !== "NONE"))
 								{
-									var currentAccidental = checkAccidental(notes[i], noteName, octave);
+									Logger.log("Previous accidentals from a previous note in the measure: " + currentAccidental);
+									previousAccidental = currentAccidental;
+									accidentalFound = true;
+									break;
+								}
+							}
+							if (accidentalFound)
+							{
+								break;
+							}
+							
+							var graceChords = cursor.element.graceNotes;
+							for (var i = graceChords.length - 1; i >= 0; i--)
+							{
+								var graceNotes = graceChords[i].notes;
+								for (let j = 0; j < graceNotes.length; j++)
+								{
+									var currentAccidental = checkAccidental(graceNotes[j], noteName, octave);
 									if (currentAccidental && (currentAccidental !== "NONE"))
 									{
 										Logger.log("Accidental changed by a previous note in the measure: " + currentAccidental);
@@ -188,46 +200,24 @@ MuseScore
 								{
 									break;
 								}
-								
-								var graceChords = cursor.element.graceNotes;
-								for (var i = graceChords.length - 1; i >= 0; i--)
-								{
-									var graceNotes = graceChords[i].notes;
-									for (let j = 0; j < graceNotes.length; j++)
-									{
-										var currentAccidental = checkAccidental(graceNotes[j], noteName, octave);
-										if (currentAccidental && (currentAccidental !== "NONE"))
-										{
-											Logger.log("Accidental changed by a previous note in the measure: " + currentAccidental);
-											accidental = currentAccidental;
-											accidentalFound = true;
-											break;
-										}
-									}
-									if (accidentalFound)
-									{
-										break;
-									}
-								}
-								if (accidentalFound)
-								{
-									break;
-								}
 							}
-							
-							// If the key signature was changed without an
-							// accidental for the current note, and we moved to
-							// a different measure without finding an accidental
-							// which alters the current note, there isn't any
-							// possible accidental which applies to the current
-							// note anymore that we could find.
-							if (keySignatureChangeFound && measureChanged)
+							if (accidentalFound)
 							{
 								break;
 							}
-							
-							cursor.prev();
 						}
+						
+						if (keySignatureChangeFound && measureChanged)
+						{
+							break;
+						}
+						
+						cursor.prev();
+					}
+					
+					if (previousAccidental && (accidental === "NONE"))
+					{
+						Logger.log("Current accidental replaced by: " + previousAccidental);
 					}
 				}
 			}

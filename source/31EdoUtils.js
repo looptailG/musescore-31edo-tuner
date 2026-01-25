@@ -467,6 +467,10 @@ function searchPreviousAccidental(note, noteName, octave, accidental, logger)
 	return previousAccidental;
 }
 
+/**
+ * Check if the input note is the same as the input targetNote and targetOctave,
+ * in which case return its accidental.  If it's not, return null.
+ */
 function checkAccidental(note, targetNote, targetOctave)
 {
 	var noteName = NoteUtils.getNoteLetter(note, "tpc");

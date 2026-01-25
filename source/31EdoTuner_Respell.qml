@@ -37,20 +37,21 @@ MuseScore
 	property variant settings: {};
 	
 	property variant keySignatures: {
-		"-7": ["B", "E", "A", "D", "G", "C", "F"],
-		"-6": ["B", "E", "A", "D", "G", "C"],
-		"-5": ["B", "E", "A", "D", "G"],
-		"-4": ["B", "E", "A", "D"],
-		"-3": ["B", "E", "A"],
-		"-2": ["B", "E"],
-		"-1": ["B"],
-		"1": ["F"],
-		"2": ["F", "C"],
-		"3": ["F", "C", "G"],
-		"4": ["F", "C", "G", "D"],
-		"5": ["F", "C", "G", "D", "A"],
-		"6": ["F", "C", "G", "D", "A", "E"],
-		"7": ["F", "C", "G", "D", "A", "E", "B"]
+		"-7": {"F": "FLAT", "C": "FLAT", "G": "FLAT", "D": "FLAT", "A": "FLAT", "E": "FLAT", "B": "FLAT"},
+		"-6": {"F": "FLAT", "C": "FLAT", "G": "FLAT", "D": "FLAT", "A": "FLAT", "E": "FLAT", "B": "NONE"},
+		"-5": {"F": "FLAT", "C": "FLAT", "G": "FLAT", "D": "FLAT", "A": "FLAT", "E": "NONE", "B": "NONE"},
+		"-4": {"F": "FLAT", "C": "FLAT", "G": "FLAT", "D": "FLAT", "A": "NONE", "E": "NONE", "B": "NONE"},
+		"-3": {"F": "FLAT", "C": "FLAT", "G": "FLAT", "D": "NONE", "A": "NONE", "E": "NONE", "B": "NONE"},
+		"-2": {"F": "FLAT", "C": "FLAT", "G": "NONE", "D": "NONE", "A": "NONE", "E": "NONE", "B": "NONE"},
+		"-1": {"F": "FLAT", "C": "NONE", "G": "NONE", "D": "NONE", "A": "NONE", "E": "NONE", "B": "NONE"},
+		"0": {"F": "NONE", "C": "NONE", "G": "NONE", "D": "NONE", "A": "NONE", "E": "NONE", "B": "NONE"},
+		"1": {"F": "SHARP", "C": "NONE", "G": "NONE", "D": "NONE", "A": "NONE", "E": "NONE", "B": "NONE"},
+		"2": {"F": "SHARP", "C": "SHARP", "G": "NONE", "D": "NONE", "A": "NONE", "E": "NONE", "B": "NONE"},
+		"3": {"F": "SHARP", "C": "SHARP", "G": "SHARP", "D": "NONE", "A": "NONE", "E": "NONE", "B": "NONE"},
+		"4": {"F": "SHARP", "C": "SHARP", "G": "SHARP", "D": "SHARP", "A": "NONE", "E": "NONE", "B": "NONE"},
+		"5": {"F": "SHARP", "C": "SHARP", "G": "SHARP", "D": "SHARP", "A": "SHARP", "E": "NONE", "B": "NONE"},
+		"6": {"F": "SHARP", "C": "SHARP", "G": "SHARP", "D": "SHARP", "A": "SHARP", "E": "SHARP", "B": "NONE"},
+		"7": {"F": "SHARP", "C": "SHARP", "G": "SHARP", "D": "SHARP", "A": "SHARP", "E": "SHARP", "B": "SHARP"}
 	};
 	
 	FileIO
@@ -87,7 +88,7 @@ MuseScore
 					var segment = element.parent.parent;
 					var cursor = curScore.newCursor();
 					cursor.voice = element.voice;
-					cursor.staffIdx = element.staff.part.startTrack / 4;
+					cursor.staffIdx = (element.staff.part.startTrack / 4) + 1;
 					cursor.rewindToTick(segment.tick);
 					
 					// Check what accidental, if any, is applied to the current
@@ -96,19 +97,8 @@ MuseScore
 					// Check if a standard key signature changes the current
 					// note.
 					var keySignature = cursor.keySignature;
-					Logger.trace("Key signature: " + keySignature);
-					if ((keySignature !== 0) && keySignatures[keySignature].includes(noteName))
-					{
-						if (keySignature > 0)
-						{
-							previousAccidental = "SHARP";
-						}
-						else
-						{
-							previousAccidental = "FLAT";
-						}
-						Logger.log("Previous accidental from a standard key signature: " + previousAccidental);
-					}
+					previousAccidental = keySignatures[keySignature][noteName];
+					Logger.log("Key signature: " + keySignature + "; Accidental: " + previousAccidental);
 					// Iterate on the previous elements, to search for a custom
 					// key signature or an accidental applied to this note.
 					var accidentalFound = false;
@@ -247,9 +237,12 @@ MuseScore
 	{
 		var noteName = NoteUtils.getNoteLetter(note, "tpc");
 		var octave = NoteUtils.getOctave(note);
+		Logger.trace("Checking accidentl for note: " + noteName + " " + octave);
 		if ((noteName === targetNote) && (octave === targetOctave))
 		{
-			return AccidentalUtils.getAccidentalName(note);
+			var currentAccidental = AccidentalUtils.getAccidentalName(note);
+			Logger.trace("Accidental found: " + currentAccidental);
+			return currentAccidental;
 		}
 		else
 		{

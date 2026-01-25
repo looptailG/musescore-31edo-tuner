@@ -91,6 +91,7 @@ const ENHARMONIC_ACCIDENTALS = [
 	"FLAT",
 	"MIRRORED_FLAT",
 	"NONE",
+	"NATURAL",
 	"SHARP_SLASH",
 	"SHARP",
 	"SHARP_SLASH4",
@@ -111,6 +112,11 @@ for (const note in NOTES_STEPS)
 {
 	for (const accidental of ENHARMONIC_ACCIDENTALS)
 	{
+		if (accidental === "NATURAL")
+		{
+			continue;
+		}
+		
 		let edoSteps = NOTES_STEPS[note] + SUPPORTED_ACCIDENTALS[accidental];
 		
 		let octaveShift;
@@ -422,6 +428,7 @@ function searchPreviousAccidental(note, noteName, octave, accidental, logger)
 				break;
 			}
 			
+			// TODO: add a check that the current note is not the same as the input note.
 			let graceChords = cursor.element.graceNotes;
 			for (let i = graceChords.length - 1; i >= 0; i--)
 			{

@@ -66,8 +66,22 @@ MuseScore
 					var octave = NoteUtils.getOctave(element);
 					var accidental = AccidentalUtils.getAccidentalName(element);
 					Logger.log("Respelling note: " + noteName + " " + octave + " " + accidental);
+					if (!EdoUtils.ENHARMONIC_ACCIDENTALS.includes(accidental))
+					{
+						Logger.warning("Accidental not supported for 31EDO enharmonic respelling: " + accidental);
+						continue;
+					}
+					var edoStep = EdoUtils.NOTES_STEPS[noteName] + EdoUtils.SUPPORTED_ACCIDENTALS[accidental];
+					Logger.trace("EDO step: " + edoStep);
 					
 					var previousAccidental = EdoUtils.searchPreviousAccidental(element, noteName, octave, accidental, Logger);
+					if ((accidental === "NONE") && (previousAccidental !== "NONE"))
+					{
+						Logger.log("Current accidental replaced with: " + previousAccidental);
+						accidental = previousAccidental;
+					}
+					
+					var enharmonicEquivalents = EdoUtils.ENHARMONIC_EQUIVALENTS[edoStep];
 				}
 			}
 			
@@ -96,7 +110,7 @@ MuseScore
 	{
 		var noteName = NoteUtils.getNoteLetter(note, "tpc");
 		var octave = NoteUtils.getOctave(note);
-		Logger.trace("Checking accidentl for note: " + noteName + " " + octave);
+		Logger.trace("Checking accidental for note: " + noteName + " " + octave);
 		if ((noteName === targetNote) && (octave === targetOctave))
 		{
 			var currentAccidental = AccidentalUtils.getAccidentalName(note);

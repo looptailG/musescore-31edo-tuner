@@ -99,9 +99,9 @@ const ENHARMONIC_ACCIDENTALS = [
 ];
 
 // Map every EDO step to an array of every possible enharmonic spelling for that
-// EDO step.  The arrays contains objects with the properties "NOTE_NAME" and
-// "ACCIDENTAL", and are ordered according to the number of EDO steps of the
-// accidental applied to the note.
+// EDO step.  The arrays contains objects with the properties "NOTE_NAME",
+// "ACCIDENTAL" and "OCTAVE_SHIFT", and are ordered according to the number of
+// EDO steps of the accidental applied to the note.
 const ENHARMONIC_EQUIVALENTS = {};
 for (let i = 0; i < 31; i++)
 {
@@ -112,6 +112,17 @@ for (const note in NOTES_STEPS)
 	for (const accidental of ENHARMONIC_ACCIDENTALS)
 	{
 		let edoSteps = NOTES_STEPS[note] + SUPPORTED_ACCIDENTALS[accidental];
+		
+		let octaveShift;
+		if (edoSteps < 0)
+		{
+			octaveShift = -1;
+		}
+		else if (edoSteps >= 31)
+		{
+			octaveShift = 1;
+		}
+		
 		edoSteps %= 31;
 		while (edoSteps < 0)
 		{
@@ -121,6 +132,7 @@ for (const note in NOTES_STEPS)
 		let newEnharmonicEquivalent = {};
 		newEnharmonicEquivalent["NOTE_NAME"] = note;
 		newEnharmonicEquivalent["ACCIDENTAL"] = accidental;
+		newEnharmonicEquivalent["OCTAVE_SHIFT"] = octaveShift;
 		ENHARMONIC_EQUIVALENTS[edoSteps].push(newEnharmonicEquivalent);
 	}
 }

@@ -122,6 +122,10 @@ for (const note in NOTES_STEPS)
 		{
 			octaveShift = 1;
 		}
+		else
+		{
+			octaveShift = 0;
+		}
 		
 		edoSteps %= 31;
 		while (edoSteps < 0)

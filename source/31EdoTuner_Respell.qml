@@ -71,8 +71,6 @@ MuseScore
 						Logger.warning("Accidental not supported for 31EDO enharmonic respelling: " + accidental);
 						continue;
 					}
-					var edoStep = EdoUtils.NOTES_STEPS[noteName] + EdoUtils.SUPPORTED_ACCIDENTALS[accidental];
-					Logger.trace("EDO step: " + edoStep);
 					
 					var previousAccidental = EdoUtils.searchPreviousAccidental(element, noteName, octave, accidental, Logger);
 					if ((accidental === "NONE") && (previousAccidental !== "NONE"))
@@ -81,11 +79,34 @@ MuseScore
 						accidental = previousAccidental;
 					}
 					
+					var edoStep = EdoUtils.NOTES_STEPS[noteName] + EdoUtils.SUPPORTED_ACCIDENTALS[accidental];
+					Logger.log("EDO step: " + edoStep);
 					var targetNoteName = null;
-					var targetOctave = null;
 					var targetAccidental = null;
+					var targetOctaveShift = null;
 					var enharmonicEquivalents = EdoUtils.ENHARMONIC_EQUIVALENTS[edoStep];
-					Logger.logProperties(enharmonicEquivalents);
+					for (var i = 0; i < enharmonicEquivalents.length; i++)
+					{
+						var currentNoteName = enharmonicEquivalents[i]["NOTE_NAME"];
+						var currentAccidental = enharmonicEquivalents[i]["ACCIDENTAL"];
+						var currentOctaveShift = enharmonicEquivalents[i]["OCTAVE_SHIFT"];
+						if ((currentNoteName === noteName) && (currentAccidental === accidental))
+						{
+							var targetIndex = i + 1;
+							targetIndex %= enharmonicEquivalents.length;
+							
+							targetNoteName = enharmonicEquivalents[targetIndex]["NOTE_NAME"];
+							targetAccidental = enharmonicEquivalents[targetIndex]["ACCIDENTAL"];
+							targetOctaveShift = enharmonicEquivalents[targetIndex]["OCTAVE_SHIFT"];
+							
+							break;
+						}
+					}
+					if ((targetNoteName === null) || (targetAccidental === null) || (targetOctaveShift === null))
+					{
+						throw "Cannot find enharmonic equivalents for note: " + noteName + " " + accidental;
+					}
+					Logger.log("Target note: " + targetNoteName + " " + targetAccidental);
 				}
 			}
 			

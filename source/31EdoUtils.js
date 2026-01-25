@@ -467,6 +467,23 @@ function searchPreviousAccidental(note, noteName, octave, accidental, logger)
 	return previousAccidental;
 }
 
+function checkAccidental(note, targetNote, targetOctave)
+{
+	var noteName = NoteUtils.getNoteLetter(note, "tpc");
+	var octave = NoteUtils.getOctave(note);
+	Logger.trace("Checking accidental for note: " + noteName + " " + octave);
+	if ((noteName === targetNote) && (octave === targetOctave))
+	{
+		var currentAccidental = AccidentalUtils.getAccidentalName(note);
+		Logger.trace("Accidental found: " + currentAccidental);
+		return currentAccidental;
+	}
+	else
+	{
+		return null;
+	}
+}
+
 /**
  * Choose the most appropriate enharmonic spelling for the input note, according
  * to the key signature and the eventual accidentals in the measure.
@@ -618,4 +635,13 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 	returnValue["NOTE_NAME"] = noteName;
 	returnValue["ACCIDENTAL"] = accidental;
 	return returnValue;
+}
+
+function isEmpty(o)
+{
+	for (var key in o)
+	{
+		return false;
+	}
+	return true;
 }

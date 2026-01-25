@@ -81,7 +81,11 @@ MuseScore
 						accidental = previousAccidental;
 					}
 					
+					var targetNoteName = null;
+					var targetOctave = null;
+					var targetAccidental = null;
 					var enharmonicEquivalents = EdoUtils.ENHARMONIC_EQUIVALENTS[edoStep];
+					Logger.logProperties(enharmonicEquivalents);
 				}
 			}
 			
@@ -104,31 +108,5 @@ MuseScore
 			
 			Logger.writeLogs();
 		}
-	}
-	
-	function checkAccidental(note, targetNote, targetOctave)
-	{
-		var noteName = NoteUtils.getNoteLetter(note, "tpc");
-		var octave = NoteUtils.getOctave(note);
-		Logger.trace("Checking accidental for note: " + noteName + " " + octave);
-		if ((noteName === targetNote) && (octave === targetOctave))
-		{
-			var currentAccidental = AccidentalUtils.getAccidentalName(note);
-			Logger.trace("Accidental found: " + currentAccidental);
-			return currentAccidental;
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	function isEmpty(o)
-	{
-		for (var key in o)
-		{
-			return false;
-		}
-		return true;
 	}
 }

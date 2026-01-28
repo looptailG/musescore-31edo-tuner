@@ -349,7 +349,7 @@ function searchPreviousAccidental(note, noteName, octave, accidental, logger)
 	let segment = note.parent.parent;
 	let cursor = curScore.newCursor();
 	cursor.voice = note.voice;
-	cursor.staffIdx = (note.staff.part.startTrack / 4) + 1;
+	cursor.staffIdx = note.staff.part.startTrack / 4;
 	cursor.rewindToTick(segment.tick);
 	
 	// Check what accidental, if any, is applied to the current note by a

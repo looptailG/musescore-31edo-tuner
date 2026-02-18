@@ -107,6 +107,28 @@ MuseScore
 						throw "Cannot find enharmonic equivalents for note: " + noteName + " " + accidental;
 					}
 					Logger.log("Target note: " + targetNoteName + " " + targetAccidental);
+					if EdoUtils.SUPPORTED_MICROTONAL_ACCIDENTALS.includes(targetAccidental)
+					{
+						// Microtol accidentals are not handled by the TPC
+						// property.  Search the pithch / TPC without accidental
+						// to put the note in the correct staff space, and then
+						// apply the accidental manually.
+						var targetTpc = NoteUtils.noteNameToTpc(targetNoteName, "NONE");
+						var targetPitch = NoteUtils.noteToMidiNumber(targetNoteName, "NONE", octave + targetOctaveShift);
+						Logger.trace("Target TPC: " + targetTpc + "; Target Pitch: " + targetPitch);
+						element.pitch = targetPitch;
+						element.tpc1 = targetTpc;
+						element.tpc2 = targetTpc;
+					}
+					else
+					{
+						var targetTpc = NoteUtils.noteNameToTpc(targetNoteName, targetAccidental);
+						var targetPitch = NoteUtils.noteToMidiNumber(targetNoteName, targetAccidental, octave + targetOctaveShift);
+						Logger.trace("Target TPC: " + targetTpc + "; Target Pitch: " + targetPitch);
+						element.pitch = targetPitch;
+						element.tpc1 = targetTpc;
+						element.tpc2 = targetTpc;
+					}
 				}
 			}
 			

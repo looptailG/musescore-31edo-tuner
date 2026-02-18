@@ -107,7 +107,7 @@ MuseScore
 						throw "Cannot find enharmonic equivalents for note: " + noteName + " " + accidental;
 					}
 					Logger.log("Target note: " + targetNoteName + " " + targetAccidental);
-					if EdoUtils.SUPPORTED_MICROTONAL_ACCIDENTALS.includes(targetAccidental)
+					if (EdoUtils.SUPPORTED_MICROTONAL_ACCIDENTALS.includes(targetAccidental))
 					{
 						// Microtol accidentals are not handled by the TPC
 						// property.  Search the pithch / TPC without accidental

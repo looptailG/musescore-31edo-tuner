@@ -376,6 +376,9 @@ function searchPreviousAccidental(note, noteName, octave, logger)
 	// an accidental applied to this note.
 	let accidentalFound = false;
 	let keySignatureChangeFound = false;
+	// By iterating backward starting from the current note, we find the input
+	// note as the first note in the loop.  Skip it.
+	let sameNote = true;
 	let measureChanged = false;
 	let measureStartTick = cursor.measure.firstSegment.tick;
 	while (cursor.segment)
@@ -428,6 +431,16 @@ function searchPreviousAccidental(note, noteName, octave, logger)
 			let notes = cursor.element.notes;
 			for (let i = 0; i < notes.length; i++)
 			{
+				if (sameNote)
+				{
+					let currentNoteName = NoteUtils.getNoteLetter(note, "tpc");
+					if (currentNoteName === noteName)
+					{
+						sameNote = false;
+						continue;
+					}
+				}
+				
 				let currentAccidental = checkAccidental(notes[i], noteName, octave);
 				if (currentAccidental && (currentAccidental !== "NONE"))
 				{
@@ -442,7 +455,6 @@ function searchPreviousAccidental(note, noteName, octave, logger)
 				break;
 			}
 			
-			// TODO: add a check that the current note is not the same as the input note.
 			let graceChords = cursor.element.graceNotes;
 			for (let i = graceChords.length - 1; i >= 0; i--)
 			{

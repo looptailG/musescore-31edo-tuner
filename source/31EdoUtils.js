@@ -47,20 +47,6 @@ const SUPPORTED_ACCIDENTALS = {
 	"SAGITTAL_SHARP": 2
 };
 
-// List of supported microtonal accidentals.
-const SUPPORTED_MICROTONAL_ACCIDENTALS = [
-	"ARROW_DOWN",
-	"MIRRORED_FLAT",
-	"MIRRORED_FLAT2",
-	"SHARP_SLASH",
-	"LOWER_ONE_SEPTIMAL_COMMA",
-	"SHARP_SLASH4",
-	"SAGITTAL_11MDD",
-	"SAGITTAL_11MDU",
-	"SAGITTAL_FLAT",
-	"SAGITTAL_SHARP"
-];
-
 // Regex used for checking if a string is valid as a custom key signature.
 const KEY_SIGNATURE_REGEX = /^(x|t#|#|t|h|d|b|db|bb|)(?:\.(?:x|t#|#|t|h|d|b|db|bb|)){6}$/;
 // Array containing the notes in the order they appear in the custom key

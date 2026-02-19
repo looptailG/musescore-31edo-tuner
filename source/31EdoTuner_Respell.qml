@@ -112,7 +112,12 @@ MuseScore
 					Logger.log("Target note: " + targetNoteName + " " + targetAccidental);
 					var targetTpc;
 					var targetPitch;
-					if (EdoUtils.SUPPORTED_MICROTONAL_ACCIDENTALS.includes(targetAccidental))
+					if (AccidentalUtils.ACCIDENTAL_DATA[targetAccidental]["TPC"])
+					{
+						targetTpc = NoteUtils.noteNameToTpc(targetNoteName, targetAccidental);
+						targetPitch = NoteUtils.noteToMidiNumber(targetNoteName, targetAccidental, octave + targetOctaveShift);
+					}
+					else
 					{
 						// Microtonal accidentals are not handled by the TPC
 						// property.  Search the pithch / TPC without accidental
@@ -121,25 +126,25 @@ MuseScore
 						targetTpc = NoteUtils.noteNameToTpc(targetNoteName, "NONE");
 						targetPitch = NoteUtils.noteToMidiNumber(targetNoteName, "NONE", octave + targetOctaveShift);
 					}
-					else
-					{
-						targetTpc = NoteUtils.noteNameToTpc(targetNoteName, targetAccidental);
-						targetPitch = NoteUtils.noteToMidiNumber(targetNoteName, targetAccidental, octave + targetOctaveShift);
-					}
 					Logger.trace("Target TPC: " + targetTpc + "; Target Pitch: " + targetPitch);
 					element.pitch = targetPitch;
 					element.tpc1 = targetTpc;
 					element.tpc2 = targetTpc;
 					
-					if (EdoUtils.SUPPORTED_MICROTONAL_ACCIDENTALS.includes(targetAccidental))
+					var targetAccidentalType = AccidentalUtils.getAccidentalType(targetAccidental);
+					Logger.trace("Target accidental type: " + targetAccidentalType);
+					previousAccidental = EdoUtils.searchPreviousAccidental(element, targetNoteName, octave + targetOctaveShift, Logger);
+					if (previousAccidental !== targetAccidental)
 					{
-						var targetAccidentalType = AccidentalUtils.getAccidentalType(targetAccidental);
-						Logger.trace("Target accidental type: " + targetAccidentalType);
-						previousAccidental = EdoUtils.searchPreviousAccidental(element, targetNoteName, octave + targetOctaveShift, Logger);
-						if (previousAccidental !== targetAccidental)
+						if (!AccidentalUtils.ACCIDENTAL_DATA[targetAccidental]["TPC"])
 						{
 							element.accidentalType = targetAccidentalType;
 						}
+					}
+					else
+					{
+						Logger.log("Target accidental already applied to the note.");
+						element.accidentalType = Accidental.NONE;
 					}
 				}
 			}

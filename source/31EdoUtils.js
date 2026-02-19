@@ -355,9 +355,9 @@ function parseCustomKeySignature(annotationText, customKeySignature, logger)
 /**
  * Search for the previous accidental which is applied to the input note.
  */
-function searchPreviousAccidental(note, noteName, octave, accidental, logger)
+function searchPreviousAccidental(note, noteName, octave, logger)
 {
-	logger.log("Searching previous accidental for note: " + noteName + " " + octave + " " + accidental);
+	logger.log("Searching previous accidental for note: " + noteName + " " + octave);
 	
 	// Create a cursor at the position of the input note.
 	let segment = note.parent.parent;
@@ -453,7 +453,7 @@ function searchPreviousAccidental(note, noteName, octave, accidental, logger)
 					if (currentAccidental && (currentAccidental !== "NONE"))
 					{
 						logger.log("Accidental changed by a previous note in the measure: " + currentAccidental);
-						accidental = currentAccidental;
+						previousAccidental = currentAccidental;
 						accidentalFound = true;
 						break;
 					}

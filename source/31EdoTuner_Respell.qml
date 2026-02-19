@@ -72,11 +72,14 @@ MuseScore
 						continue;
 					}
 					
-					var previousAccidental = EdoUtils.searchPreviousAccidental(element, noteName, octave, accidental, Logger);
-					if ((accidental === "NONE") && (previousAccidental !== "NONE"))
+					if (accidental === "NONE")
 					{
-						Logger.log("Current accidental replaced with: " + previousAccidental);
-						accidental = previousAccidental;
+						var previousAccidental = EdoUtils.searchPreviousAccidental(element, noteName, octave, Logger);
+						if (previousAccidental !== "NONE")
+						{
+							Logger.log("Current accidental replaced with: " + previousAccidental);
+							accidental = previousAccidental;
+						}
 					}
 					
 					var edoStep = EdoUtils.NOTES_STEPS[noteName] + EdoUtils.SUPPORTED_ACCIDENTALS[accidental];
@@ -109,16 +112,14 @@ MuseScore
 					Logger.log("Target note: " + targetNoteName + " " + targetAccidental);
 					var targetTpc;
 					var targetPitch;
-					var targetAccidentalType = null;
 					if (EdoUtils.SUPPORTED_MICROTONAL_ACCIDENTALS.includes(targetAccidental))
 					{
-						// Microtol accidentals are not handled by the TPC
+						// Microtonal accidentals are not handled by the TPC
 						// property.  Search the pithch / TPC without accidental
 						// to put the note in the correct staff space, and then
 						// apply the accidental manually.
 						targetTpc = NoteUtils.noteNameToTpc(targetNoteName, "NONE");
 						targetPitch = NoteUtils.noteToMidiNumber(targetNoteName, "NONE", octave + targetOctaveShift);
-						targetAccidentalType = AccidentalUtils.getAccidentalType(targetAccidental);
 					}
 					else
 					{
@@ -129,10 +130,16 @@ MuseScore
 					element.pitch = targetPitch;
 					element.tpc1 = targetTpc;
 					element.tpc2 = targetTpc;
-					if (targetAccidentalType)
+					
+					if (EdoUtils.SUPPORTED_MICROTONAL_ACCIDENTALS.includes(targetAccidental))
 					{
+						var targetAccidentalType = AccidentalUtils.getAccidentalType(targetAccidental);
 						Logger.trace("Target accidental type: " + targetAccidentalType);
-						element.accidentalType = targetAccidentalType;
+						previousAccidental = EdoUtils.searchPreviousAccidental(element, targetNoteName, octave + targetOctaveShift, Logger);
+						if (previousAccidental !== targetAccidental)
+						{
+							element.accidentalType = targetAccidentalType;
+						}
 					}
 				}
 			}

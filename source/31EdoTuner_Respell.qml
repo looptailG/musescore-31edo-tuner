@@ -131,20 +131,19 @@ MuseScore
 					element.tpc1 = targetTpc;
 					element.tpc2 = targetTpc;
 					
-					var targetAccidentalType = AccidentalUtils.getAccidentalType(targetAccidental);
-					Logger.trace("Target accidental type: " + targetAccidentalType);
 					previousAccidental = EdoUtils.searchPreviousAccidental(element, targetNoteName, octave + targetOctaveShift, Logger);
 					if (previousAccidental !== targetAccidental)
 					{
 						if (!AccidentalUtils.ACCIDENTAL_DATA[targetAccidental]["TPC"])
 						{
+							var targetAccidentalType = AccidentalUtils.getAccidentalType(targetAccidental);
+							Logger.trace("Target accidental type: " + targetAccidentalType);
 							element.accidentalType = targetAccidentalType;
 						}
 					}
 					else
 					{
 						Logger.log("Target accidental already applied to the note.");
-						element.accidentalType = Accidental.NONE;
 					}
 				}
 			}

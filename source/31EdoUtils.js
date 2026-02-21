@@ -118,21 +118,6 @@ for (const note in NOTES_STEPS)
 		}
 		
 		let edoSteps = NOTES_STEPS[note] + SUPPORTED_ACCIDENTALS[accidental];
-		
-		let octaveShift;
-		if (edoSteps < 0)
-		{
-			octaveShift = -1;
-		}
-		else if (edoSteps >= 31)
-		{
-			octaveShift = 1;
-		}
-		else
-		{
-			octaveShift = 0;
-		}
-		
 		edoSteps %= 31;
 		while (edoSteps < 0)
 		{
@@ -142,7 +127,6 @@ for (const note in NOTES_STEPS)
 		let newEnharmonicEquivalent = {};
 		newEnharmonicEquivalent["NOTE_NAME"] = note;
 		newEnharmonicEquivalent["ACCIDENTAL"] = accidental;
-		newEnharmonicEquivalent["OCTAVE_SHIFT"] = octaveShift;
 		ENHARMONIC_EQUIVALENTS[edoSteps].push(newEnharmonicEquivalent);
 	}
 }

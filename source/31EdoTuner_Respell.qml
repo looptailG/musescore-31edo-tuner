@@ -97,7 +97,6 @@ MuseScore
 					{
 						var currentNoteName = enharmonicEquivalents[i]["NOTE_NAME"];
 						var currentAccidental = enharmonicEquivalents[i]["ACCIDENTAL"];
-						var currentOctaveShift = enharmonicEquivalents[i]["OCTAVE_SHIFT"];
 						if ((currentNoteName === noteName) && (currentAccidental === accidental))
 						{
 							var targetIndex = i + 1;
@@ -105,16 +104,35 @@ MuseScore
 							
 							targetNoteName = enharmonicEquivalents[targetIndex]["NOTE_NAME"];
 							targetAccidental = enharmonicEquivalents[targetIndex]["ACCIDENTAL"];
-							targetOctaveShift = enharmonicEquivalents[targetIndex]["OCTAVE_SHIFT"];
 							
 							break;
 						}
 					}
-					if ((targetNoteName === null) || (targetAccidental === null) || (targetOctaveShift === null))
+					if ((targetNoteName === null) || (targetAccidental === null))
 					{
 						throw "Cannot find enharmonic equivalents for note: " + noteName + " " + accidental;
 					}
 					Logger.log("Target note: " + targetNoteName + " " + targetAccidental);
+					// Calculate the octave shift to apply, in case changing the
+					// enharmonic spelling changes the octave of the note.
+					var targetOctaveShift;
+					if (
+						((noteName === "A") || (noteName === "B"))
+						&& ((targetNoteName === "C") || (targetNoteName === "D"))
+					) {
+						targetOctaveShift = 1;
+					}
+					else if (
+						((noteName === "C") || (noteName === "D"))
+						&& ((targetNoteName === "A") || (targetNoteName === "B"))
+					) {
+						targetOctaveShift = -1;
+					}
+					else
+					{
+						targetOctaveShift = 0;
+					}
+					Logger.trace("Target octave shift: " + targetOctaveShift);
 					var targetTpc;
 					var targetPitch;
 					if (AccidentalUtils.ACCIDENTAL_DATA[targetAccidental]["TPC"])

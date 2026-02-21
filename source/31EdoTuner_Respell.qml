@@ -127,6 +127,7 @@ MuseScore
 						targetPitch = NoteUtils.noteToMidiNumber(targetNoteName, "NONE", octave + targetOctaveShift);
 					}
 					Logger.trace("Target TPC: " + targetTpc + "; Target Pitch: " + targetPitch);
+					element.accidentalType = Accidental.NONE;
 					element.pitch = targetPitch;
 					element.tpc1 = targetTpc;
 					element.tpc2 = targetTpc;

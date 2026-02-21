@@ -83,6 +83,11 @@ MuseScore
 					}
 					
 					var edoStep = EdoUtils.NOTES_STEPS[noteName] + EdoUtils.SUPPORTED_ACCIDENTALS[accidental];
+					edoStep %= 31;
+					while (edoStep < 0)
+					{
+						edoStep += 31;
+					}
 					Logger.log("EDO step: " + edoStep);
 					var targetNoteName = null;
 					var targetAccidental = null;

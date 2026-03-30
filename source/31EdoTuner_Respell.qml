@@ -56,8 +56,6 @@ MuseScore
 			Logger.initialise(loggerId, parseInt(settings["LogLevel"]));
 			Logger.log("-- " + title + " -- Version " + version + " --");
 			
-			curScore.startCmd();
-			
 			for (var element of curScore.selection.elements)
 			{
 				if (element.type === Element.NOTE)
@@ -150,10 +148,17 @@ MuseScore
 						targetPitch = NoteUtils.noteToMidiNumber(targetNoteName, "NONE", octave + targetOctaveShift);
 					}
 					Logger.trace("Target TPC: " + targetTpc + "; Target Pitch: " + targetPitch);
+					
+					// Changing a note's pitch and applying a microtonal 
+					// accidental to that note in the same .startCmd() - 
+					// endCmd() block doesn't work correctly, keep them 
+					// separated.
+					curScore.startCmd();
 					element.accidentalType = Accidental.NONE;
 					element.pitch = targetPitch;
 					element.tpc1 = targetTpc;
 					element.tpc2 = targetTpc;
+					curScore.endCmd();
 					
 					previousAccidental = EdoUtils.searchPreviousAccidental(element, targetNoteName, octave + targetOctaveShift, Logger);
 					if (previousAccidental !== targetAccidental)
@@ -162,17 +167,20 @@ MuseScore
 						{
 							var targetAccidentalType = AccidentalUtils.getAccidentalType(targetAccidental);
 							Logger.trace("Target accidental type: " + targetAccidentalType);
+							curScore.startCmd();
 							element.accidentalType = targetAccidentalType;
+							curScore.endCmd();
 						}
 					}
 					else
 					{
 						Logger.log("Target accidental already applied to the note.");
+						curScore.startCmd();
+						element.accidentalType = Accidental.NONE;
+						curScore.endCmd();
 					}
 				}
 			}
-			
-			curScore.endCmd();
 		}
 		catch (error)
 		{

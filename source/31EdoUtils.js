@@ -464,6 +464,30 @@ function searchPreviousAccidental(note, noteName, octave, logger)
 }
 
 /**
+ * Guess what the most appropriate enharmonic spelling could be for the input 
+ * EDO step, given the environment of the specified note.
+ */
+function chooseEnharmonicSpelling(note, edoStep, direction, logger)
+{
+	logger.log("Choosing enharmonic spelling for EDO step: " + edoStep);
+	
+	// Create a cursor at the position of the input note.
+	let segment = note.parent.parent;
+	let cursor = curScore.newCursor();
+	cursor.voice = note.voice;
+	cursor.staffIdx = note.staff.part.startTrack / 4;
+	cursor.rewindToTick(segment.tick);
+	
+	// Check what accidental, if any, is applied to the target EDO step by a
+	// previous key signature or accidental.
+	// Check if a standard key signature changes the target EDO step.
+	let keySignature = cursor.keySignature;
+	for (let keySignatureAccidental in STANDARD_KEY_SIGNATURES[keySignature])
+	{
+	}
+}
+
+/**
  * Check if the input note is the same as the input targetNote and targetOctave,
  * in which case return its accidental.  If it's not, return null.
  */

@@ -66,6 +66,7 @@ MuseScore
 			// notes.
 			var targetEdoSteps = {};
 			searchEdoStepsUp(curScore.selection.elements, targetEdoSteps, Logger);
+			applyEdoStepUp(curScore.selection.elements, targetEdoSteps, Logger);
 		}
 		catch (error)
 		{
@@ -150,6 +151,28 @@ MuseScore
 					"EDO_STEP": targetEdoStep,
 					"OCTAVE_SHIFT": targetOctaveShift
 				};
+			}
+		}
+	}
+	
+	/**
+	 * Apply the EDO step pitch ups to the notes in the current selection.
+	 */
+	function applyEdoStepUp(selection, targetEdoSteps, logger)
+	{
+		for (var element of selection)
+		{
+			if (element.type === Element.NOTE)
+			{
+				var noteName = NoteUtils.getNoteLetter(element, "tpc");
+				var octave = NoteUtils.getOctave(element);
+				var accidental = AccidentalUtils.getAccidentalName(element);
+				logger.log("Applying EDO step up to note: " + noteName + " " + octave + " " + accidental);
+				
+				var targetEdoStep = targetEdoSteps[element.eid]["EDO_STEP"];
+				var targetOctaveShift = targetEdoSteps[element.eid]["OCTAVE_SHIFT"];
+				
+				var enharmonicSpelling = EdoUtils.chooseEnharmonicSpelling(element, targetEdoStep, 1, logger);
 			}
 		}
 	}

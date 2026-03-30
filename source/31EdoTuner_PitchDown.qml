@@ -22,11 +22,11 @@ import MuseScore
 
 MuseScore
 {
-	title: "31EDO Tuner - Pitch Down";
+	title: "31EDO Tuner Pitch Down";
 	description: "Move the selection, or the whole score if nothing is selected, down by a 31EDO step.";
 	categoryCode: "playback";
 	thumbnailName: "thumbnails/31Edo_PitchDown_Thumbnail.png";
-	version: "2.2.0"
+	version: "2.2.0";
 
 	onRun:
 	{}

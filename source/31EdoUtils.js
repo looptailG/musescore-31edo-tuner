@@ -44,7 +44,7 @@ const SUPPORTED_ACCIDENTALS = {
 	"SAGITTAL_11MDD": -1,
 	"SAGITTAL_11MDU": 1,
 	"SAGITTAL_FLAT": -2,
-	"SAGITTAL_SHARP": 2,
+	"SAGITTAL_SHARP": 2
 };
 
 // Regex used for checking if a string is valid as a custom key signature.
@@ -52,6 +52,24 @@ const KEY_SIGNATURE_REGEX = /^(x|t#|#|t|h|d|b|db|bb|)(?:\.(?:x|t#|#|t|h|d|b|db|b
 // Array containing the notes in the order they appear in the custom key
 // signature string.
 const KEY_SIGNATURE_NOTE_ORDER = ["F", "C", "G", "D", "A", "E", "B"];
+
+const STANDARD_KEY_SIGNATURES = {
+	"-7": {"F": "FLAT", "C": "FLAT", "G": "FLAT", "D": "FLAT", "A": "FLAT", "E": "FLAT", "B": "FLAT"},
+	"-6": {"F": "FLAT", "C": "FLAT", "G": "FLAT", "D": "FLAT", "A": "FLAT", "E": "FLAT", "B": "NONE"},
+	"-5": {"F": "FLAT", "C": "FLAT", "G": "FLAT", "D": "FLAT", "A": "FLAT", "E": "NONE", "B": "NONE"},
+	"-4": {"F": "FLAT", "C": "FLAT", "G": "FLAT", "D": "FLAT", "A": "NONE", "E": "NONE", "B": "NONE"},
+	"-3": {"F": "FLAT", "C": "FLAT", "G": "FLAT", "D": "NONE", "A": "NONE", "E": "NONE", "B": "NONE"},
+	"-2": {"F": "FLAT", "C": "FLAT", "G": "NONE", "D": "NONE", "A": "NONE", "E": "NONE", "B": "NONE"},
+	"-1": {"F": "FLAT", "C": "NONE", "G": "NONE", "D": "NONE", "A": "NONE", "E": "NONE", "B": "NONE"},
+	"0": {"F": "NONE", "C": "NONE", "G": "NONE", "D": "NONE", "A": "NONE", "E": "NONE", "B": "NONE"},
+	"1": {"F": "SHARP", "C": "NONE", "G": "NONE", "D": "NONE", "A": "NONE", "E": "NONE", "B": "NONE"},
+	"2": {"F": "SHARP", "C": "SHARP", "G": "NONE", "D": "NONE", "A": "NONE", "E": "NONE", "B": "NONE"},
+	"3": {"F": "SHARP", "C": "SHARP", "G": "SHARP", "D": "NONE", "A": "NONE", "E": "NONE", "B": "NONE"},
+	"4": {"F": "SHARP", "C": "SHARP", "G": "SHARP", "D": "SHARP", "A": "NONE", "E": "NONE", "B": "NONE"},
+	"5": {"F": "SHARP", "C": "SHARP", "G": "SHARP", "D": "SHARP", "A": "SHARP", "E": "NONE", "B": "NONE"},
+	"6": {"F": "SHARP", "C": "SHARP", "G": "SHARP", "D": "SHARP", "A": "SHARP", "E": "SHARP", "B": "NONE"},
+	"7": {"F": "SHARP", "C": "SHARP", "G": "SHARP", "D": "SHARP", "A": "SHARP", "E": "SHARP", "B": "SHARP"}
+};
 
 // Distance of each note in EDO steps from the note C.
 const NOTES_STEPS = {
@@ -73,6 +91,7 @@ const ENHARMONIC_ACCIDENTALS = [
 	"FLAT",
 	"MIRRORED_FLAT",
 	"NONE",
+	"NATURAL",
 	"SHARP_SLASH",
 	"SHARP",
 	"SHARP_SLASH4",
@@ -81,9 +100,9 @@ const ENHARMONIC_ACCIDENTALS = [
 ];
 
 // Map every EDO step to an array of every possible enharmonic spelling for that
-// EDO step.  The arrays contains objects with the properties "NOTE_NAME" and
-// "ACCIDENTAL", and are ordered according to the number of EDO steps of the
-// accidental applied to the note.
+// EDO step.  The arrays contains objects with the properties "NOTE_NAME",
+// "ACCIDENTAL" and "OCTAVE_SHIFT", and are ordered according to the number of
+// EDO steps of the accidental applied to the note.
 const ENHARMONIC_EQUIVALENTS = {};
 for (let i = 0; i < 31; i++)
 {
@@ -93,6 +112,11 @@ for (const note in NOTES_STEPS)
 {
 	for (const accidental of ENHARMONIC_ACCIDENTALS)
 	{
+		if (accidental === "NATURAL")
+		{
+			continue;
+		}
+		
 		let edoSteps = NOTES_STEPS[note] + SUPPORTED_ACCIDENTALS[accidental];
 		edoSteps %= 31;
 		while (edoSteps < 0)
@@ -212,15 +236,12 @@ function getNonMicrotonalEnharmonicEquivalent(note)
  * Check if the input text is valid as a custom key signature, and if yes parse
  * it and update the input key signature map.
  */
-function parseCustomKeySignature(annotationText, customKeySignature, logger = null)
+function parseCustomKeySignature(annotationText, customKeySignature, logger)
 {
 	annotationText = annotationText.replace(/\s*/g, "");
 	if (KEY_SIGNATURE_REGEX.test(annotationText))
 	{
-		if (logger)
-		{
-			logger.log("Applying custom key signature: " + annotationText);
-		}
+		logger.log("Applying custom key signature: " + annotationText);
 		
 		// Empty the input key signature.  Can't use `customKeySignature = {}`,
 		// because that would break the reference, and the new key signature
@@ -282,10 +303,7 @@ function parseCustomKeySignature(annotationText, customKeySignature, logger = nu
 				}
 				if (accidentalName)
 				{
-					if (logger)
-					{
-						logger.trace("Note: " + currentNote + "; Accidental: " + accidentalName);
-					}
+					logger.trace("Note: " + currentNote + "; Accidental: " + accidentalName);
 					
 					customKeySignature[currentNote] = accidentalName;
 				}
@@ -293,20 +311,176 @@ function parseCustomKeySignature(annotationText, customKeySignature, logger = nu
 		}
 		catch (error)
 		{
-			if (logger)
-			{
-				logger.err(error);
-			}
+			logger.err(error);
 			
 			customKeySignature = {};
 		}
 	}
 	else
 	{
-		if (logger)
+		logger.trace("Text not valid as a key signature: " + annotationText);
+	}
+}
+
+/**
+ * Search for the previous accidental which is applied to the input note.
+ */
+function searchPreviousAccidental(note, noteName, octave, logger)
+{
+	logger.log("Searching previous accidental for note: " + noteName + " " + octave);
+	
+	// Create a cursor at the position of the input note.
+	let segment = note.parent.parent;
+	let cursor = curScore.newCursor();
+	cursor.voice = note.voice;
+	cursor.staffIdx = note.staff.part.startTrack / 4;
+	cursor.rewindToTick(segment.tick);
+	
+	// Check what accidental, if any, is applied to the current note by a
+	// previous key signature or accidental.
+	// Check if a standard key signature changes the current note.
+	let keySignature = cursor.keySignature;
+	let previousAccidental = STANDARD_KEY_SIGNATURES[keySignature][noteName];
+	logger.log("Key signature: " + keySignature + "; Accidental: " + previousAccidental);
+	// Iterate on the previous elements, to search for a custom key signature or
+	// an accidental applied to this note.
+	let accidentalFound = false;
+	let keySignatureChangeFound = false;
+	// By iterating backward starting from the current note, we find the input
+	// note as the first note in the loop.  Skip it.
+	let sameNote = true;
+	let measureChanged = false;
+	let measureStartTick = cursor.measure.firstSegment.tick;
+	while (cursor.segment)
+	{
+		// Check for a standard key signature change.
+		if (!keySignatureChangeFound && (cursor.keySignature !== keySignature))
 		{
-			logger.trace("Text not valid as a key signature: " + annotationText);
+			keySignatureChangeFound = true;
+			logger.trace("Key signature change found.");
 		}
+		// Check for a custom key signature change.  This is only relevant if we
+		// didn't find a key signature change, because otherwise the custom key
+		// signature wouldn't be in effect for the note we're respelling.
+		// Additionally, we only check if the key signature is 0, because that's
+		// what custom key signatures return.
+		if (!keySignatureChangeFound && (cursor.keySignature === 0))
+		{
+			for (let i = 0; i < cursor.segment.annotations.length; i++)
+			{
+				let annotation = cursor.segment.annotations[i];
+				// TODO: check that staff text elements apply only to the current staff.
+				
+				let customKeySignature = {};
+				EdoUtils.parseCustomKeySignature(annotation.text, customKeySignature, logger);
+				if (!isEmpty(customKeySignature))
+				{
+					keySignatureChangeFound = true;
+					let previousAccidental = customKeySignature[noteName];
+					logger.log("Previous accidental from a standard key signature: " + previousAccidental);
+					break;
+				}
+			}
+			if (keySignatureChangeFound)
+			{
+				break;
+			}
+		}
+		
+		// Check if we moved to a previous measure, in which case we do not have
+		// to check for altered notes anymore.
+		if (!measureChanged && (cursor.tick < measureStartTick))
+		{
+			measureChanged = true;
+			logger.trace("Measure changed.");
+		}
+		// Check if the same note previously in the measure was altered by an
+		// accidental.
+		if (!measureChanged && cursor.element && (cursor.element.type === Element.CHORD))
+		{
+			let notes = cursor.element.notes;
+			for (let i = 0; i < notes.length; i++)
+			{
+				if (sameNote)
+				{
+					let currentNoteName = NoteUtils.getNoteLetter(note, "tpc");
+					if (currentNoteName === noteName)
+					{
+						sameNote = false;
+						continue;
+					}
+				}
+				
+				let currentAccidental = checkAccidental(notes[i], noteName, octave);
+				if (currentAccidental && (currentAccidental !== "NONE"))
+				{
+					logger.log("Previous accidentals from a previous note in the measure: " + currentAccidental);
+					previousAccidental = currentAccidental;
+					accidentalFound = true;
+					break;
+				}
+			}
+			if (accidentalFound)
+			{
+				break;
+			}
+			
+			let graceChords = cursor.element.graceNotes;
+			for (let i = graceChords.length - 1; i >= 0; i--)
+			{
+				let graceNotes = graceChords[i].notes;
+				for (let j = 0; j < graceNotes.length; j++)
+				{
+					let currentAccidental = checkAccidental(graceNotes[j], noteName, octave);
+					if (currentAccidental && (currentAccidental !== "NONE"))
+					{
+						logger.log("Accidental changed by a previous note in the measure: " + currentAccidental);
+						previousAccidental = currentAccidental;
+						accidentalFound = true;
+						break;
+					}
+				}
+				if (accidentalFound)
+				{
+					break;
+				}
+			}
+			if (accidentalFound)
+			{
+				break;
+			}
+		}
+		
+		if (keySignatureChangeFound && measureChanged)
+		{
+			break;
+		}
+		
+		cursor.prev();
+	}
+	
+	logger.log("Previous accidental found: " + previousAccidental);
+	return previousAccidental;
+}
+
+/**
+ * Check if the input note is the same as the input targetNote and targetOctave,
+ * in which case return its accidental.  If it's not, return null.
+ */
+function checkAccidental(note, targetNote, targetOctave)
+{
+	var noteName = NoteUtils.getNoteLetter(note, "tpc");
+	var octave = NoteUtils.getOctave(note);
+	Logger.trace("Checking accidental for note: " + noteName + " " + octave);
+	if ((noteName === targetNote) && (octave === targetOctave))
+	{
+		var currentAccidental = AccidentalUtils.getAccidentalName(note);
+		Logger.trace("Accidental found: " + currentAccidental);
+		return currentAccidental;
+	}
+	else
+	{
+		return null;
 	}
 }
 
@@ -461,4 +635,13 @@ function chooseEnharmonicEquivalent(edoStep, keySignature, previousAccidentals)
 	returnValue["NOTE_NAME"] = noteName;
 	returnValue["ACCIDENTAL"] = accidental;
 	return returnValue;
+}
+
+function isEmpty(o)
+{
+	for (var key in o)
+	{
+		return false;
+	}
+	return true;
 }

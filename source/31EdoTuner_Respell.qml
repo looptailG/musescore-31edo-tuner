@@ -56,6 +56,9 @@ MuseScore
 			Logger.initialise(loggerId, parseInt(settings["LogLevel"]));
 			Logger.log("-- " + title + " -- Version " + version + " --");
 			
+			var enharmonicRespellings = {};
+			searchEnharmonicRespellings(curScore.selection.elements, enharmonicRespellings, Logger);
+			
 			for (var element of curScore.selection.elements)
 			{
 				if (element.type === Element.NOTE)
@@ -198,6 +201,94 @@ MuseScore
 			}
 			
 			Logger.writeLogs();
+		}
+	}
+	
+	/**
+	 * Search for the next enharmonic spelling for the notes in the current 
+	 * selection.
+	 */
+	function searchEnharmonicRespellings(selection, enharmonicRespellings, logger)
+	{
+		for (var element of selection)
+		{
+			if (element.type === Element.NOTE)
+			{
+				var noteName = NoteUtils.getNoteLetter(element, "tpc");
+				var octave = NoteUtils.getOctave(element);
+				var accidental = AccidentalUtils.getAccidentalName(element);
+				logger.log("Respelling note: " + noteName + " " + octave + " " + accidental);
+				if (!EdoUtils.ENHARMONIC_ACCIDENTALS.includes(accidental))
+				{
+					logger.warning("Accidental not supported for 31EDO respelling: " + accidental);
+					continue;
+				}
+				
+				if (accidental === "NONE")
+				{
+					var previousAccidental = EdoUtils.searchPreviousAccidental(element, noteName, octave, logger);
+					if (previousAccidental !== "NONE")
+					{
+						logger.log("Current accidental replaceb by: " + previousAccidental);
+						accidental = previousAccidental;
+					}
+				}
+				
+				var edoStep = EdoUtils.NOTES_STEPS[noteName] + EdoUtils.SUPPORTED_ACCIDENTALS[accidental];
+				edoStep %= 31;
+				while (edoStep < 0)
+				{
+					edoStep += 31;
+				}
+				logger.log("EDO step: " + edoStep);
+				
+				var targetNoteName = null;
+				var targetAccidental = null;
+				var enharmonicEquivalents = EdoUtils.ENHARMONIC_EQUIVALENTS[edoStep];
+				for (var i = 0; i < enharmonicEquivalents.length; i++)
+				{
+					var currentNoteName = enharmonicEquivalents[i]["NOTE_NAME"];
+					var currentAccidental = enharmonicEquivalents[i]["ACCIDENTAL"];
+					if ((currentNoteName === noteName) && (currentAccidental === accidental))
+					{
+						var targetIndex = i + 1;
+						targetIndex %= enharmonicEquivalents.length;
+						targetNoteName = enharmonicEquivalents[targetIndex]["NOTE_NAME"];
+						targetAccidental = enharmonicEquivalents[targetIndex]["ACCIDENTAL"];
+						break;
+					}
+				}
+				if ((targetNoteName === null) || (targetAccidental === null))
+				{
+					throw "Cannot find enharmonic equivalent for note: " + noteName + " " + accidental;
+				}
+				logger.log("Target note: " + targetNoteName + " " + targetAccidental);
+				
+				var targetOctaveShift = null;
+				if (
+					((noteName === "A") || (noteName === "B"))
+					&& ((targetNoteName === "C") || (targetNoteName === "D"))
+				) {
+					targetOctaveShift = 1;
+				}
+				else if (
+					((noteName === "C") || (noteName === "D"))
+					&& ((targetNoteName === "A") || (targetNoteName === "B"))
+				) {
+					targetOctaveShift = -1;
+				}
+				else
+				{
+					targetOctaveShift = 0;
+				}
+				logger.log("Target octave shift: " + targetOctaveShift);
+				
+				enharmonicRespellings[element.eid] = {
+					"NOTE_NAME": targetNoteName,
+					"ACCIDENTAL": targetAccidental,
+					"OCTAVE_SHIFT": targetOctaveShift
+				};
+			}
 		}
 	}
 }

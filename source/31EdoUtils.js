@@ -377,7 +377,7 @@ function searchPreviousAccidental(note, noteName, octave, logger)
 				{
 					keySignatureChangeFound = true;
 					let previousAccidental = customKeySignature[noteName];
-					logger.log("Previous accidental from a standard key signature: " + previousAccidental);
+					logger.log("Previous accidental from a custom key signature: " + previousAccidental);
 					break;
 				}
 			}

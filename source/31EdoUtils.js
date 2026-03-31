@@ -336,12 +336,11 @@ function searchPreviousAccidental(note, noteName, octave, logger)
 	cursor.staffIdx = note.staff.part.startTrack / 4;
 	cursor.rewindToTick(segment.tick);
 	
-	// Check what accidental, if any, is applied to the current note by a
-	// previous key signature or accidental.
 	// Check if a standard key signature changes the current note.
 	let keySignature = cursor.keySignature;
 	let previousAccidental = STANDARD_KEY_SIGNATURES[keySignature][noteName];
 	logger.log("Key signature: " + keySignature + "; Accidental: " + previousAccidental);
+	
 	// Iterate on the previous elements, to search for a custom key signature or
 	// an accidental applied to this note.
 	let accidentalFound = false;
@@ -372,7 +371,7 @@ function searchPreviousAccidental(note, noteName, octave, logger)
 				// TODO: check that staff text elements apply only to the current staff.
 				
 				let customKeySignature = {};
-				EdoUtils.parseCustomKeySignature(annotation.text, customKeySignature, logger);
+				parseCustomKeySignature(annotation.text, customKeySignature, logger);
 				if (!isEmpty(customKeySignature))
 				{
 					keySignatureChangeFound = true;
@@ -478,12 +477,113 @@ function chooseEnharmonicSpelling(note, edoStep, direction, logger)
 	cursor.staffIdx = note.staff.part.startTrack / 4;
 	cursor.rewindToTick(segment.tick);
 	
-	// Check what accidental, if any, is applied to the target EDO step by a
-	// previous key signature or accidental.
-	// Check if a standard key signature changes the target EDO step.
+	// Check if a standard key signature affects the target EDO step.
+	let enharmonicSpelling = null;
 	let keySignature = cursor.keySignature;
-	for (let keySignatureAccidental in STANDARD_KEY_SIGNATURES[keySignature])
+	let keySignatureData = STANDARD_KEY_SIGNATURES[keySignature];
+	for (let keySignatureNote in keySignatureData)
 	{
+		let accidental = keySignatureData[keySignatureNote];
+		let keySignatureEdoStep = NOTES_STEPS[keySignatureNote] + SUPPORTED_ACCIDENTALS[accidental];
+		keySignatureEdoStep %= 31;
+		while (keySignatureEdoStep < 0)
+		{
+			keySignatureEdoStep += 31;
+		}
+		if (keySignatureEdoStep === edoStep)
+		{
+			logger.log("Enharmonic spelling from standard key signature: " + keySignatureNote + " " + accidental);
+			enharmonicSpelling = {
+				"NOTE_NAME": keySignatureNote,
+				"ACCIDENTAL": accidental
+			};
+			break;
+		}
+	}
+	
+	// Iterate on the previous elements, to search for a custom key signature or
+	// an accidental applied to this note.
+	let accidentalFound = false;
+	let keySignatureFound = false;
+	let measureChanged = false;
+	let measureStartTick = cursor.measure.firstSegment.tick;
+	while (cursor.segment)
+	{
+		// Check for a standard key signature change.
+		if (!keySignatureChangeFound && (cursor.keySignature !== keySignature))
+		{
+			keySignatureChangeFound = true;
+			logger.trace("Key signature change found.");
+		}
+		// Check for a custom key signature change.  This is only relevant if we
+		// didn't find a key signature change, because otherwise the custom key
+		// signature wouldn't be in effect for the note we're respelling.
+		// Additionally, we only check if the key signature is 0, because that's
+		// what custom key signatures return.
+		if (!keySignatureChangeFound && (cursor.keySignature === 0))
+		{
+			for (let i = 0; i < cursor.segment.annotations.length; i++)
+			{
+				let annotation = cursor.segment.annotations[i];
+				// TODO: check that staff text elements apply only to the current staff.
+				
+				let customKeySignature = {};
+				parseCustomKeySignature(annotation.text, customKeySignature, logger);
+				if (!isEmpty(customKeySignature))
+				{
+					keySignatureChangeFound = true;
+					for (let keySignatureNote in customKeySignature)
+					{
+						let accidental = customKeySignature[keySignatureNote];
+						let keySignatureEdoStep = NOTES_STEPS[keySignatureNote] + SUPPORTED_ACCIDENTALS[accidental];
+						keySignatureEdoStep %= 31;
+						while (keySignatureEdoStep < 0)
+						{
+							keySignatureEdoStep += 31;
+						}
+						if (keySignatureEdoStep === edoStep)
+						{
+							logger.log(
+								"Enharmonic spelling from custom key signatuere: " + keySignatureNote + " " + accidental
+							);
+							enharmonicSpelling = {
+								"NOTE_NAME": keySignatureNote,
+								"ACCIDENTAL": accidental
+							};
+							break;
+						}
+					}
+				}
+			}
+			if (keySignatureFound)
+			{
+				break;
+			}
+		}
+
+		// Check if we moved to a previous measure, in which case we do not have
+		// to check for altered notes anymore.
+		if (!measureChanged && (cursor.tick < measureStartTick))
+		{
+			measureChanged = true;
+			logger.trace("Measure changed.");
+		}
+		// Check if an accidental previously in the measure affects the target 
+		// EDO step.
+		if (!measureChanged && cursor.element && (cursor.element.type === Element.CHORD))
+		{
+			let notes = cursor.element.notes;
+			for (let i = 0; i < notes.length; i++)
+			{
+				// The target EDO step is always one above or below the EDO step
+				// of the input note, because we call this function when we're 
+				// pitch shifting the note by 1 EDO step.  Due to this, it's not
+				// necessary to check if the current note is the same as the 
+				// input note, as they will never have the same EDO step.
+				let noteName = NoteUtils.getNoteLetter(notes[i], "tpc");
+				let accidental = AccidentalUtils.getAccidentalName(notes[i]);
+			}
+		}
 	}
 }
 

@@ -112,41 +112,13 @@ MuseScore
 				}
 
 				var targetEdoStep = EdoUtils.NOTES_STEPS[noteName] + EdoUtils.SUPPORTED_ACCIDENTALS[accidental];
-				var inputOctaveShift = null;
-				if (targetEdoStep >= 31)
-				{
-					inputOctaveShift = 1;
-				}
-				else if (targetEdoStep < 0)
-				{
-					inputOctaveShift = -1;
-				}
-				else
-				{
-					inputOctaveShift = 0;
-				}
 				targetEdoStep++;
-				var targetOctaveShift = null;
-				if (targetEdoStep >= 31)
-				{
-					targetOctaveShift = 1;
-				}
-				else if (targetEdoStep < 0)
-				{
-					targetOctaveShift = -1;
-				}
-				else
-				{
-					targetOctaveShift = 0;
-				}
-				targetOctaveShift -= inputOctaveShift;
 				targetEdoStep %= 31;
 				while (targetEdoStep < 0)
 				{
 					targetEdoStep += 31;
 				}
-				logger.log("Target EDO step: " + targetEdoStep + "; Target octave shift: " + targetOctaveShift);
-
+				logger.log("Target EDO step: " + targetEdoStep);
 				targetEdoSteps[element.eid] = targetEdoStep;
 			}
 		}

@@ -504,7 +504,7 @@ function chooseEnharmonicSpelling(note, edoStep, direction, logger)
 	// Iterate on the previous elements, to search for a custom key signature or
 	// an accidental applied to this note.
 	let accidentalFound = false;
-	let keySignatureFound = false;
+	let keySignatureChangeFound = false;
 	let measureChanged = false;
 	let measureStartTick = cursor.measure.firstSegment.tick;
 	while (cursor.segment)
@@ -582,8 +582,74 @@ function chooseEnharmonicSpelling(note, edoStep, direction, logger)
 				// input note, as they will never have the same EDO step.
 				let noteName = NoteUtils.getNoteLetter(notes[i], "tpc");
 				let accidental = AccidentalUtils.getAccidentalName(notes[i]);
+				let currentEdoStep = NOTES_STEPS[noteName] + SUPPORTED_ACCIDENTALS[accidental];
+				currentEdoStep %= 31;
+				while (currentEdoStep < 0)
+				{
+					currentEdoStep += 31;
+				}
+				if (currentEdoStep === edoStep)
+				{
+					logger.log(
+						"Enharmonic spelling from a previous note in the measure: " + noteName + " " + accidental
+					);
+					enharmonicSpelling = {
+						"NOTE_NAME": noteName,
+						"ACCIDENTAL": accidental
+					};
+					accidentalFound = true;
+					break;
+				}
+			}
+			if (accidentalFound)
+			{
+				break;
+			}
+			
+			let graceChords = cursor.element.graceNotes;
+			for (let i = graceChords.length - 1; i >= 0; i--)
+			{
+				let graceNotes = graceChords[i].notes;
+				for (let j = 0; j < graceNotes.length; j++)
+				{
+					let noteName = NoteUtils.getNoteLetter(notes[i], "tpc");
+					let accidental = AccidentalUtils.getAccidentalName(notes[i]);
+					let currentEdoStep = NOTES_STEPS[noteName] + SUPPORTED_ACCIDENTALS[accidental];
+					currentEdoStep %= 31;
+					while (currentEdoStep < 0)
+					{
+						currentEdoStep += 31;
+					}
+					if (currentEdoStep === edoStep)
+					{
+						logger.log(
+							"Enharmonic spelling from a previous note in the measure: " + noteName + " " + accidental
+						);
+						enharmonicSpelling = {
+							"NOTE_NAME": noteName,
+							"ACCIDENTAL": accidental
+						};
+						accidentalFound = true;
+						break;
+					}
+				}
+				if (accidentalFound)
+				{
+					break;
+				}
+			}
+			if (accidentalFound)
+			{
+				break;
 			}
 		}
+		
+		if (keySignatureChangeFound && measureChanged)
+		{
+			break;
+		}
+		
+		cursor.prev();
 	}
 }
 

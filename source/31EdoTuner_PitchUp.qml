@@ -147,10 +147,7 @@ MuseScore
 				}
 				logger.log("Target EDO step: " + targetEdoStep + "; Target octave shift: " + targetOctaveShift);
 
-				targetEdoSteps[element.eid] = {
-					"EDO_STEP": targetEdoStep,
-					"OCTAVE_SHIFT": targetOctaveShift
-				};
+				targetEdoSteps[element.eid] = targetEdoStep;
 			}
 		}
 	}
@@ -169,8 +166,7 @@ MuseScore
 				var accidental = AccidentalUtils.getAccidentalName(element);
 				logger.log("Applying EDO step up to note: " + noteName + " " + octave + " " + accidental);
 
-				var targetEdoStep = targetEdoSteps[element.eid]["EDO_STEP"];
-				var targetOctaveShift = targetEdoSteps[element.eid]["OCTAVE_SHIFT"];
+				var targetEdoStep = targetEdoSteps[element.eid];
 
 				var enharmonicSpelling = EdoUtils.chooseEnharmonicSpelling(element, targetEdoStep, 1, logger);
 				var targetNoteName = enharmonicSpelling["NOTE_NAME"];
@@ -181,9 +177,7 @@ MuseScore
 				if (AccidentalUtils.ACCIDENTAL_DATA[targetAccidental]["TPC"])
 				{
 					targetTpc = NoteUtils.noteNameToTpc(targetNoteName, targetAccidental);
-					targetPitch = NoteUtils.noteToMidiNumber(
-						targetNoteName, targetAccidental, octave + targetOctaveShift
-					);
+					targetPitch = NoteUtils.noteToMidiNumber(targetNoteName, targetAccidental, octave);
 				}
 				else
 				{
@@ -192,7 +186,7 @@ MuseScore
 					// to put the note in the correct staff space, and then
 					// the accidental will be added manually.
 					targetTpc = NoteUtils.noteNameToTpc(targetNoteName, "NONE");
-					targetPitch = NoteUtils.noteToMidiNumber(targetNoteName, "NONE", octave + targetOctaveShift);
+					targetPitch = NoteUtils.noteToMidiNumber(targetNoteName, "NONE", octave);
 				}
 				logger.log("Target TPC: " + targetTpc + "; Target Pitch: " + targetPitch);
 
@@ -206,9 +200,7 @@ MuseScore
 				element.tpc2 = targetTpc;
 				curScore.endCmd();
 
-				var previousAccidental = EdoUtils.searchPreviousAccidental(
-					element, targetNoteName, octave + targetOctaveShift, logger
-				);
+				var previousAccidental = EdoUtils.searchPreviousAccidental(element, targetNoteName, octave, logger);
 				if (previousAccidental !== targetAccidental)
 				{
 					if (!AccidentalUtils.ACCIDENTAL_DATA[targetAccidental]["TPC"])

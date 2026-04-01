@@ -48,7 +48,7 @@ const SUPPORTED_ACCIDENTALS = {
 };
 
 // Regex used for checking if a string is valid as a custom key signature.
-const KEY_SIGNATURE_REGEX = /^(x|t#|#|t|h|d|b|db|bb|)(?:\.(?:x|t#|#|t|h|d|b|db|bb|)){6}$/;
+const KEY_SIGNATURE_REGEX = /^(?:x|t#|#|t|h|d|b|db|bb|)(?:\.(?:x|t#|#|t|h|d|b|db|bb|)){6}$/;
 // Array containing the notes in the order they appear in the custom key
 // signature string.
 const KEY_SIGNATURE_NOTE_ORDER = ["F", "C", "G", "D", "A", "E", "B"];
@@ -100,9 +100,9 @@ const ENHARMONIC_ACCIDENTALS = [
 ];
 
 // Map every EDO step to an array of every possible enharmonic spelling for that
-// EDO step.  The arrays contains objects with the properties "NOTE_NAME",
-// "ACCIDENTAL" and "OCTAVE_SHIFT", and are ordered according to the number of
-// EDO steps of the accidental applied to the note.
+// EDO step.  The arrays contains objects with the properties "NOTE_NAME" and
+// "ACCIDENTAL", and are ordered according to the number of EDO steps of the
+// accidental applied to the note.
 const ENHARMONIC_EQUIVALENTS = {};
 for (let i = 0; i < 31; i++)
 {
@@ -132,7 +132,9 @@ for (const note in NOTES_STEPS)
 }
 for (let i = 0; i < 31; i++)
 {
-	ENHARMONIC_EQUIVALENTS[i].sort((a, b) => SUPPORTED_ACCIDENTALS[a["ACCIDENTAL"]] - SUPPORTED_ACCIDENTALS[b["ACCIDENTAL"]]);
+	ENHARMONIC_EQUIVALENTS[i].sort(
+		(a, b) => SUPPORTED_ACCIDENTALS[a["ACCIDENTAL"]] - SUPPORTED_ACCIDENTALS[b["ACCIDENTAL"]]
+	);
 }
 
 /**
@@ -145,88 +147,60 @@ function getNonMicrotonalEnharmonicEquivalent(note)
 	{
 		case "Cdb":
 			return "B";
-
 		case "Cd":
 			return "B#";
-
 		case "Ct":
 			return "Dbb";
-
 		case "Ct#":
 			return "Db";
-
 		case "Ddb":
 			return "C#";
-
 		case "Dd":
 			return "Cx";
-
 		case "Dt":
 			return "Ebb";
-
 		case "Dt#":
 			return "Eb";
-
 		case "Edb":
 			return "D#";
-
 		case "Ed":
 			return "Dx";
-
 		case "Et":
 			return "Fb";
-
 		case "Et#":
 			return "F";
-
 		case "Fdb":
 			return "E";
-
 		case "Fd":
 			return "E#";
-
 		case "Ft":
 			return "Gbb";
-
 		case "Ft#":
 			return "Gb";
-
 		case "Gdb":
 			return "F#";
-
 		case "Gd":
 			return "Fx";
-
 		case "Gt":
 			return "Abb";
-
 		case "Gt#":
 			return "Ab";
-
 		case "Adb":
 			return "G#";
-
 		case "Ad":
 			return "Gx";
-
 		case "At":
 			return "Bbb";
-
 		case "At#":
 			return "Bb";
-
 		case "Bdb":
 			return "A#";
-
 		case "Bd":
 			return "Ax";
-
 		case "Bt":
 			return "Cb";
-
 		case "Bt#":
 			return "C";
-
 		default:
 			throw "Unsupported note for respelling without microtonal accidentals: " + note;
 	}
@@ -262,44 +236,44 @@ function parseCustomKeySignature(annotationText, customKeySignature, logger)
 				switch (currentAccidental)
 				{
 					case "bb":
-							accidentalName = "FLAT2";
-							break;
+						accidentalName = "FLAT2";
+						break;
 
-						case "b":
-							accidentalName = "FLAT";
-							break;
+					case "b":
+						accidentalName = "FLAT";
+						break;
 
-						case "":
-						case "h":
-							accidentalName = "NONE";
-							break;
+					case "":
+					case "h":
+						accidentalName = "NONE";
+						break;
 
-						case "#":
-							accidentalName = "SHARP";
-							break;
+					case "#":
+						accidentalName = "SHARP";
+						break;
 
-						case "x":
-							accidentalName = "SHARP2";
-							break;
+					case "x":
+						accidentalName = "SHARP2";
+						break;
 
-						case "db":
-							accidentalName = "MIRRORED_FLAT2";
-							break;
+					case "db":
+						accidentalName = "MIRRORED_FLAT2";
+						break;
 
-						case "d":
-							accidentalName = "MIRRORED_FLAT";
-							break;
+					case "d":
+						accidentalName = "MIRRORED_FLAT";
+						break;
 
-						case "t":
-							accidentalName = "SHARP_SLASH";
-							break;
+					case "t":
+						accidentalName = "SHARP_SLASH";
+						break;
 
-						case "t#":
-							accidentalName = "SHARP_SLASH4";
-							break;
+					case "t#":
+						accidentalName = "SHARP_SLASH4";
+						break;
 
-						default:
-							throw "Unsupported accidental in the custom key signature: " + currentAccidental;
+					default:
+						throw "Unsupported accidental in the custom key signature: " + currentAccidental;
 				}
 				if (accidentalName)
 				{
@@ -376,7 +350,7 @@ function searchPreviousAccidental(note, noteName, octave, logger)
 				{
 					keySignatureChangeFound = true;
 					let previousAccidental = customKeySignature[noteName];
-					logger.log("Previous accidental from a standard key signature: " + previousAccidental);
+					logger.log("Previous accidental from a custom key signature: " + previousAccidental);
 					break;
 				}
 			}

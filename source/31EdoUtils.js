@@ -20,7 +20,7 @@ const VERSION = "1.0.0";
 
 // Size in cents of an EDO step.
 const STEP_SIZE = 1200.0 / 31;
-// Difference in cents between a 12EDO and a 31EDO fifth.
+// Difference in cents between a 12EDO fifth and a 31EDO fifth.
 const FIFTH_DEVIATION = 700.0 - (18 * STEP_SIZE);
 
 // Map containing the amount of EDO steps of every supported accidental.
@@ -310,12 +310,11 @@ function searchPreviousAccidental(note, noteName, octave, logger)
 	cursor.staffIdx = note.staff.part.startTrack / 4;
 	cursor.rewindToTick(segment.tick);
 
-	// Check what accidental, if any, is applied to the current note by a
-	// previous key signature or accidental.
 	// Check if a standard key signature changes the current note.
 	let keySignature = cursor.keySignature;
 	let previousAccidental = STANDARD_KEY_SIGNATURES[keySignature][noteName];
 	logger.log("Key signature: " + keySignature + "; Accidental: " + previousAccidental);
+
 	// Iterate on the previous elements, to search for a custom key signature or
 	// an accidental applied to this note.
 	let accidentalFound = false;
@@ -346,7 +345,7 @@ function searchPreviousAccidental(note, noteName, octave, logger)
 				// TODO: check that staff text elements apply only to the current staff.
 
 				let customKeySignature = {};
-				EdoUtils.parseCustomKeySignature(annotation.text, customKeySignature, logger);
+				parseCustomKeySignature(annotation.text, customKeySignature, logger);
 				if (!isEmpty(customKeySignature))
 				{
 					keySignatureChangeFound = true;
@@ -435,6 +434,279 @@ function searchPreviousAccidental(note, noteName, octave, logger)
 
 	logger.log("Previous accidental found: " + previousAccidental);
 	return previousAccidental;
+}
+
+/**
+ * Guess what the most appropriate enharmonic spelling could be for the input
+ * EDO step, given the environment of the specified note.
+ */
+function chooseEnharmonicSpelling(note, edoStep, direction, logger)
+{
+	logger.log("Choosing enharmonic spelling for EDO step: " + edoStep);
+
+	let flatFound = false;
+	let sharpFound = false;
+
+	// Create a cursor at the position of the input note.
+	let segment = note.parent.parent;
+	let cursor = curScore.newCursor();
+	cursor.voice = note.voice;
+	cursor.staffIdx = note.staff.part.startTrack / 4;
+	cursor.rewindToTick(segment.tick);
+
+	// Check if a standard key signature affects the target EDO step.
+	let enharmonicSpelling = null;
+	let keySignature = cursor.keySignature;
+	let keySignatureData = STANDARD_KEY_SIGNATURES[keySignature];
+	for (let keySignatureNote in keySignatureData)
+	{
+		let accidental = keySignatureData[keySignatureNote];
+		if (SUPPORTED_ACCIDENTALS[accidental] > 0)
+		{
+			sharpFound = true;
+		}
+		else if (SUPPORTED_ACCIDENTALS[accidental] < 0)
+		{
+			flatFound = true;
+		}
+		let keySignatureEdoStep = NOTES_STEPS[keySignatureNote] + SUPPORTED_ACCIDENTALS[accidental];
+		keySignatureEdoStep %= 31;
+		while (keySignatureEdoStep < 0)
+		{
+			keySignatureEdoStep += 31;
+		}
+		if (keySignatureEdoStep === edoStep)
+		{
+			logger.log("Enharmonic spelling from standard key signature: " + keySignatureNote + " " + accidental);
+			enharmonicSpelling = {
+				"NOTE_NAME": keySignatureNote,
+				"ACCIDENTAL": accidental
+			};
+			break;
+		}
+	}
+
+	// Iterate on the previous elements, to search for a custom key signature or
+	// an accidental applied to this note.
+	let accidentalFound = false;
+	let keySignatureChangeFound = false;
+	let measureChanged = false;
+	let measureStartTick = cursor.measure.firstSegment.tick;
+	while (cursor.segment)
+	{
+		// Check for a standard key signature change.
+		if (!keySignatureChangeFound && (cursor.keySignature !== keySignature))
+		{
+			keySignatureChangeFound = true;
+			logger.trace("Key signature change found.");
+		}
+		// Check for a custom key signature change.  This is only relevant if we
+		// didn't find a key signature change, because otherwise the custom key
+		// signature wouldn't be in effect for the note we're respelling.
+		// Additionally, we only check if the key signature is 0, because that's
+		// what custom key signatures return.
+		if (!keySignatureChangeFound && (cursor.keySignature === 0))
+		{
+			for (let i = 0; i < cursor.segment.annotations.length; i++)
+			{
+				let annotation = cursor.segment.annotations[i];
+				// TODO: check that staff text elements apply only to the current staff.
+
+				let customKeySignature = {};
+				parseCustomKeySignature(annotation.text, customKeySignature, logger);
+				if (!isEmpty(customKeySignature))
+				{
+					keySignatureChangeFound = true;
+					for (let keySignatureNote in customKeySignature)
+					{
+						let accidental = customKeySignature[keySignatureNote];
+						if (SUPPORTED_ACCIDENTALS[accidental] > 0)
+						{
+							sharpFound = true;
+						}
+						else if (SUPPORTED_ACCIDENTALS[accidental] < 0)
+						{
+							flatFound = true;
+						}
+						let keySignatureEdoStep = NOTES_STEPS[keySignatureNote] + SUPPORTED_ACCIDENTALS[accidental];
+						keySignatureEdoStep %= 31;
+						while (keySignatureEdoStep < 0)
+						{
+							keySignatureEdoStep += 31;
+						}
+						if (keySignatureEdoStep === edoStep)
+						{
+							logger.log(
+								"Enharmonic spelling from custom key signatuere: " + keySignatureNote + " " + accidental
+							);
+							enharmonicSpelling = {
+								"NOTE_NAME": keySignatureNote,
+								"ACCIDENTAL": accidental
+							};
+							break;
+						}
+					}
+				}
+			}
+			if (keySignatureFound)
+			{
+				break;
+			}
+		}
+
+		// Check if we moved to a previous measure, in which case we do not have
+		// to check for altered notes anymore.
+		if (!measureChanged && (cursor.tick < measureStartTick))
+		{
+			measureChanged = true;
+			logger.trace("Measure changed.");
+		}
+		// Check if an accidental previously in the measure affects the target
+		// EDO step.
+		if (!measureChanged && cursor.element && (cursor.element.type === Element.CHORD))
+		{
+			let notes = cursor.element.notes;
+			for (let i = 0; i < notes.length; i++)
+			{
+				// The target EDO step is always one above or below the EDO step
+				// of the input note, because we call this function when we're
+				// pitch shifting the note by 1 EDO step.  Due to this, it's not
+				// necessary to check if the current note is the same as the
+				// input note, as they will never have the same EDO step.
+				let noteName = NoteUtils.getNoteLetter(notes[i], "tpc");
+				let accidental = AccidentalUtils.getAccidentalName(notes[i]);
+				if (SUPPORTED_ACCIDENTALS[accidental] > 0)
+				{
+					sharpFound = true;
+				}
+				else if (SUPPORTED_ACCIDENTALS[accidental] < 0)
+				{
+					flatFound = true;
+				}
+				let currentEdoStep = NOTES_STEPS[noteName] + SUPPORTED_ACCIDENTALS[accidental];
+				currentEdoStep %= 31;
+				while (currentEdoStep < 0)
+				{
+					currentEdoStep += 31;
+				}
+				if (currentEdoStep === edoStep)
+				{
+					logger.log(
+						"Enharmonic spelling from a previous note in the measure: " + noteName + " " + accidental
+					);
+					enharmonicSpelling = {
+						"NOTE_NAME": noteName,
+						"ACCIDENTAL": accidental
+					};
+					accidentalFound = true;
+					break;
+				}
+			}
+			if (accidentalFound)
+			{
+				break;
+			}
+
+			let graceChords = cursor.element.graceNotes;
+			for (let i = graceChords.length - 1; i >= 0; i--)
+			{
+				let graceNotes = graceChords[i].notes;
+				for (let j = 0; j < graceNotes.length; j++)
+				{
+					let noteName = NoteUtils.getNoteLetter(notes[i], "tpc");
+					let accidental = AccidentalUtils.getAccidentalName(notes[i]);
+					if (SUPPORTED_ACCIDENTALS[accidental] > 0)
+					{
+						sharpFound = true;
+					}
+					else if (SUPPORTED_ACCIDENTALS[accidental] < 0)
+					{
+						flatFound = true;
+					}
+					let currentEdoStep = NOTES_STEPS[noteName] + SUPPORTED_ACCIDENTALS[accidental];
+					currentEdoStep %= 31;
+					while (currentEdoStep < 0)
+					{
+						currentEdoStep += 31;
+					}
+					if (currentEdoStep === edoStep)
+					{
+						logger.log(
+							"Enharmonic spelling from a previous note in the measure: " + noteName + " " + accidental
+						);
+						enharmonicSpelling = {
+							"NOTE_NAME": noteName,
+							"ACCIDENTAL": accidental
+						};
+						accidentalFound = true;
+						break;
+					}
+				}
+				if (accidentalFound)
+				{
+					break;
+				}
+			}
+			if (accidentalFound)
+			{
+				break;
+			}
+		}
+
+		if (keySignatureChangeFound && measureChanged)
+		{
+			break;
+		}
+
+		cursor.prev();
+	}
+
+	if (!enharmonicSpelling)
+	{
+		// An enharmonic spelling for the input EDO step was not found.  If
+		// only flat or only sharp accidentals were found, choose an enharmonic
+		// spelling of the same type.
+		let enharmonicSpellings = ENHARMONIC_EQUIVALENTS[edoStep];
+		if (flatFound && !sharpFound)
+		{
+			logger.trace("Only flat accidentals found.");
+			enharmonicSpellings = enharmonicSpellings.filter(e => SUPPORTED_ACCIDENTALS[e["ACCIDENTAL"]] <= 0);
+		}
+		else if (sharpFound && !flatFound)
+		{
+			logger.trace("Only sharp accidentals found.");
+			enharmonicSpellings = enharmonicSpellings.filter(e => SUPPORTED_ACCIDENTALS[e["ACCIDENTAL"]] >= 0);
+		}
+		else
+		{
+			// We didn't find only one kind of accidental, or we didn't find any
+			// accidental at all.  Choose the accidental depending on the
+			// direction of the pitch shift.
+			if (direction > 0)
+			{
+				logger.trace("Using sharp accidentals due to up shift.");
+				enharmonicSpellings = enharmonicSpellings.filter(e => SUPPORTED_ACCIDENTALS[e["ACCIDENTAL"]] >= 0);
+			}
+			else
+			{
+				logger.trace("Using flat accidentals due to down shift.");
+				enharmonicSpellings = enharmonicSpellings.filter(e => SUPPORTED_ACCIDENTALS[e["ACCIDENTAL"]] <= 0);
+			}
+		}
+		// In case there are still multiple spellings after having filtered the
+		// enharmonic equivalents, use the one with the smallest number of EDO
+		// steps.
+		enharmonicSpelling = enharmonicSpellings.reduce((min, current) => {
+			return SUPPORTED_ACCIDENTALS[current["ACCIDENTAL"]] < SUPPORTED_ACCIDENTALS[min["ACCIDENTAL"]]
+				? current : min;
+		});
+		logger.log(
+			"Enharmonic spelling guess based on environment: "
+			+ enharmonicSpelling["NOTE_NAME"] + " " + enharmonicSpelling["ACCIDENTAL"]
+		);
+	}
+
+	return enharmonicSpelling;
 }
 
 /**

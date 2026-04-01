@@ -33,14 +33,14 @@ MuseScore
 	categoryCode: "playback";
 	thumbnailName: "thumbnails/31Edo_PitchUp_Thumbnail.png";
 	version: "2.2.0";
-	
+
 	property variant settings: {};
-	
+
 	FileIO
 	{
 		id: loggerId;
 	}
-	
+
 	FileIO
 	{
 		id: settingsId;
@@ -52,17 +52,17 @@ MuseScore
 		try
 		{
 			settings = SettingsIO.readTsvFile(settingsId);
-			
+
 			Logger.initialise(loggerId, parseInt(settings["LogLevel"]));
 			Logger.log("-- " + title + " -- Version " + version + " --");
-			
-			// We can't respell every note in the selection in a single pass, 
+
+			// We can't respell every note in the selection in a single pass,
 			// because if there are two or more of the same note with the same
 			// microtonal accidental (which is applied only to the first note of
-			// the measure), after we respell the first note, the accidental 
-			// will not be there for the following notes anymore.  For this 
+			// the measure), after we respell the first note, the accidental
+			// will not be there for the following notes anymore.  For this
 			// reason we first have to calculate every pitch up respelling for
-			// every note in the current selection, and only then respell the 
+			// every note in the current selection, and only then respell the
 			// notes.
 			var targetEdoSteps = {};
 			searchEdoStepsUp(curScore.selection.elements, targetEdoSteps, Logger);
@@ -82,11 +82,11 @@ MuseScore
 			{
 				Logger.err(error);
 			}
-			
+
 			Logger.writeLogs();
 		}
 	}
-	
+
 	/**
 	 * Search for the target EDO step for the notes in the current selection.
 	 */
@@ -100,7 +100,7 @@ MuseScore
 				var octave = NoteUtils.getOctave(element);
 				var accidental = AccidentalUtils.getAccidentalName(element);
 				logger.log("Searching EDO step up for note: " + noteName + " " + octave + " " + accidental);
-				
+
 				if (accidental === "NONE")
 				{
 					var previousAccidental = EdoUtils.searchPreviousAccidental(element, noteName, octave, logger);
@@ -110,7 +110,7 @@ MuseScore
 						accidental = previousAccidental;
 					}
 				}
-				
+
 				var targetEdoStep = EdoUtils.NOTES_STEPS[noteName] + EdoUtils.SUPPORTED_ACCIDENTALS[accidental];
 				var inputOctaveShift = null;
 				if (targetEdoStep >= 31)
@@ -146,7 +146,7 @@ MuseScore
 					targetEdoStep += 31;
 				}
 				logger.log("Target EDO step: " + targetEdoStep + "; Target octave shift: " + targetOctaveShift);
-				
+
 				targetEdoSteps[element.eid] = {
 					"EDO_STEP": targetEdoStep,
 					"OCTAVE_SHIFT": targetOctaveShift
@@ -154,7 +154,7 @@ MuseScore
 			}
 		}
 	}
-	
+
 	/**
 	 * Apply the EDO step pitch ups to the notes in the current selection.
 	 */
@@ -168,11 +168,65 @@ MuseScore
 				var octave = NoteUtils.getOctave(element);
 				var accidental = AccidentalUtils.getAccidentalName(element);
 				logger.log("Applying EDO step up to note: " + noteName + " " + octave + " " + accidental);
-				
+
 				var targetEdoStep = targetEdoSteps[element.eid]["EDO_STEP"];
 				var targetOctaveShift = targetEdoSteps[element.eid]["OCTAVE_SHIFT"];
-				
+
 				var enharmonicSpelling = EdoUtils.chooseEnharmonicSpelling(element, targetEdoStep, 1, logger);
+				var targetNoteName = enharmonicSpelling["NOTE_NAME"];
+				var targetAccidental = enharmonicSpelling["ACCIDENTAL"];
+
+				var targetTpc = null;
+				var targetPitch = null;
+				if (AccidentalUtils.ACCIDENTAL_DATA[targetAccidental]["TPC"])
+				{
+					targetTpc = NoteUtils.noteNameToTpc(targetNoteName, targetAccidental);
+					targetPitch = NoteUtils.noteToMidiNumber(
+						targetNoteName, targetAccidental, octave + targetOctaveShift
+					);
+				}
+				else
+				{
+					// Microtonal accidentals are not handled by the TPC
+					// property.  Search the pitch / TPC without any accidental
+					// to put the note in the correct staff space, and then
+					// the accidental will be added manually.
+					targetTpc = NoteUtils.noteNameToTpc(targetNoteName, "NONE");
+					targetPitch = NoteUtils.noteToMidiNumber(targetNoteName, "NONE", octave + targetOctaveShift);
+				}
+				logger.log("Target TPC: " + targetTpc + "; Target Pitch: " + targetPitch);
+
+				// Changing a note's pitch and applying a microtonal accidental
+				// to it in the same .startCmd() - .endCmd() block does not work
+				// correctly, keep them separated.
+				curScore.startCmd();
+				element.accidentalType = Accidental.NONE;
+				element.pitch = targetPitch;
+				element.tpc1 = targetTpc;
+				element.tpc2 = targetTpc;
+				curScore.endCmd();
+
+				var previousAccidental = EdoUtils.searchPreviousAccidental(
+					element, targetNoteName, octave + targetOctaveShift, logger
+				);
+				if (previousAccidental !== targetAccidental)
+				{
+					if (!AccidentalUtils.ACCIDENTAL_DATA[targetAccidental]["TPC"])
+					{
+						var targetAccidentalType = AccidentalUtils.getAccidentalType(targetAccidental);
+						logger.trace("Target accidental type: " + targetAccidentalType);
+						curScore.startCmd();
+						element.accidentalType = targetAccidentalType;
+						curScore.endCmd();
+					}
+				}
+				else
+				{
+					logger.log("Target accidental already applied to the note.");
+					curScore.startCmd();
+					element.accidentalType = Accidental.NONE;
+					curScore.endCmd();
+				}
 			}
 		}
 	}

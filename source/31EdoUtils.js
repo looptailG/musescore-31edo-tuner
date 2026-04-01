@@ -706,7 +706,7 @@ function chooseEnharmonicSpelling(note, edoStep, direction, logger)
 		else
 		{
 			// We didn't find only one kind of accidental, or we didn't find any
-			// accidental at all.  Choose the accidental depending on the 
+			// accidental at all.  Choose the accidental depending on the
 			// direction of the pitch shift.
 			if (direction > 0)
 			{
@@ -731,7 +731,7 @@ function chooseEnharmonicSpelling(note, edoStep, direction, logger)
 			+ enharmonicSpelling["NOTE_NAME"] + " " + enharmonicSpelling["ACCIDENTAL"]
 		);
 	}
-	
+
 	return enharmonicSpelling;
 }
 

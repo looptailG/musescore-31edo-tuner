@@ -136,7 +136,7 @@ MuseScore
 				var noteName = NoteUtils.getNoteLetter(element, "tpc");
 				var octave = NoteUtils.getOctave(element);
 				var accidental = AccidentalUtils.getAccidentalName(element);
-				logger.log("Applying EDO step up to note: " + noteName + " " + octave + " " + accidental);
+				logger.log("Applying EDO step down to note: " + noteName + " " + octave + " " + accidental);
 
 				var targetEdoStep = targetEdoSteps[element.eid];
 

@@ -548,7 +548,7 @@ function chooseEnharmonicSpelling(note, edoStep, direction, logger)
 					}
 				}
 			}
-			if (keySignatureFound)
+			if (keySignatureChangeFound)
 			{
 				break;
 			}
@@ -692,7 +692,7 @@ function chooseEnharmonicSpelling(note, edoStep, direction, logger)
 		// enharmonic equivalents, use the one with the smallest number of EDO
 		// steps.
 		enharmonicSpelling = enharmonicSpellings.reduce((min, current) => {
-			return SUPPORTED_ACCIDENTALS[current["ACCIDENTAL"]] < SUPPORTED_ACCIDENTALS[min["ACCIDENTAL"]]
+			return Math.abs(SUPPORTED_ACCIDENTALS[current["ACCIDENTAL"]]) < Math.abs(SUPPORTED_ACCIDENTALS[min["ACCIDENTAL"]])
 				? current : min;
 		});
 		logger.log(

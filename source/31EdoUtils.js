@@ -376,7 +376,7 @@ function searchPreviousAccidental(note, noteName, octave, logger)
 			{
 				if (sameNote)
 				{
-					let currentNoteName = NoteUtils.getNoteLetter(note, "tpc");
+					let currentNoteName = NoteUtils.getNoteLetter(notes[i], "tpc");
 					if (currentNoteName === noteName)
 					{
 						sameNote = false;
@@ -568,11 +568,6 @@ function chooseEnharmonicSpelling(note, edoStep, direction, logger)
 			let notes = cursor.element.notes;
 			for (let i = 0; i < notes.length; i++)
 			{
-				// The target EDO step is always one above or below the EDO step
-				// of the input note, because we call this function when we're
-				// pitch shifting the note by 1 EDO step.  Due to this, it's not
-				// necessary to check if the current note is the same as the
-				// input note, as they will never have the same EDO step.
 				let noteName = NoteUtils.getNoteLetter(notes[i], "tpc");
 				let accidental = AccidentalUtils.getAccidentalName(notes[i]);
 				if (SUPPORTED_ACCIDENTALS[accidental] > 0)
@@ -706,6 +701,9 @@ function chooseEnharmonicSpelling(note, edoStep, direction, logger)
 		);
 	}
 
+	logger.log(
+		"Chosen enharmonic spelling: " + enharmonicSpelling["NOTE_NAME"] + " " + enharmonicSpelling["ACCIDENTAL"]
+	);
 	return enharmonicSpelling;
 }
 

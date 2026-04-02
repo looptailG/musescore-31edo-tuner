@@ -30,14 +30,15 @@ MuseScore
 	categoryCode: "playback";
 	thumbnailName: "thumbnails/31Edo_Configure_Thumbnail.png";
 	version: "2.2.0";
-	
+
 	pluginType: "dialog";
 	property var padding: 10;
-	width: mainWindow.implicitWidth + 2 * padding;
+	// The height should not be too short, or the drop-down menus won't render
+	// properly.
 	height: Math.max(mainWindow.implicitHeight, 250) + 2 * padding;
-	
+
 	property variant settings: {};
-	
+
 	property var tripleFlat: "\uE266";
 	property var doubleFlat: "\uE264";
 	property var sesquiFlat: "\uE281";
@@ -87,79 +88,89 @@ MuseScore
 		"#x": 10
 	}
 	property var referenceNoteRegex: /^\s*(A|B|C|D|E|F|G)\s*(bbb|bb|db|b|d||t|#|t#|x|#x)\s*$/i;
-	
+
 	FileIO
 	{
 		id: loggerId;
 	}
-	
+
 	FileIO
 	{
 		id: settingsId;
 		source: Qt.resolvedUrl(".").toString() + "Settings.tsv";
 	}
-	
-	Row
+
+	Column
 	{
 		id: mainWindow;
+		anchors.centerIn: parent;
 		spacing: padding;
-		
-		Text
+
+		Row
 		{
-			text: "Reference Note:";
-			font: ui.theme.bodyBoldFont;
-			color: ui.theme.fontPrimaryColor;
-		}
-		
-		ComboBox
-		{
-			id: referenceNoteNameComboBox;
-			model: ["A", "B", "C", "D", "E", "F", "G"];
-			
-			onActivated:
+			spacing: padding;
+			anchors.horizontalCenter: parent.horizontalCenter;
+			anchors.top: parent.top;
+			anchors.topMargin: padding;
+
+			Text
 			{
-				onReferenceNoteChange();
+				text: "Reference Note: ";
+				font: ui.theme.bodyBoldFont;
+				color: ui.theme.fontPrimaryColor;
+				anchors.verticalCenter: parent.verticalCenter;
 			}
-		}
-		
-		ComboBox
-		{
-			id: referenceNoteAccidentalComboBox;
-			model: [
-				tripleFlat,
-				doubleFlat,
-				sesquiFlat,
-				flat_,
-				halfFlat,
-				natural,
-				halfSharp,
-				sharp,
-				sesquiSharp,
-				doubleSharp,
-				tripleSharp
-			];
-			font: ui.theme.musicalFont;
-			
-			delegate: ItemDelegate
+
+			ComboBox
 			{
-				text: modelData;
+				id: referenceNoteNameComboBox;
+				model: ["A", "B", "C", "D", "E", "F", "G"];
+
+				onActivated:
+				{
+					onReferenceNoteChange();
+				}
+			}
+
+			ComboBox
+			{
+				id: referenceNoteAccidentalComboBox;
+				model: [
+					tripleFlat,
+					doubleFlat,
+					sesquiFlat,
+					flat_,
+					halfFlat,
+					natural,
+					halfSharp,
+					sharp,
+					sesquiSharp,
+					doubleSharp,
+					tripleSharp
+				];
 				font: ui.theme.musicalFont;
-				height: 30;
-			}
-			
-			onActivated:
-			{
-				onReferenceNoteChange();
+
+				delegate: ItemDelegate
+				{
+					text: modelData;
+					font: ui.theme.musicalFont;
+					height: 30;
+				}
+
+				onActivated:
+				{
+					onReferenceNoteChange();
+				}
 			}
 		}
 	}
-	
+
 	Component.onCompleted:
 	{
 		settings = SettingsIO.readTsvFile(settingsId);
-		
+
 		Logger.initialise(loggerId, parseInt(settings["LogLevel"]));
-		
+
 		try
 		{
 			let referenceNoteMatch = settings["ReferenceNote"].match(referenceNoteRegex);
@@ -170,7 +181,7 @@ MuseScore
 			let referenceNoteName = referenceNoteMatch[1];
 			let referenceNoteAccidental = referenceNoteMatch[2];
 			Logger.log("Reference note name: " + referenceNoteName + "; Accidental: " + referenceNoteAccidental);
-			
+
 			referenceNoteNameComboBox.currentIndex = noteNameToIndex[referenceNoteName];
 			referenceNoteAccidentalComboBox.currentIndex = accidentalToIndex[referenceNoteAccidental];
 		}
@@ -183,7 +194,7 @@ MuseScore
 			Logger.writeLogs();
 		}
 	}
-	
+
 	onRun:
 	{
 		if (typeof curScore === "undefined")
@@ -191,7 +202,7 @@ MuseScore
 			quit();
 		}
 	}
-	
+
 	function onReferenceNoteChange()
 	{
 		try

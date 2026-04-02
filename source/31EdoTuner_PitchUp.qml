@@ -143,6 +143,13 @@ MuseScore
 				var enharmonicSpelling = EdoUtils.chooseEnharmonicSpelling(element, targetEdoStep, 1, logger);
 				var targetNoteName = enharmonicSpelling["NOTE_NAME"];
 				var targetAccidental = enharmonicSpelling["ACCIDENTAL"];
+				if ((targetNoteName === "C") && (EdoUtils.SUPPORTED_ACCIDENTALS[targetAccidental] < 0))
+				{
+					// Account for octave shift.  Only necessary for flat
+					// accidentals, because for sharp accidentals the altered C
+					// is already in the correct octave;
+					octave += 1;
+				}
 
 				var targetTpc = null;
 				var targetPitch = null;

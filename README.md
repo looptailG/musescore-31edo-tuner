@@ -108,9 +108,7 @@ plugin.  If nothing is selected, the entire score will be tuned.
 <code>31EDO Tuner</code>
 
 ### Enharmonic Respelling / Pitch Up / Pitch Down
-- If you want to respell / pitch shift only a portion of the score, select it
-before running the plugin.  If nothing is selected, the entire score will be
-affected.
+- Select the portion of the score you want to respell or pitch shift.
 - Launch the corresponding plugin:
 	- Respelling: <code>Plugins</code> → <code>Playback</code> →
 	<code>31EDO Tuner Respell</code>
@@ -121,6 +119,11 @@ affected.
 
 Since these are actions that you'll probably do often when transcribing a piece
 in 31EDO, you might want to assign these plugins to a keyboard shortcut.
+
+These actions are meant to be used to quickly write 31EDO pitches while writing 
+a score, but can get quite slow if a large portion of the score is selected.  To
+prevent Musescore from crashing, the plugins for respelling / pitch shifting 
+notes will automatically stop after 20 notes.
 
 ### Configure
 By default the plugin will keep the tuning offset of the note `A` equal to zero,

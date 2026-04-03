@@ -36,6 +36,8 @@ MuseScore
 
 	property variant settings: {};
 
+	property var iterationLimit: 0;
+
 	FileIO
 	{
 		id: loggerId;
@@ -55,6 +57,8 @@ MuseScore
 
 			Logger.initialise(loggerId, parseInt(settings["LogLevel"]));
 			Logger.log("-- " + title + " -- Version " + version + " --");
+
+			iterationLimit = parseInt(settings["IterationLimit"]);
 
 			// We can't respell every note in the selection in a single pass,
 			// because if there are two or more of the same note with the same
@@ -94,10 +98,18 @@ MuseScore
 	{
 		try
 		{
+			var counter = 0;
 			for (var element of selection)
 			{
 				if (element.type === Element.NOTE)
 				{
+					counter++;
+					if (counter > iterationLimit)
+					{
+						Logger.log("Iteration limit exceeded.");
+						return;
+					}
+
 					var noteName = NoteUtils.getNoteLetter(element, "tpc");
 					var octave = NoteUtils.getOctave(element);
 					var accidental = AccidentalUtils.getAccidentalName(element);
@@ -138,10 +150,18 @@ MuseScore
 	{
 		try
 		{
+			var counter = 0;
 			for (var element of selection)
 			{
 				if (element.type === Element.NOTE)
 				{
+					counter++;
+					if (counter > iterationLimit)
+					{
+						Logger.log("Iteration limit exceeded.");
+						return;
+					}
+
 					var noteName = NoteUtils.getNoteLetter(element, "tpc");
 					var octave = NoteUtils.getOctave(element);
 					var accidental = AccidentalUtils.getAccidentalName(element);

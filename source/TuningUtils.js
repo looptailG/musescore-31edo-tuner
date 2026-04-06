@@ -16,12 +16,12 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-const VERSION = "1.3.0";
+const VERSION = "1.3.1";
 
 // Size in cents of a justly tuned perfect fifth.
 const JUST_FIFTH = intervalInCents(3 / 2);
 // Size in cents of a 12EDO perfect fifth.
-const DEFAULT_FIFTH = 700.0;
+const STANDARD_FIFTH = 700.0;
 // Size in cents of the smallest fifth in the diatonic range.  It's equal to the
 // 7EDO fifth.
 const SMALLEST_DIATONIC_FIFTH = 1200.0 / 7 * 4;

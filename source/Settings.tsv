@@ -1,2 +1,3 @@
-LogLevel	2
+LogLevel	3
 ReferenceNote	A
+IterationLimit	20

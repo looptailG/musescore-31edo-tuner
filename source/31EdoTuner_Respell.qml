@@ -168,29 +168,9 @@ MuseScore
 					}
 					logger.log("Target note: " + targetNoteName + " " + targetAccidental);
 
-					var targetOctaveShift = null;
-					if (
-						((noteName === "A") || (noteName === "B"))
-						&& ((targetNoteName === "C") || (targetNoteName === "D"))
-					) {
-						targetOctaveShift = 1;
-					}
-					else if (
-						((noteName === "C") || (noteName === "D"))
-						&& ((targetNoteName === "A") || (targetNoteName === "B"))
-					) {
-						targetOctaveShift = -1;
-					}
-					else
-					{
-						targetOctaveShift = 0;
-					}
-					logger.log("Target octave shift: " + targetOctaveShift);
-
 					enharmonicRespellings[element.eid] = {
 						"NOTE_NAME": targetNoteName,
-						"ACCIDENTAL": targetAccidental,
-						"OCTAVE_SHIFT": targetOctaveShift
+						"ACCIDENTAL": targetAccidental
 					};
 				}
 			}
@@ -227,16 +207,34 @@ MuseScore
 
 					var targetNoteName = enharmonicRespellings[element.eid]["NOTE_NAME"];
 					var targetAccidental = enharmonicRespellings[element.eid]["ACCIDENTAL"];
-					var targetOctaveShift = enharmonicRespellings[element.eid]["OCTAVE_SHIFT"];
+					if (
+						((noteName === "C") || (noteName === "D"))
+						&& ((targetNoteName === "A") || (targetNoteName === "B"))
+						&& (EdoUtils.SUPPORTED_ACCIDENTALS[accidental] > 0)
+					) {
+						// Account for octave shift.  Only necessary for sharp
+						// accidentals, because for flat accidentals the altered
+						// note is already in the correct octave.
+						octave -= 1;
+					}
+					else if
+					(
+						((noteName === "A") || (noteName === "B"))
+						&& ((targetNoteName === "C") || (targetNoteName === "D"))
+						&& (EdoUtils.SUPPORTED_ACCIDENTALS[accidental] < 0)
+					) {
+						// Account for octave shift.  Only necessary for flat
+						// accidentals, because for sharp accidentals the
+						// altered note is already in the correct octave.
+						octave += 1;
+					}
 
 					var targetTpc = null;
 					var targetPitch = null;
 					if (AccidentalUtils.ACCIDENTAL_DATA[targetAccidental]["TPC"])
 					{
 						targetTpc = NoteUtils.noteNameToTpc(targetNoteName, targetAccidental);
-						targetPitch = NoteUtils.noteToMidiNumber(
-							targetNoteName, targetAccidental, octave + targetOctaveShift
-						);
+						targetPitch = NoteUtils.noteToMidiNumber(targetNoteName, targetAccidental, octave);
 					}
 					else
 					{
@@ -246,7 +244,7 @@ MuseScore
 						// space, and then the accidental will be added
 						// manually.
 						targetTpc = NoteUtils.noteNameToTpc(targetNoteName, "NONE");
-						targetPitch = NoteUtils.noteToMidiNumber(targetNoteName, "NONE", octave + targetOctaveShift);
+						targetPitch = NoteUtils.noteToMidiNumber(targetNoteName, "NONE", octave);
 					}
 					logger.log("Target TPC: " + targetTpc + "; Target Pitch: " + targetPitch);
 
@@ -260,9 +258,7 @@ MuseScore
 					element.tpc2 = targetTpc;
 					curScore.endCmd();
 
-					var previousAccidental = EdoUtils.searchPreviousAccidental(
-						element, targetNoteName, octave + targetOctaveShift, logger
-					);
+					var previousAccidental = EdoUtils.searchPreviousAccidental(element, targetNoteName, octave, logger);
 					if (previousAccidental !== targetAccidental)
 					{
 						if (!AccidentalUtils.ACCIDENTAL_DATA[targetAccidental]["TPC"])

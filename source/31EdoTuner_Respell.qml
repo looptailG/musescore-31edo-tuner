@@ -269,6 +269,16 @@ MuseScore
 							element.accidentalType = targetAccidentalType;
 							curScore.endCmd();
 						}
+						else
+						{
+							if ((targetAccidental === "NONE") && (previousAccidental !== "NONE"))
+							{
+								logger.log("Accidental replaced with natural.");
+								curScore.startCmd();
+								element.accidentalType = Accidental.NATURAL;
+								curScore.endCmd();
+							}
+						}
 					}
 					else
 					{

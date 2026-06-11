@@ -17,9 +17,13 @@
 */
 
 import QtQuick
+import QtQuick.Layouts
 import QtQuick.Controls
 import FileIO
+import Muse.Ui
+import Muse.UiComponents
 import MuseScore
+import "AccidentalUtils.js" as AccidentalUtils
 import "Logger.js" as Logger
 import "SettingsIO.js" as SettingsIO
 
@@ -30,63 +34,14 @@ MuseScore
 	categoryCode: "playback";
 	thumbnailName: "thumbnails/31Edo_Configure_Thumbnail.png";
 	version: "2.2.1";
-
 	pluginType: "dialog";
-	property var padding: 10;
-	// The height should not be too short, or the drop-down menus won't render
-	// properly.
-	height: Math.max(mainWindow.implicitHeight, 250) + 2 * padding;
 
 	property variant settings: {};
 
-	property var tripleFlat: "\uE266";
-	property var doubleFlat: "\uE264";
-	property var sesquiFlat: "\uE281";
-	// Naming this variable "flat" doesn't work properly, possibily because it's
-	// a reserved keyword.
-	property var flat_: "\uE260";
-	property var halfFlat: "\uE280";
-	property var natural: "\uE261";
-	property var halfSharp: "\uE282";
-	property var sharp: "\uE262";
-	property var sesquiSharp: "\uE283";
-	property var doubleSharp: "\uE263";
-	property var tripleSharp: "\uE265";
-	property variant unicodeToAscii: {
-		"\uE266": "bbb",
-		"\uE264": "bb",
-		"\uE281": "db",
-		"\uE260": "b",
-		"\uE280": "d",
-		"\uE261": "",
-		"\uE282": "t",
-		"\uE262": "#",
-		"\uE283": "t#",
-		"\uE263": "x",
-		"\uE265": "#x"
-	}
-	property variant noteNameToIndex: {
-		"A": 0,
-		"B": 1,
-		"C": 2,
-		"D": 3,
-		"E": 4,
-		"F": 5,
-		"G": 6
-	}
-	property variant accidentalToIndex: {
-		"bbb": 0,
-		"bb": 1,
-		"db": 2,
-		"b": 3,
-		"d": 4,
-		"": 5,
-		"t": 6,
-		"#": 7,
-		"t#": 8,
-		"x": 9,
-		"#x": 10
-	}
+	readonly property int defaultPadding: 10;
+	width: childrenRect.width + 2 * defaultPadding;
+	height: childrenRect.height + 2 * defaultPadding;
+
 	property var referenceNoteRegex: /^\s*(A|B|C|D|E|F|G)\s*(bbb|bb|db|b|d||t|#|t#|x|#x)\s*$/i;
 
 	FileIO

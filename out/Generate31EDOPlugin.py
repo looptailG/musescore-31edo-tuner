@@ -16,6 +16,9 @@ FILES_TO_COPY = [README_FILE, LICENSE_FILE]
 
 def main():
     try:
+        if os.path.exists(PLUGIN_FOLDER):
+            shutil.rmtree(PLUGIN_FOLDER)
+
         shutil.copytree(
                 f"{PROJECT_FOLDER}/{SOURCE_FOLDER}", PLUGIN_FOLDER,
                 dirs_exist_ok=True, ignore=ignore_test_files
@@ -23,10 +26,10 @@ def main():
         for file_path in FILES_TO_COPY:
             file_name = file_path[file_path.rindex("/") + 1:]
             shutil.copyfile(file_path, f"{PLUGIN_FOLDER}/{file_name}")
-        
+
         if not os.path.exists(f"{PLUGIN_FOLDER}/{LOGS_FOLDER}"):
             os.makedirs(f"{PLUGIN_FOLDER}/{LOGS_FOLDER}")
-        
+
         if not os.path.exists(f"{PLUGIN_FOLDER}/{THUMBNAILS_FOLDER}"):
             os.makedirs(f"{PLUGIN_FOLDER}/{THUMBNAILS_FOLDER}")
         for file_path in glob.glob(f"{PROJECT_FOLDER}/{THUMBNAILS_FOLDER}/*.png"):

@@ -55,66 +55,49 @@ MuseScore
 		source: Qt.resolvedUrl(".").toString() + "Settings.tsv";
 	}
 
-	Column
+	ColumnLayout
 	{
-		id: mainWindow;
 		anchors.centerIn: parent;
-		spacing: padding;
+		spacing: defaultPadding;
 
-		Row
+		StyledGroupBox
 		{
-			spacing: padding;
-			anchors.horizontalCenter: parent.horizontalCenter;
-			anchors.top: parent.top;
-			anchors.topMargin: padding;
+			title: "Reference Note";
 
-			Text
+			RowLayout
 			{
-				text: "Reference Note: ";
-				font: ui.theme.bodyBoldFont;
-				color: ui.theme.fontPrimaryColor;
-				anchors.verticalCenter: parent.verticalCenter;
-			}
+				spacing: defaultPadding;
 
-			ComboBox
-			{
-				id: referenceNoteNameComboBox;
-				model: ["A", "B", "C", "D", "E", "F", "G"];
-
-				onActivated:
+				StyledDropdown
 				{
-					onReferenceNoteChange();
-				}
-			}
+					id: referenceNoteNameId;
+					width: 80;
+					model: ["A", "B", "C", "D", "E", "F", "G"];
 
-			ComboBox
-			{
-				id: referenceNoteAccidentalComboBox;
-				model: [
-					tripleFlat,
-					doubleFlat,
-					sesquiFlat,
-					flat_,
-					halfFlat,
-					natural,
-					halfSharp,
-					sharp,
-					sesquiSharp,
-					doubleSharp,
-					tripleSharp
-				];
-				font: ui.theme.musicalFont;
-
-				delegate: ItemDelegate
-				{
-					text: modelData;
-					font: ui.theme.musicalFont;
-					height: 30;
+					onActivated: function(index, value)
+					{
+						referenceNoteNameId.currentIndex = index;
+						onReferenceNoteChange();
+					}
 				}
 
-				onActivated:
+				StyledDropdown
 				{
-					onReferenceNoteChange();
+					id: referenceNoteAccidentalId;
+					width: 80;
+					model: [
+						AccidentalUtils.UNICODE_ACCIDENTALS["FLAT2"],
+						AccidentalUtils.UNICODE_ACCIDENTALS["FLAT"],
+						AccidentalUtils.UNICODE_ACCIDENTALS["NATURAL"],
+						AccidentalUtils.UNICODE_ACCIDENTALS["SHARP"],
+						AccidentalUtils.UNICODE_ACCIDENTALS["SHARP2"]
+					];
+
+					onActivated: function(index, value)
+					{
+						referenceNoteAccidentalId.currentIndex = index;
+						onReferenceNoteChange();
+					}
 				}
 			}
 		}

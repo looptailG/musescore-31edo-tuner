@@ -32,7 +32,7 @@ MuseScore
 	description: "Move the selection down by a 31EDO step.";
 	categoryCode: "playback";
 	thumbnailName: "thumbnails/31Edo_PitchDown_Thumbnail.png";
-	version: "2.2.0";
+	version: "2.2.1";
 
 	property variant settings: {};
 

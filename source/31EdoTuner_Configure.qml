@@ -43,6 +43,26 @@ MuseScore
 	height: childrenRect.height + 2 * defaultPadding;
 
 	property var referenceNoteRegex: /^\s*(A|B|C|D|E|F|G)\s*(bbb|bb|db|b|d||t|#|t#|x|#x)\s*$/i;
+	property variant noteNameToIndex: {
+		"A": 0,
+		"B": 1,
+		"C": 2,
+		"D": 3,
+		"E": 4,
+		"F": 5,
+		"G": 6
+	}
+	property variant accidentalToIndex: {
+		"bb": 0,
+		"db": 1,
+		"b": 2,
+		"d": 3,
+		"": 4,
+		"t": 5,
+		"#": 6,
+		"t#": 7,
+		"x": 8
+	}
 
 	FileIO
 	{
@@ -107,10 +127,11 @@ MuseScore
 	{
 		settings = SettingsIO.readTsvFile(settingsId);
 
-		Logger.initialise(loggerId, parseInt(settings["LogLevel"]));
-
 		try
 		{
+			Logger.initialise(loggerId, parseInt(settings["LogLevel"]));
+			Logger.log(title + " - v" + version);
+
 			let referenceNoteMatch = settings["ReferenceNote"].match(referenceNoteRegex);
 			if (!referenceNoteMatch)
 			{
@@ -119,9 +140,8 @@ MuseScore
 			let referenceNoteName = referenceNoteMatch[1];
 			let referenceNoteAccidental = referenceNoteMatch[2];
 			Logger.log("Reference note name: " + referenceNoteName + "; Accidental: " + referenceNoteAccidental);
-
-			referenceNoteNameComboBox.currentIndex = noteNameToIndex[referenceNoteName];
-			referenceNoteAccidentalComboBox.currentIndex = accidentalToIndex[referenceNoteAccidental];
+			referenceNoteNameId.currentIndex = noteNameToIndex[referenceNoteName];
+			referenceNoteAccidentalId.currentIndex = accidentalToIndex[referenceNoteAccidental];
 		}
 		catch (error)
 		{

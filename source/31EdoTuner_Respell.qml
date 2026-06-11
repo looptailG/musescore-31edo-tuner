@@ -56,7 +56,7 @@ MuseScore
 			settings = SettingsIO.readTsvFile(settingsId);
 
 			Logger.initialise(loggerId, parseInt(settings["LogLevel"]));
-			Logger.log("-- " + title + " -- Version " + version + " --");
+			Logger.log(title + " - v" + version);
 
 			iterationLimit = parseInt(settings["IterationLimit"]);
 

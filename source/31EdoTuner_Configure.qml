@@ -51,18 +51,7 @@ MuseScore
 		"E": 4,
 		"F": 5,
 		"G": 6
-	}
-	property variant accidentalToIndex: {
-		"bb": 0,
-		"db": 1,
-		"b": 2,
-		"d": 3,
-		"": 4,
-		"t": 5,
-		"#": 6,
-		"t#": 7,
-		"x": 8
-	}
+	};
 
 	FileIO
 	{
@@ -164,6 +153,21 @@ MuseScore
 			let referenceNoteName = referenceNoteMatch[1];
 			let referenceNoteAccidental = referenceNoteMatch[2];
 			Logger.log("Reference note name: " + referenceNoteName + "; Accidental: " + referenceNoteAccidental);
+
+			var accidentalToIndex = {};
+			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["FLAT3"]]] = 0;
+			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["FLAT2"]]] = 1;
+			accidentalToIndex[
+				AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["MIRRORED_FLAT2"]]
+			] = 2;
+			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["FLAT"]]] = 3;
+			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["MIRRORED_FLAT"]]] = 4;
+			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["NATURAL"]]] = 5;
+			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["SHARP_SLASH"]]] = 6;
+			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["SHARP"]]] = 7;
+			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["SHARP_SLASH4"]]] = 8;
+			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["SHARP2"]]] = 9;
+			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["SHARP3"]]] = 10;
 			referenceNoteNameId.currentIndex = noteNameToIndex[referenceNoteName];
 			referenceNoteAccidentalId.currentIndex = accidentalToIndex[referenceNoteAccidental];
 		}

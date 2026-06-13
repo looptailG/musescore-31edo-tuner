@@ -42,7 +42,6 @@ MuseScore
 	width: childrenRect.width + 2 * defaultPadding;
 	height: childrenRect.height + 2 * defaultPadding;
 
-	property var referenceNoteRegex: /^\s*(A|B|C|D|E|F|G)\s*(bbb|bb|db|b|d||t|#|t#|x|#x)\s*$/i;
 	property variant noteNameToIndex: {
 		"A": 0,
 		"B": 1,
@@ -145,6 +144,32 @@ MuseScore
 			Logger.initialise(loggerId, parseInt(settings["LogLevel"]));
 			Logger.log(title + " - v" + version);
 
+			var referenceNoteRegex = "^\\s*(A|B|C|D|E|F|G)\\s*(";
+			referenceNoteRegex += AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["FLAT3"]];
+			referenceNoteRegex += "|";
+			referenceNoteRegex += AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["FLAT2"]];
+			referenceNoteRegex += "|";
+			referenceNoteRegex += AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["MIRRORED_FLAT2"]];
+			referenceNoteRegex += "|";
+			referenceNoteRegex += AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["FLAT"]];
+			referenceNoteRegex += "|";
+			referenceNoteRegex += AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["MIRRORED_FLAT"]];
+			referenceNoteRegex += "|";
+			// The accidental is not written in the configuration file if it is
+			// a natural.  For this reason, we account for an empty accidental
+			// in the regex.
+			referenceNoteRegex += "|";
+			referenceNoteRegex += AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["SHARP_SLASH"]];
+			referenceNoteRegex += "|";
+			referenceNoteRegex += AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["SHARP"]];
+			referenceNoteRegex += "|";
+			referenceNoteRegex += AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["SHARP_SLASH4"]];
+			referenceNoteRegex += "|";
+			referenceNoteRegex += AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["SHARP2"]];
+			referenceNoteRegex += "|";
+			referenceNoteRegex += AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["SHARP3"]];
+			referenceNoteRegex += ")\\s*$";
+			referenceNoteRegex = new RegExp(String.raw`${referenceNoteRegex}`, "i");
 			let referenceNoteMatch = settings["ReferenceNote"].match(referenceNoteRegex);
 			if (!referenceNoteMatch)
 			{
@@ -168,6 +193,7 @@ MuseScore
 			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["SHARP_SLASH4"]]] = 8;
 			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["SHARP2"]]] = 9;
 			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["SHARP3"]]] = 10;
+
 			referenceNoteNameId.currentIndex = noteNameToIndex[referenceNoteName];
 			referenceNoteAccidentalId.currentIndex = accidentalToIndex[referenceNoteAccidental];
 		}

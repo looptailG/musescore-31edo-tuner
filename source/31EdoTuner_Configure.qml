@@ -187,7 +187,10 @@ MuseScore
 			] = 2;
 			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["FLAT"]]] = 3;
 			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["MIRRORED_FLAT"]]] = 4;
-			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["NATURAL"]]] = 5;
+			// The accidental is not written in the configuration file if it is
+			// a natural.  For this reason, we map an empty string to the
+			// natural index in the drop-down menu.
+			accidentalToIndex[""] = 5;
 			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["SHARP_SLASH"]]] = 6;
 			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["SHARP"]]] = 7;
 			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["SHARP_SLASH4"]]] = 8;

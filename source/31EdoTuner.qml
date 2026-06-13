@@ -75,7 +75,7 @@ MuseScore
 			settings = SettingsIO.readTsvFile(settingsId);
 			
 			Logger.initialise(loggerId, parseInt(settings["LogLevel"]));
-			Logger.log("-- " + title + " -- Version " + version + " --");
+			Logger.log(title + " - v" + version);
 			
 			referenceNote = settings["ReferenceNote"];
 			Logger.log("Reference note set to: " + referenceNote);

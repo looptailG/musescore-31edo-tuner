@@ -144,7 +144,7 @@ MuseScore
 			Logger.initialise(loggerId, parseInt(settings["LogLevel"]));
 			Logger.log(title + " - v" + version);
 
-			var referenceNoteRegex = "^\\s*(A|B|C|D|E|F|G)\\s*(";
+			let referenceNoteRegex = "^\\s*(A|B|C|D|E|F|G)\\s*(";
 			referenceNoteRegex += AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["FLAT3"]];
 			referenceNoteRegex += "|";
 			referenceNoteRegex += AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["FLAT2"]];
@@ -179,7 +179,7 @@ MuseScore
 			let referenceNoteAccidental = referenceNoteMatch[2];
 			Logger.log("Reference note name: " + referenceNoteName + "; Accidental: " + referenceNoteAccidental);
 
-			var accidentalToIndex = {};
+			let accidentalToIndex = {};
 			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["FLAT3"]]] = 0;
 			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["FLAT2"]]] = 1;
 			accidentalToIndex[
@@ -222,8 +222,11 @@ MuseScore
 	{
 		try
 		{
-			let selectedNoteName = referenceNoteNameComboBox.currentText;
-			let selectedAccidental = unicodeToAscii[referenceNoteAccidentalComboBox.currentText];
+			let selectedNoteName = referenceNoteNameId.currentText;
+			let selectedAccidental = AccidentalUtils.UNICODE_TO_ASCII[referenceNoteAccidentalId.currentText];
+			selectedAccidental = selectedAccidental.replace(
+				AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["NATURAL"]], ""
+			);
 			let newReferenceNote = selectedNoteName + selectedAccidental;
 			Logger.log("Reference note set to: " + newReferenceNote);
 			settings["ReferenceNote"] = newReferenceNote;

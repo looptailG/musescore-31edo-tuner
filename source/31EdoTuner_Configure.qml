@@ -76,23 +76,19 @@ MuseScore
 			{
 				spacing: defaultPadding;
 
-				// The combo boxes use the old style elements, because I need to
-				// be able to set the font to the musical font, in order to use
-				// the proper SMuFL code points for the accidentals.
+				// The combo boxes for the reference note don't use the
+				// MuseScore specific GUI elements, because I need to be able to
+				// set the font to the musical font in order to use the proper
+				// SMuFL code points for the accidentals.
 
-				ComboBox
+				ReferenceNoteComboBox
 				{
 					id: referenceNoteNameId;
-					font: ui.theme.bodyFont;
+					comboBoxFont: ui.theme.bodyFont;
+					Layout.preferredWidth: 80;
+					Layout.preferredHeight: 30;
 
 					model: ["A", "B", "C", "D", "E", "F", "G"];
-
-					delegate: ItemDelegate
-					{
-						text: modelData;
-						font: ui.theme.bodyFont;
-						height: 30;
-					}
 
 					onActivated: function(index, value)
 					{
@@ -100,10 +96,12 @@ MuseScore
 					}
 				}
 
-				ComboBox
+				ReferenceNoteComboBox
 				{
 					id: referenceNoteAccidentalId;
-					font: ui.theme.musicalFont;
+					comboBoxFont: ui.theme.musicalFont;
+					Layout.preferredWidth: 80;
+					Layout.preferredHeight: 30;
 
 					model: [
 						AccidentalUtils.SMUFL_ACCIDENTALS["FLAT3"],
@@ -118,13 +116,6 @@ MuseScore
 						AccidentalUtils.SMUFL_ACCIDENTALS["SHARP2"],
 						AccidentalUtils.SMUFL_ACCIDENTALS["SHARP3"]
 					];
-
-					delegate: ItemDelegate
-					{
-						text: modelData;
-						font: ui.theme.musicalFont;
-						height: 30;
-					}
 
 					onActivated: function(index, value)
 					{

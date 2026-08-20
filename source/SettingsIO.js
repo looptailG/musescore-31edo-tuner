@@ -1,6 +1,6 @@
 /*
 	QML component for reading and writing configuration files.
-	Copyright (C) 2025 Alessandro Culatti
+	Copyright (C) 2025 - 2026 Alessandro Culatti
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -16,26 +16,31 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-const VERSION = "1.0.0";
+const VERSION = "1.1.1";
 
 /**
  * Read the input TSV file, and return its content as a dictionary, where the
  * keys are the content of keyColumn, and the values the content of valueColumn.
  */
-function readTsvFile(fileIO, keyColumn = 0, valueColumn = 1)
+function readTsvFile(fileIO, keyColumn = 0, valueColumn = 1, firstRowIsHeader = true)
 {
 	let settings = {};
-	
+
 	let fileContent = fileIO.read().split("\n");
 	for (let i = 0; i < fileContent.length; i++)
 	{
+		if (firstRowIsHeader && (i == 0))
+		{
+			continue;
+		}
+
 		if (fileContent[i])
 		{
 			let rowData = parseTsvRow(fileContent[i]);
 			settings[rowData[keyColumn]] = rowData[valueColumn];
 		}
 	}
-	
+
 	return settings;
 }
 
@@ -43,16 +48,24 @@ function readTsvFile(fileIO, keyColumn = 0, valueColumn = 1)
  * Write the content of the input dictionary to the specified TSV file.  The
  * keys will be written in column 0, and the values in column 1.
  */
-function writeTsvFile(settings, fileIO)
+function writeTsvFile(settings, fileIO, keyColumnName = "KEY", valueColumnName = "VALUE")
 {
-	let fileContent = "";
-	
+	let fileContent;
+	if (keyColumnName && valueColumnName)
+	{
+		fileContent = formatForTsv(keyColumnName) + "\t" + formatForTsv(valueColumnName) + "\n";
+	}
+	else
+	{
+		fileContent = "";
+	}
+
 	for (let key in settings)
 	{
 		let value = settings[key];
 		fileContent += formatForTsv(key.toString()) + "\t" + formatForTsv(value.toString()) + "\n";
 	}
-	
+
 	fileIO.write(fileContent);
 }
 
@@ -63,7 +76,7 @@ function writeTsvFile(settings, fileIO)
 function parseTsvRow(s)
 {
 	s = s.split("\t");
-	
+
 	// QML does not support lookbehind in regex, which would be necessary to
 	// properly unescape the characters, so we have to manually loop on the
 	// strings and check for escape characters.
@@ -83,19 +96,19 @@ function parseTsvRow(s)
 					case "\\":
 						unescapedString += "\\";
 						break;
-					
+
 					case "n":
 						unescapedString += "\n";
 						break;
-					
+
 					case "r":
 						unescapedString += "\r";
 						break;
-					
+
 					case "t":
 						unescapedString += "\t";
 						break;
-					
+
 					default:
 						throw "Invalid escape sequence: " + c + nextCharacter;
 				}
@@ -109,7 +122,7 @@ function parseTsvRow(s)
 		}
 		s[i] = unescapedString;
 	}
-	
+
 	return s;
 }
 

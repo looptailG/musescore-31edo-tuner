@@ -17,9 +17,13 @@
 */
 
 import QtQuick
+import QtQuick.Layouts
 import QtQuick.Controls
 import FileIO
+import Muse.Ui
+import Muse.UiComponents
 import MuseScore
+import "AccidentalUtils.js" as AccidentalUtils
 import "Logger.js" as Logger
 import "SettingsIO.js" as SettingsIO
 
@@ -29,42 +33,15 @@ MuseScore
 	description: "Configure the reference note for the 31EDO tuner."
 	categoryCode: "playback";
 	thumbnailName: "thumbnails/31Edo_Configure_Thumbnail.png";
-	version: "2.2.0";
-
+	version: "2.2.1";
 	pluginType: "dialog";
-	property var padding: 10;
-	// The height should not be too short, or the drop-down menus won't render
-	// properly.
-	height: Math.max(mainWindow.implicitHeight, 250) + 2 * padding;
 
 	property variant settings: {};
 
-	property var tripleFlat: "\uE266";
-	property var doubleFlat: "\uE264";
-	property var sesquiFlat: "\uE281";
-	// Naming this variable "flat" doesn't work properly, possibily because it's
-	// a reserved keyword.
-	property var flat_: "\uE260";
-	property var halfFlat: "\uE280";
-	property var natural: "\uE261";
-	property var halfSharp: "\uE282";
-	property var sharp: "\uE262";
-	property var sesquiSharp: "\uE283";
-	property var doubleSharp: "\uE263";
-	property var tripleSharp: "\uE265";
-	property variant unicodeToAscii: {
-		"\uE266": "bbb",
-		"\uE264": "bb",
-		"\uE281": "db",
-		"\uE260": "b",
-		"\uE280": "d",
-		"\uE261": "",
-		"\uE282": "t",
-		"\uE262": "#",
-		"\uE283": "t#",
-		"\uE263": "x",
-		"\uE265": "#x"
-	}
+	readonly property int defaultPadding: 10;
+	width: childrenRect.width + 2 * defaultPadding;
+	height: childrenRect.height + 2 * defaultPadding;
+
 	property variant noteNameToIndex: {
 		"A": 0,
 		"B": 1,
@@ -73,21 +50,7 @@ MuseScore
 		"E": 4,
 		"F": 5,
 		"G": 6
-	}
-	property variant accidentalToIndex: {
-		"bbb": 0,
-		"bb": 1,
-		"db": 2,
-		"b": 3,
-		"d": 4,
-		"": 5,
-		"t": 6,
-		"#": 7,
-		"t#": 8,
-		"x": 9,
-		"#x": 10
-	}
-	property var referenceNoteRegex: /^\s*(A|B|C|D|E|F|G)\s*(bbb|bb|db|b|d||t|#|t#|x|#x)\s*$/i;
+	};
 
 	FileIO
 	{
@@ -100,66 +63,64 @@ MuseScore
 		source: Qt.resolvedUrl(".").toString() + "Settings.tsv";
 	}
 
-	Column
+	ColumnLayout
 	{
-		id: mainWindow;
 		anchors.centerIn: parent;
-		spacing: padding;
+		spacing: defaultPadding;
 
-		Row
+		StyledGroupBox
 		{
-			spacing: padding;
-			anchors.horizontalCenter: parent.horizontalCenter;
-			anchors.top: parent.top;
-			anchors.topMargin: padding;
+			title: "Reference Note";
 
-			Text
+			RowLayout
 			{
-				text: "Reference Note: ";
-				font: ui.theme.bodyBoldFont;
-				color: ui.theme.fontPrimaryColor;
-				anchors.verticalCenter: parent.verticalCenter;
-			}
+				spacing: defaultPadding;
 
-			ComboBox
-			{
-				id: referenceNoteNameComboBox;
-				model: ["A", "B", "C", "D", "E", "F", "G"];
+				// The combo boxes for the reference note don't use the
+				// MuseScore specific GUI elements, because I need to be able to
+				// set the font to the musical font in order to use the proper
+				// SMuFL code points for the accidentals.
 
-				onActivated:
+				ReferenceNoteComboBox
 				{
-					onReferenceNoteChange();
-				}
-			}
+					id: referenceNoteNameId;
+					comboBoxFont: ui.theme.bodyFont;
+					Layout.preferredWidth: 80;
+					Layout.preferredHeight: 30;
 
-			ComboBox
-			{
-				id: referenceNoteAccidentalComboBox;
-				model: [
-					tripleFlat,
-					doubleFlat,
-					sesquiFlat,
-					flat_,
-					halfFlat,
-					natural,
-					halfSharp,
-					sharp,
-					sesquiSharp,
-					doubleSharp,
-					tripleSharp
-				];
-				font: ui.theme.musicalFont;
+					model: ["A", "B", "C", "D", "E", "F", "G"];
 
-				delegate: ItemDelegate
-				{
-					text: modelData;
-					font: ui.theme.musicalFont;
-					height: 30;
+					onActivated: function(index, value)
+					{
+						onReferenceNoteChange();
+					}
 				}
 
-				onActivated:
+				ReferenceNoteComboBox
 				{
-					onReferenceNoteChange();
+					id: referenceNoteAccidentalId;
+					comboBoxFont: ui.theme.musicalFont;
+					Layout.preferredWidth: 80;
+					Layout.preferredHeight: 30;
+
+					model: [
+						AccidentalUtils.SMUFL_ACCIDENTALS["FLAT3"],
+						AccidentalUtils.SMUFL_ACCIDENTALS["FLAT2"],
+						AccidentalUtils.SMUFL_ACCIDENTALS["MIRRORED_FLAT2"],
+						AccidentalUtils.SMUFL_ACCIDENTALS["FLAT"],
+						AccidentalUtils.SMUFL_ACCIDENTALS["MIRRORED_FLAT"],
+						AccidentalUtils.SMUFL_ACCIDENTALS["NATURAL"],
+						AccidentalUtils.SMUFL_ACCIDENTALS["SHARP_SLASH"],
+						AccidentalUtils.SMUFL_ACCIDENTALS["SHARP"],
+						AccidentalUtils.SMUFL_ACCIDENTALS["SHARP_SLASH4"],
+						AccidentalUtils.SMUFL_ACCIDENTALS["SHARP2"],
+						AccidentalUtils.SMUFL_ACCIDENTALS["SHARP3"]
+					];
+
+					onActivated: function(index, value)
+					{
+						onReferenceNoteChange();
+					}
 				}
 			}
 		}
@@ -169,10 +130,37 @@ MuseScore
 	{
 		settings = SettingsIO.readTsvFile(settingsId);
 
-		Logger.initialise(loggerId, parseInt(settings["LogLevel"]));
-
 		try
 		{
+			Logger.initialise(loggerId, parseInt(settings["LogLevel"]));
+			Logger.log(title + " - v" + version);
+
+			let referenceNoteRegex = "^\\s*(A|B|C|D|E|F|G)\\s*(";
+			referenceNoteRegex += AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["FLAT3"]];
+			referenceNoteRegex += "|";
+			referenceNoteRegex += AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["FLAT2"]];
+			referenceNoteRegex += "|";
+			referenceNoteRegex += AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["MIRRORED_FLAT2"]];
+			referenceNoteRegex += "|";
+			referenceNoteRegex += AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["FLAT"]];
+			referenceNoteRegex += "|";
+			referenceNoteRegex += AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["MIRRORED_FLAT"]];
+			referenceNoteRegex += "|";
+			// The accidental is not written in the configuration file if it is
+			// a natural.  For this reason, we account for an empty accidental
+			// in the regex.
+			referenceNoteRegex += "|";
+			referenceNoteRegex += AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["SHARP_SLASH"]];
+			referenceNoteRegex += "|";
+			referenceNoteRegex += AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["SHARP"]];
+			referenceNoteRegex += "|";
+			referenceNoteRegex += AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["SHARP_SLASH4"]];
+			referenceNoteRegex += "|";
+			referenceNoteRegex += AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["SHARP2"]];
+			referenceNoteRegex += "|";
+			referenceNoteRegex += AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["SHARP3"]];
+			referenceNoteRegex += ")\\s*$";
+			referenceNoteRegex = new RegExp(String.raw`${referenceNoteRegex}`, "i");
 			let referenceNoteMatch = settings["ReferenceNote"].match(referenceNoteRegex);
 			if (!referenceNoteMatch)
 			{
@@ -182,8 +170,26 @@ MuseScore
 			let referenceNoteAccidental = referenceNoteMatch[2];
 			Logger.log("Reference note name: " + referenceNoteName + "; Accidental: " + referenceNoteAccidental);
 
-			referenceNoteNameComboBox.currentIndex = noteNameToIndex[referenceNoteName];
-			referenceNoteAccidentalComboBox.currentIndex = accidentalToIndex[referenceNoteAccidental];
+			let accidentalToIndex = {};
+			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["FLAT3"]]] = 0;
+			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["FLAT2"]]] = 1;
+			accidentalToIndex[
+				AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["MIRRORED_FLAT2"]]
+			] = 2;
+			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["FLAT"]]] = 3;
+			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["MIRRORED_FLAT"]]] = 4;
+			// The accidental is not written in the configuration file if it is
+			// a natural.  For this reason, we map an empty string to the
+			// natural index in the drop-down menu.
+			accidentalToIndex[""] = 5;
+			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["SHARP_SLASH"]]] = 6;
+			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["SHARP"]]] = 7;
+			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["SHARP_SLASH4"]]] = 8;
+			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["SHARP2"]]] = 9;
+			accidentalToIndex[AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["SHARP3"]]] = 10;
+
+			referenceNoteNameId.currentIndex = noteNameToIndex[referenceNoteName];
+			referenceNoteAccidentalId.currentIndex = accidentalToIndex[referenceNoteAccidental];
 		}
 		catch (error)
 		{
@@ -207,8 +213,11 @@ MuseScore
 	{
 		try
 		{
-			let selectedNoteName = referenceNoteNameComboBox.currentText;
-			let selectedAccidental = unicodeToAscii[referenceNoteAccidentalComboBox.currentText];
+			let selectedNoteName = referenceNoteNameId.currentText;
+			let selectedAccidental = AccidentalUtils.UNICODE_TO_ASCII[referenceNoteAccidentalId.currentText];
+			selectedAccidental = selectedAccidental.replace(
+				AccidentalUtils.UNICODE_TO_ASCII[AccidentalUtils.SMUFL_ACCIDENTALS["NATURAL"]], ""
+			);
 			let newReferenceNote = selectedNoteName + selectedAccidental;
 			Logger.log("Reference note set to: " + newReferenceNote);
 			settings["ReferenceNote"] = newReferenceNote;

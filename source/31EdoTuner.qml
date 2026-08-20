@@ -33,7 +33,7 @@ MuseScore
 	description: "Retune the selection, or the whole score if nothing is selected, to 31EDO.";
 	categoryCode: "playback";
 	thumbnailName: "thumbnails/31Edo_Tuner_Thumbnail.png";
-	version: "2.2.0";
+	version: "2.2.1";
 	
 	property variant settings: {};
 
@@ -75,7 +75,7 @@ MuseScore
 			settings = SettingsIO.readTsvFile(settingsId);
 			
 			Logger.initialise(loggerId, parseInt(settings["LogLevel"]));
-			Logger.log("-- " + title + " -- Version " + version + " --");
+			Logger.log(title + " - v" + version);
 			
 			referenceNote = settings["ReferenceNote"];
 			Logger.log("Reference note set to: " + referenceNote);

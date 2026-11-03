@@ -79,115 +79,98 @@ function iterate(curScore, actions, logger)
 			logger.trace("Iterating only on staffs: " + startStaff + " - " + endStaff);
 		}
 
-		// Iterate on the score.
+		// Iterate on the score.  Segments are walked directly, rather than
+		// with one cursor pass per voice, so that every voice sees the same
+		// staff-wide context (annotations, measure starts, accidentals) in
+		// time order.
+		let voices = [0, 1, 2, 3].filter(v => !voicesFilter || voicesFilter.includes(v));
 		for (let staff = startStaff; staff <= endStaff; staff++)
 		{
-			for (let voice = 0; voice < 4; voice++)
+			logger.log("Staff: " + staff);
+			let staffTrack = 4 * staff;
+
+			if (onStaffStart)
 			{
-				if (voicesFilter)
+				onStaffStart();
+			}
+
+			for (let measure = curScore.firstMeasure; measure; measure = measure.nextMeasure)
+			{
+				if (measure.firstSegment.tick > endTick)
 				{
-					if (!voicesFilter.includes(voice))
+					break;
+				}
+				if (measure.lastSegment.tick < startTick)
+				{
+					continue;
+				}
+
+				if (onNewMeasure)
+				{
+					onNewMeasure();
+				}
+
+				if (onLayoutBreak)
+				{
+					for (let e of measure.elements)
 					{
-						logger.trace("Skipping voice: " + voice);
+						// TODO: improve this check.
+						if (e.name.toLowerCase() === "layoutbreak")
+						{
+							onLayoutBreak(e);
+						}
+					}
+				}
+
+				for (let segment = measure.firstSegment; segment; segment = segment.nextInMeasure)
+				{
+					if (segment.tick < startTick)
+					{
 						continue;
 					}
-				}
-
-				logger.log("Staff: " + staff + "; Voice: " + voice);
-
-				cursor.voice = voice;
-				cursor.staffIdx = staff;
-				cursor.filter = Segment.All;
-
-				if (onStaffStart)
-				{
-					onStaffStart();
-				}
-
-				if (startTick === 0)
-				{
-					// This is necessary in case nothing is selected before
-					// running the plugin, in which case SELECTION_START is not
-					// initialised.
-					cursor.rewind(Cursor.SCORE_START);
-				}
-				else
-				{
-					cursor.rewind(Cursor.SELECTION_START);
-				}
-
-				// The first tick of the current measure.  Used to prevent
-				// duplicate calls to onNewMeasure() in case there are multiple
-				// elements on the first tick of a measure.
-				var measureStartTick = null;
-
-				// Loop on the elements of the current staff.
-				while (cursor.segment && (cursor.tick <= endTick))
-				{
-					if (onNewMeasure || onLayoutBreak)
+					if (segment.tick > endTick)
 					{
+						break;
+					}
+
+					let staffElement = segment.elementAt(staffTrack);
+					if (staffElement)
+					{
+						if (onClef && (staffElement.type === Element.CLEF))
+						{
+							onClef(staffElement);
+						}
+
+						if (onKeySignature && (staffElement.type === Element.KEYSIG))
+						{
+							onKeySignature(staffElement);
+						}
+
+						if (onTimeSignature && (staffElement.type === Element.TIMESIG))
+						{
+							onTimeSignature(staffElement);
+						}
+
 						if (
-							(cursor.segment.tick !== measureStartTick)
-							&& (cursor.segment.tick === cursor.measure.firstSegment.tick)
+							onBarLine
+							&& (staffElement.type === Element.BAR_LINE)
+							&& !(skipSystemStartBarLine && (segment.segmentType === Segment.BeginBarLine))
 						) {
-							measureStartTick = cursor.measure.firstSegment.tick;
-
-							if (onNewMeasure)
-							{
-								onNewMeasure();
-							}
-
-							if (onLayoutBreak)
-							{
-								for (let e of cursor.measure.elements)
-								{
-									// TODO: improve this check.
-									if (e.name.toLowerCase() === "layoutbreak")
-									{
-										onLayoutBreak(e);
-									}
-								}
-							}
-						}
-					}
-
-					if (onClef)
-					{
-						if (cursor.element && (cursor.element.type === Element.CLEF))
-						{
-							onClef(cursor.element);
-						}
-					}
-
-					if (onKeySignature)
-					{
-						if (cursor.element && (cursor.element.type === Element.KEYSIG))
-						{
-							onKeySignature(cursor.element);
-						}
-					}
-
-					if (onTimeSignature)
-					{
-						if (cursor.element && (cursor.element.type === Element.TIMESIG))
-						{
-							onTimeSignature(cursor.element);
+							onBarLine(staffElement);
 						}
 					}
 
 					if (onAnnotation)
 					{
-						for (let i = 0; i < cursor.segment.annotations.length; i++)
+						for (let i = 0; i < segment.annotations.length; i++)
 						{
-							let annotation = cursor.segment.annotations[i];
+							let annotation = segment.annotations[i];
 							if (staffTextOnCurrentStaffOnly && (annotation.type === Element.STAFF_TEXT))
 							{
-								// Call onAnnotation() only if the staff text is
-								// for the current staff.
 								let annotationPart = annotation.staff.part;
 								if (!(
-									(4 * staff >= annotationPart.startTrack)
-									&& (4 * staff < annotationPart.endTrack)
+									(staffTrack >= annotationPart.startTrack)
+									&& (staffTrack < annotationPart.endTrack)
 								)) {
 									continue;
 								}
@@ -197,18 +180,24 @@ function iterate(curScore, actions, logger)
 						}
 					}
 
-					if (onChord || onNote)
+					for (let voice of voices)
 					{
-						if (cursor.element && (cursor.element.type === Element.CHORD))
+						let element = segment.elementAt(staffTrack + voice);
+						if (!element)
+						{
+							continue;
+						}
+
+						if (element.type === Element.CHORD)
 						{
 							if (onChord)
 							{
-								onChord(cursor.element);
+								onChord(element);
 							}
 
 							if (onNote)
 							{
-								let graceChords = cursor.element.graceNotes;
+								let graceChords = element.graceNotes;
 								for (let i = 0; i < graceChords.length; i++)
 								{
 									let notes = graceChords[i].notes;
@@ -218,48 +207,24 @@ function iterate(curScore, actions, logger)
 									}
 								}
 
-								let notes = cursor.element.notes;
+								let notes = element.notes;
 								for (let i = 0; i < notes.length; i++)
 								{
 									onNote(notes[i]);
 								}
 							}
 						}
-					}
-
-					if (onRest)
-					{
-						if (cursor.element && (cursor.element.type === Element.REST))
+						else if (onRest && (element.type === Element.REST))
 						{
-							onRest(cursor.element);
+							onRest(element);
 						}
 					}
-
-					if (onBarLine)
-					{
-						if (cursor.element && (cursor.element.type === Element.BAR_LINE))
-						{
-							if (skipSystemStartBarLine)
-							{
-								if (cursor.segment && (cursor.segment.segmentType !== Segment.BeginBarLine))
-								{
-									onBarLine(cursor.element);
-								}
-							}
-							else
-							{
-								onBarLine(cursor.element);
-							}
-						}
-					}
-
-					cursor.next();
 				}
+			}
 
-				if (onStaffEnd)
-				{
-					onStaffEnd();
-				}
+			if (onStaffEnd)
+			{
+				onStaffEnd();
 			}
 		}
 	}
